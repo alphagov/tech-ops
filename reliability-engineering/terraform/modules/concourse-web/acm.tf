@@ -19,7 +19,7 @@ resource "aws_route53_record" "concourse_public_deployment_cert_validation" {
   ttl = 60
 }
 
-resource "aws_acm_certificate_validation" "concourse_web" {
+resource "aws_acm_certificate_validation" "concourse_public_deployment" {
   certificate_arn         = "${aws_acm_certificate.concourse_public_deployment.arn}"
   validation_record_fqdns = ["${aws_route53_record.concourse_public_deployment_cert_validation.fqdn}"]
 }

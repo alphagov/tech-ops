@@ -23,7 +23,7 @@ resource "aws_lb_listener" "concourse_web_https" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2015-05"
-  certificate_arn   = "${aws_acm_certificate.concourse_public_deployment.arn}"
+  certificate_arn   = "${aws_acm_certificate_validation.concourse_public_deployment.certificate_arn}"
 
   default_action {
     type             = "forward"
