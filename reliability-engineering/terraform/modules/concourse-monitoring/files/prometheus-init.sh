@@ -47,7 +47,7 @@ scrape_configs:
     ec2_sd_configs:
       - region: eu-west-2
         refresh_interval: 30s
-        port: 9100
+        port: 9090
     relabel_configs:
       - source_labels: [__meta_ec2_tag_Name]
         regex: '^${deployment}-concourse-prometheus$'
@@ -55,11 +55,21 @@ scrape_configs:
       - source_labels: [__meta_ec2_instance_id]
         target_label: instance
 
-  - job_name: concourse_web
+  - job_name: concourse_node_exporter
     ec2_sd_configs:
       - region: eu-west-2
         refresh_interval: 30s
         port: 9100
+    relabel_configs:
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_tag_Team]
+        target_label: team
+
+  - job_name: concourse_web
+    ec2_sd_configs:
       - region: eu-west-2
         refresh_interval: 30s
         port: 9101
@@ -67,27 +77,6 @@ scrape_configs:
       - source_labels: [__meta_ec2_tag_Name]
         regex: '^${deployment}-concourse-web$'
         action: keep
-      - source_labels: [__meta_ec2_instance_id]
-        target_label: instance
-
-  - job_name: concourse_worker
-    ec2_sd_configs:
-      - region: eu-west-2
-        refresh_interval: 30s
-        port: 9100
-    relabel_configs:
-      - source_labels: [__meta_ec2_tag_Name]
-        regex: '^${deployment}-.*-concourse-worker$'
-        action: keep
-      - source_labels: [__meta_ec2_instance_id]
-        target_label: instance
-
-  - job_name: concourse_all
-    ec2_sd_configs:
-      - region: eu-west-2
-        refresh_interval: 30s
-        port: 9100
-    relabel_configs:
       - source_labels: [__meta_ec2_instance_id]
         target_label: instance
 EOF

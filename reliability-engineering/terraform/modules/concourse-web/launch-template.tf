@@ -56,6 +56,7 @@ resource "aws_launch_template" "concourse_web" {
     tags = {
       Name       = "${var.deployment}-concourse-web"
       Deployment = "${var.deployment}"
+      Role       = "concourse-web"
     }
   }
 

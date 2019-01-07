@@ -43,6 +43,7 @@ resource "aws_instance" "concourse_prometheus" {
   tags {
     Name       = "${var.deployment}-concourse-prometheus"
     Deployment = "${var.deployment}"
+    Role       = "prometheus"
   }
 }
 

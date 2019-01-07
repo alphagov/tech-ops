@@ -49,6 +49,7 @@ resource "aws_launch_template" "concourse_grafana" {
     tags = {
       Name       = "${var.deployment}-concourse-grafana"
       Deployment = "${var.deployment}"
+      Role       = "grafana"
     }
   }
 

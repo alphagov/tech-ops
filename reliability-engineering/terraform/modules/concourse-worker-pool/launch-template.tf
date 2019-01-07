@@ -17,7 +17,7 @@ data "template_file" "concourse_worker_cloud_init" {
     deployment       = "${var.deployment}"
     worker_team_name = "${var.name}"
 
-    concourse_host     = "${local.concourse_url}"
+    concourse_host    = "${local.concourse_url}"
     concourse_version = "v4.2.2"
     concourse_sha1    = "c40f1b97bd45b9d52962616562bf6ff77731b542  concourse_linux_amd64"
   }
@@ -56,6 +56,8 @@ resource "aws_launch_template" "concourse_worker" {
     tags = {
       Name       = "${var.deployment}-${var.name}-concourse-worker"
       Deployment = "${var.deployment}"
+      Role       = "concourse-worker"
+      Team       = "${var.name}"
     }
   }
 
