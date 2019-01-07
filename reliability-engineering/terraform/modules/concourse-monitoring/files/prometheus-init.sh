@@ -72,7 +72,7 @@ scrape_configs:
     ec2_sd_configs:
       - region: eu-west-2
         refresh_interval: 30s
-        port: 9101
+        port: 9391
     relabel_configs:
       - source_labels: [__meta_ec2_tag_Name]
         regex: '^${deployment}-concourse-web$'

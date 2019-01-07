@@ -188,20 +188,29 @@ module "concourse_worker_base_can_talk_to_concourse_elb_over_2222" {
   to_port           = 65535
 }
 
-module "concourse_prometheus_can_talk_to_concourse_web_over_exporter_ports" {
+module "concourse_prometheus_can_talk_to_concourse_web_over_9100" {
   source = "../sg-access-pair"
 
   source_sg_id      = "${aws_security_group.concourse_prometheus.id}"
   destination_sg_id = "${aws_security_group.concourse_web.id}"
   from_port         = 9100
-  to_port           = 9101
+  to_port           = 9100
 }
 
-module "concourse_prometheus_can_talk_to_concourse_worker_base_over_exporter_ports" {
+module "concourse_prometheus_can_talk_to_concourse_web_over_9391" {
+  source = "../sg-access-pair"
+
+  source_sg_id      = "${aws_security_group.concourse_prometheus.id}"
+  destination_sg_id = "${aws_security_group.concourse_web.id}"
+  from_port         = 9391
+  to_port           = 9391
+}
+
+module "concourse_prometheus_can_talk_to_concourse_worker_base_over_9100" {
   source = "../sg-access-pair"
 
   source_sg_id      = "${aws_security_group.concourse_prometheus.id}"
   destination_sg_id = "${aws_security_group.concourse_worker_base.id}"
   from_port         = 9100
-  to_port           = 9101
+  to_port           = 9100
 }

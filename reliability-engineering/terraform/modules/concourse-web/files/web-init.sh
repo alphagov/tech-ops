@@ -90,7 +90,7 @@ ExecStart=/usr/local/bin/concourse web \
   --main-team-github-team ${main_team_github_team} \
   \
   --prometheus-bind-ip   0.0.0.0 \
-  --prometheus-bind-port 9101    \
+  --prometheus-bind-port 9391    \
   \
   --peer-url http://$${local_ip}:8080 \
 
