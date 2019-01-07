@@ -1,0 +1,70 @@
+[
+  {
+    "essential": true,
+    "image": "grafana/grafana:5.4.2",
+    "memory": 1024,
+    "name": "grafana",
+    "portMappings": [
+      {
+        "containerPort": 3000,
+        "hostPort": 8080
+      }
+    ],
+    "environment": [
+      {
+        "name": "GF_SERVER_ROOT_URL",
+        "value": "${grafana_url}"
+      },
+      {
+        "name": "GF_DATABASE_TYPE",
+        "value": "postgres"
+      },
+      {
+        "name": "GF_DATABASE_HOST",
+        "value": "${database_host}"
+      },
+      {
+        "name": "GF_DATABASE_NAME",
+        "value": "grafana"
+      },
+      {
+        "name": "GF_DATABASE_USER",
+        "value": "grafana"
+      },
+      {
+        "name": "GF_AUTH_GITHUB_ENABLED",
+        "value": "true"
+      },
+      {
+        "name": "GF_AUTH_ALLOW_SIGN_UP",
+        "value": "true"
+      },
+      {
+        "name": "GF_AUTH_GITHUB_TEAM_IDS",
+        "value": "${github_team_ids}"
+      },
+      {
+        "name": "GF_EXPLORE_ENABLED",
+        "value": "true"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "GF_DATABASE_PASSWORD",
+        "valueFrom": "arn:aws:ssm:eu-west-2:${aws_account_id}:parameter/${deployment}/grafana/db-password"
+      },
+      {
+        "name": "GF_AUTH_GITHUB_CLIENT_ID",
+        "valueFrom": "arn:aws:ssm:eu-west-2:${aws_account_id}:parameter/${deployment}/grafana/github-client-id"
+      },
+      {
+        "name": "GF_AUTH_GITHUB_CLIENT_SECRET",
+        "valueFrom": "arn:aws:ssm:eu-west-2:${aws_account_id}:parameter/${deployment}/grafana/github-client-secret"
+      },
+      {
+        "name": "GF_SECURITY_ADMIN_PASSWORD",
+        "valueFrom": "arn:aws:ssm:eu-west-2:${aws_account_id}:parameter/${deployment}/grafana/grafana-admin-password"
+      }
+    ]
+  }
+]
