@@ -138,8 +138,8 @@ resource "aws_db_instance" "concourse_grafana_db" {
   storage_encrypted         = true
 }
 
-data "template_file" "concourse_grafana_task_def" {
-  template = "${file("${path.module}/files/grafana-task.json")}"
+data "template_file" "concourse_grafana_container_def" {
+  template = "${file("${path.module}/files/grafana-container-def.json")}"
 
   vars {
     deployment      = "${var.deployment}"
@@ -152,7 +152,7 @@ data "template_file" "concourse_grafana_task_def" {
 
 resource "aws_ecs_task_definition" "concourse_grafana_task_def" {
   family                = "${var.deployment}-concourse-grafana"
-  container_definitions = "${data.template_file.concourse_grafana_task_def.rendered}"
+  container_definitions = "${data.template_file.concourse_grafana_container_def.rendered}"
   execution_role_arn    = "${aws_iam_role.concourse_grafana_execution.arn}"
 }
 
