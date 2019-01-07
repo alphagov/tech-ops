@@ -16,7 +16,7 @@ resource "aws_lb_listener" "concourse_monitoring_https" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2015-05"
-  certificate_arn   = "${aws_acm_certificate.concourse_monitoring.arn}"
+  certificate_arn   = "${aws_acm_certificate_validation.concourse_web.certificate_arn}"
 
   default_action {
     type = "fixed-response"
