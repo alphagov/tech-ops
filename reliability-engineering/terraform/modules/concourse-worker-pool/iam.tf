@@ -70,6 +70,10 @@ resource "aws_iam_policy" "concourse_worker_base" {
           "kms:Decrypt"
         ],
         "Resource": "${var.kms_key_arn}"
+      }, {
+        "Effect": "Allow",
+        "Action": ["sts:AssumeRole"],
+        "Resource": "*"
       }
     ]
   }
