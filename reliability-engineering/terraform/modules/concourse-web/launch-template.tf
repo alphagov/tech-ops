@@ -20,6 +20,9 @@ data "template_file" "concourse_web_cloud_init" {
     concourse_db_url         = "${aws_route53_record.concourse_private_db.fqdn}"
     concourse_version        = "v4.2.2"
     concourse_sha1           = "c40f1b97bd45b9d52962616562bf6ff77731b542  concourse_linux_amd64"
+
+    concourse_web_bucket      = "${aws_s3_bucket.concourse_web.bucket}"
+    worker_keys_s3_object_key = "${aws_s3_bucket_object.concourse_web_authorized_worker_keys.id}"
   }
 }
 

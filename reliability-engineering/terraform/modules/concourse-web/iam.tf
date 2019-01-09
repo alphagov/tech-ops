@@ -63,6 +63,34 @@ resource "aws_iam_policy" "concourse_web" {
           "${aws_kms_key.concourse_web.arn}",
           "${aws_kms_key.concourse_worker_shared.arn}"
         ]
+      }, {
+        "Effect": "Allow",
+        "Action": [
+          "s3:AbortMultipartUpload",
+          "s3:DeleteObject",
+          "s3:DeleteObjectTagging",
+          "s3:DeleteObjectVersion",
+          "s3:DeleteObjectVersionTagging",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:GetObjectTagging",
+          "s3:GetObjectTorrent",
+          "s3:GetObjectVersion",
+          "s3:GetObjectVersionAcl",
+          "s3:GetObjectVersionTagging",
+          "s3:GetObjectVersionTorrent",
+          "s3:ListMultipartUploadParts",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:PutObjectTagging",
+          "s3:PutObjectVersionAcl",
+          "s3:PutObjectVersionTagging",
+          "s3:RestoreObject"
+        ],
+        "Resource": [
+          "${aws_s3_bucket.concourse_web.arn}",
+          "${aws_s3_bucket.concourse_web.arn}/*"
+        ]
       }
     ]
   }
