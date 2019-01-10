@@ -55,11 +55,21 @@ resource "aws_iam_policy" "concourse_worker_base" {
           "ssm:GetParameter",
           "ssm:GetParameters",
           "ssm:GetParametersByPath",
-          "ssm:DeleteParameter"
+          "ssm:DeleteParameter",
+          "ssm:PutParameter"
         ],
         "Effect": "Allow",
         "Resource": [
           "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.account.account_id}:parameter/${var.deployment}/concourse/pipelines/${var.name}/*"
+        ]
+      }, {
+        "Action": [
+          "ssm:DeleteParameter",
+          "ssm:PutParameter"
+        ],
+        "Effect": "Deny",
+        "Resource": [
+          "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.account.account_id}:parameter/${var.deployment}/concourse/pipelines/${var.name}/readonly_*"
         ]
       }, {
         "Effect": "Allow",
@@ -73,6 +83,60 @@ resource "aws_iam_policy" "concourse_worker_base" {
       }, {
         "Effect": "Allow",
         "Action": ["sts:AssumeRole"],
+        "Resource": "*"
+      }, {
+        "Effect": "Allow",
+        "Action": [
+          "s3:AbortMultipartUpload",
+          "s3:DeleteObject",
+          "s3:DeleteObjectTagging",
+          "s3:DeleteObjectVersion",
+          "s3:DeleteObjectVersionTagging",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:GetObjectTagging",
+          "s3:GetObjectTorrent",
+          "s3:GetObjectVersion",
+          "s3:GetObjectVersionAcl",
+          "s3:GetObjectVersionTagging",
+          "s3:GetObjectVersionTorrent",
+          "s3:ListMultipartUploadParts",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:PutObjectTagging",
+          "s3:PutObjectVersionAcl",
+          "s3:PutObjectVersionTagging",
+          "s3:RestoreObject",
+          "s3:ListBucket",
+          "s3:ListBucketVersions"
+        ],
+        "Resource": [
+          "${aws_s3_bucket.concourse_worker_private.arn}",
+          "${aws_s3_bucket.concourse_worker_private.arn}/*",
+          "${aws_s3_bucket.concourse_worker_public.arn}",
+          "${aws_s3_bucket.concourse_worker_public.arn}/*"
+        ]
+      }, {
+        "Effect": "Deny",
+        "Action": [
+          "s3:DeleteObject",
+          "s3:DeleteObjectTagging",
+          "s3:DeleteObjectVersion",
+          "s3:DeleteObjectVersionTagging",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:PutObjectTagging",
+          "s3:PutObjectVersionAcl",
+          "s3:PutObjectVersionTagging",
+          "s3:RestoreObject"
+        ],
+        "Resource": [
+          "${aws_s3_bucket.concourse_worker_private.arn}/readonly/*",
+          "${aws_s3_bucket.concourse_worker_public.arn}/readonly/*"
+        ]
+      }, {
+        "Effect": "Allow",
+        "Action": ["ecr:GetAuthorizationToken"],
         "Resource": "*"
       }
     ]

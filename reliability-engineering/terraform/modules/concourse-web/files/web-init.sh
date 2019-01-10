@@ -43,10 +43,9 @@ postgres_password="$(
   | jq -r .Parameter.Value
 )"
 
-aws ssm get-parameter \
-  --name /${deployment}/concourse/web/authorised_worker_keys \
-  --with-decryption \
-| jq -r .Parameter.Value > /opt/concourse/keys/workers
+aws s3 cp \
+          s3://${concourse_web_bucket}/${worker_keys_s3_object_key} \
+          /opt/concourse/keys/workers
 
 aws ssm get-parameter \
   --name /${deployment}/concourse/web/ssh_key \

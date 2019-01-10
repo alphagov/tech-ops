@@ -96,10 +96,6 @@ resource "aws_ssm_parameter" "concourse_worker_ssh_private_keys" {
     count.index
   )}"
 
-  lifecycle {
-    ignore_changes = ["value"]
-  }
-
   tags = {
     Deployment = "${var.deployment}"
   }
@@ -146,18 +142,6 @@ resource "aws_ssm_parameter" "concourse_web_session_key" {
   }
 }
 
-resource "aws_ssm_parameter" "concourse_web_authorized_worker_keys" {
-  name        = "/${var.deployment}/concourse/web/authorised_worker_keys"
-  type        = "SecureString"
-  description = "Authorised worker public keys in OpenSSH format"
-  value       = "${local.concourse_worker_openssh_public_keys}"
-  key_id      = "${aws_kms_key.concourse_web.id}"
-
-  tags = {
-    Deployment = "${var.deployment}"
-  }
-}
-
 resource "aws_ssm_parameter" "concourse_web_db_password" {
   name        = "/${var.deployment}/concourse/web/db_password"
   type        = "SecureString"
@@ -168,4 +152,11 @@ resource "aws_ssm_parameter" "concourse_web_db_password" {
   tags = {
     Deployment = "${var.deployment}"
   }
+}
+
+resource "aws_s3_bucket_object" "concourse_web_authorized_worker_keys" {
+  bucket  = "${aws_s3_bucket.concourse_web.bucket}"
+  key     = "authorized_worker_keys"
+  content = "${local.concourse_worker_openssh_public_keys}"
+  etag    = "${md5(local.concourse_worker_openssh_public_keys)}"
 }
