@@ -117,3 +117,43 @@ resource "aws_ssm_parameter" "concourse_worker_private_ecr_repo_registry_id" {
     Deployment = "${var.deployment}"
   }
 }
+
+resource "aws_ssm_parameter" "concourse_worker_team_name" {
+  name = "/${var.deployment}/concourse/pipelines/${var.name}/readonly_team_name"
+
+  type        = "String"
+  description = "Team name for ${var.deployment}/${var.name}"
+  value       = "${var.name}"
+
+  tags = {
+    Deployment = "${var.deployment}"
+  }
+}
+
+resource "aws_ssm_parameter" "concourse_worker_secrets_path_prefix" {
+  name = "/${var.deployment}/concourse/pipelines/${var.name}/readonly_secrets_path_prefix"
+
+  type        = "String"
+  description = "Secrets path prefix for ${var.deployment}/${var.name}"
+  value       = "/${var.deployment}/concourse/pipelines/${var.name}"
+
+  tags = {
+    Deployment = "${var.deployment}"
+  }
+}
+
+data "aws_kms_key" "worker_shared_key" {
+  key_id = "${var.kms_key_arn}"
+}
+
+resource "aws_ssm_parameter" "concourse_worker_secrets_kms_key_id" {
+  name = "/${var.deployment}/concourse/pipelines/${var.name}/readonly_secrets_kms_key_id"
+
+  type        = "String"
+  description = "KMS key id for ${var.deployment}/${var.name}"
+  value       = "${data.aws_kms_key.worker_shared_key.id}"
+
+  tags = {
+    Deployment = "${var.deployment}"
+  }
+}
