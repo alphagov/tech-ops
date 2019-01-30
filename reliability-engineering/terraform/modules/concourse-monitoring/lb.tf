@@ -72,10 +72,11 @@ resource "aws_lb_listener_rule" "concourse_prometheus" {
 }
 
 resource "aws_lb_target_group" "concourse_grafana" {
-  name     = "${var.deployment}-concourse-grafana"
-  port     = 8080
-  protocol = "HTTP"
-  vpc_id   = "${var.vpc_id}"
+  name        = "${var.deployment}-concourse-grafana"
+  port        = 8080
+  protocol    = "HTTP"
+  vpc_id      = "${var.vpc_id}"
+  target_type = "ip"
 
   health_check {
     healthy_threshold   = 2
@@ -89,7 +90,7 @@ resource "aws_lb_target_group" "concourse_grafana" {
 
 resource "aws_lb_listener_rule" "concourse_grafana" {
   listener_arn = "${aws_lb_listener.concourse_monitoring_https.arn}"
-  priority     = 101
+  priority     = 110
 
   action {
     type             = "forward"

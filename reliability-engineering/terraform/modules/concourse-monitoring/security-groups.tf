@@ -60,13 +60,13 @@ module "concourse_monitoring_lb_can_talk_to_concourse_prometheus_over_9090" {
   to_port           = 9090
 }
 
-module "concourse_monitoring_lb_can_talk_to_concourse_grafana_over_8080" {
+module "concourse_monitoring_lb_can_talk_to_concourse_grafana_over_3000" {
   source = "../sg-access-pair"
 
   source_sg_id      = "${aws_security_group.concourse_monitoring_lb.id}"
   destination_sg_id = "${aws_security_group.concourse_grafana.id}"
-  from_port         = 8080
-  to_port           = 8080
+  from_port         = 3000
+  to_port           = 3000
 }
 
 module "concourse_grafana_can_talk_to_concourse_prometheus_over_9090" {

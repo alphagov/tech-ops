@@ -7,93 +7,6 @@ resource "aws_kms_alias" "concourse_grafana" {
   target_key_id = "${aws_kms_key.concourse_grafana.key_id}"
 }
 
-data "template_file" "concourse_grafana_cloud_init" {
-  template = "${file("${path.module}/files/grafana-init.sh")}"
-
-  vars {
-    deployment       = "${var.deployment}"
-    vpc_dns_resolver = "${local.vpc_dns_resolver}"
-  }
-}
-
-resource "aws_launch_template" "concourse_grafana" {
-  name_prefix            = "${var.deployment}-concourse-grafana-"
-  ebs_optimized          = true
-  image_id               = "${data.aws_ami.ubuntu_bionic.id}"
-  instance_type          = "${var.grafana_instance_type}"
-  vpc_security_group_ids = ["${aws_security_group.concourse_grafana.id}"]
-
-  user_data = "${
-    base64encode(data.template_file.concourse_grafana_cloud_init.rendered)
-  }"
-
-  block_device_mappings {
-    device_name = "/dev/sda1"
-
-    ebs {
-      volume_size = 20
-    }
-  }
-
-  iam_instance_profile {
-    name = "${aws_iam_instance_profile.concourse_grafana.name}"
-  }
-
-  monitoring {
-    enabled = true
-  }
-
-  tag_specifications {
-    resource_type = "instance"
-
-    tags = {
-      Name       = "${var.deployment}-concourse-grafana"
-      Deployment = "${var.deployment}"
-      Role       = "grafana"
-    }
-  }
-
-  tag_specifications {
-    resource_type = "volume"
-
-    tags = {
-      Name       = "${var.deployment}-concourse-grafana"
-      Deployment = "${var.deployment}"
-    }
-  }
-
-  tags {
-    Deployment = "${var.deployment}"
-  }
-}
-
-resource "aws_autoscaling_group" "concourse_grafana" {
-  name = "${join("-", list(
-    "${aws_launch_template.concourse_grafana.id}",
-    "${aws_launch_template.concourse_grafana.latest_version}"
-  ))}"
-
-  max_size            = 2
-  min_size            = 0
-  desired_capacity    = 1
-  vpc_zone_identifier = ["${var.private_subnet_ids}"]
-
-  launch_template = {
-    id      = "${aws_launch_template.concourse_grafana.id}"
-    version = "$$Latest"
-  }
-
-  tag {
-    key                 = "Deployment"
-    value               = "${var.deployment}"
-    propagate_at_launch = true
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "random_string" "concourse_grafana_db_password" {
   length  = 64
   special = false
@@ -152,15 +65,20 @@ data "template_file" "concourse_grafana_container_def" {
 }
 
 resource "aws_ecs_task_definition" "concourse_grafana_task_def" {
-  family                = "${var.deployment}-concourse-grafana"
-  container_definitions = "${data.template_file.concourse_grafana_container_def.rendered}"
-  execution_role_arn    = "${aws_iam_role.concourse_grafana_execution.arn}"
+  family                   = "${var.deployment}-concourse-grafana"
+  container_definitions    = "${data.template_file.concourse_grafana_container_def.rendered}"
+  execution_role_arn       = "${aws_iam_role.concourse_grafana_execution.arn}"
+  network_mode             = "awsvpc"
+  cpu                      = 2048
+  memory                   = 4096
+  requires_compatibilities = ["FARGATE"]
 }
 
 resource "aws_ecs_service" "concourse_grafana" {
   name            = "${var.deployment}-concourse-grafana"
   cluster         = "${aws_ecs_cluster.concourse_grafana.name}"
   task_definition = "${aws_ecs_task_definition.concourse_grafana_task_def.arn}"
+  launch_type     = "FARGATE"
 
   desired_count                      = 1
   deployment_minimum_healthy_percent = 0
@@ -170,5 +88,10 @@ resource "aws_ecs_service" "concourse_grafana" {
     target_group_arn = "${aws_lb_target_group.concourse_grafana.id}"
     container_name   = "grafana"
     container_port   = "3000"
+  }
+
+  network_configuration {
+    security_groups = ["${aws_security_group.concourse_grafana.id}"]
+    subnets         = ["${var.private_subnet_ids}"]
   }
 }
