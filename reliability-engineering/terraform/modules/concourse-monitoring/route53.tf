@@ -6,9 +6,10 @@ data "aws_route53_zone" "private_root" {
   zone_id = "${var.private_root_zone_id}"
 }
 
-resource "aws_route53_record" "concourse_public_prometheus" {
+resource "aws_route53_record" "concourse_public_prometheis" {
+  count   = 2
   zone_id = "${data.aws_route53_zone.public_root.zone_id}"
-  name    = "prometheus.${local.monitoring_domain}"
+  name    = "prom-${count.index+1}.${local.monitoring_domain}"
   type    = "A"
 
   alias {
@@ -35,7 +36,19 @@ resource "aws_route53_record" "concourse_private_prometheus" {
   name    = "prometheus.${data.aws_route53_zone.private_root.name}"
   type    = "A"
   ttl     = 10
-  records = ["${aws_instance.concourse_prometheus.private_ip}"]
+  records = ["${aws_instance.concourse_prometheus.*.private_ip}"]
+}
+
+resource "aws_route53_record" "concourse_private_prometheis" {
+  count   = 2
+  zone_id = "${data.aws_route53_zone.private_root.zone_id}"
+  name    = "prom-${count.index+1}.${data.aws_route53_zone.private_root.name}"
+  type    = "A"
+  ttl     = 10
+
+  records = ["${
+    element(aws_instance.concourse_prometheus.*.private_ip, count.index)
+  }"]
 }
 
 locals {
