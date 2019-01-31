@@ -36,6 +36,38 @@ variable "worker_team_names" {
   type        = "list"
 }
 
+variable "worker_ssh_public_keys_openssh" {
+  type = "map"
+}
+
+variable "web_ssh_private_key_pem" {
+  type = "string"
+}
+
+variable "web_session_private_key_pem" {
+  type = "string"
+}
+
+variable "web_kms_key_id" {
+  type = "string"
+}
+
+variable "web_kms_key_arn" {
+  type = "string"
+}
+
+variable "worker_kms_key_id" {
+  type = "string"
+}
+
+variable "worker_kms_key_arn" {
+  type = "string"
+}
+
+variable "web_iam_role_name" {
+  type = "string"
+}
+
 variable "desired_capacity" {
   default = 1
 }

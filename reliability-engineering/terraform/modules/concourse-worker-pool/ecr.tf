@@ -1,3 +1,7 @@
+data "aws_iam_role" "concourse_worker" {
+  name = "${var.worker_iam_role_name}"
+}
+
 resource "random_string" "concourse_worker_private_ecr_repo" {
   length  = 6
   special = false
@@ -69,7 +73,7 @@ resource "aws_ecr_repository_policy" "concourse_worker_private" {
         "ecr:CompleteLayerUpload"
       ],
       "Principal": {
-        "AWS": ["${aws_iam_role.concourse_worker.arn}"]
+        "AWS": ["${data.aws_iam_role.concourse_worker.arn}"]
       }
     }]
   }

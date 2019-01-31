@@ -18,7 +18,23 @@ variable "private_root_zone_id" {
   type = "string"
 }
 
+variable "web_ssh_public_key_openssh" {
+  type = "string"
+}
+
+variable "worker_ssh_private_key_pem" {
+  type = "string"
+}
+
+variable "kms_key_id" {
+  type = "string"
+}
+
 variable "kms_key_arn" {
+  type = "string"
+}
+
+variable "worker_iam_role_name" {
   type = "string"
 }
 
