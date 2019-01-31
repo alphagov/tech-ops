@@ -34,13 +34,6 @@ resource "aws_ssm_parameter" "concourse_web_db_password" {
   }
 }
 
-resource "aws_s3_bucket_object" "concourse_web_authorized_worker_keys" {
-  bucket  = "${aws_s3_bucket.concourse_web.bucket}"
-  key     = "authorized_worker_keys"
-  content = "${join("\n", values(var.worker_ssh_public_keys_openssh))}"
-  etag    = "${md5(join("\n", values(var.worker_ssh_public_keys_openssh)))}"
-}
-
 resource "aws_s3_bucket_object" "concourse_web_team_authorized_worker_keys" {
   bucket  = "${aws_s3_bucket.concourse_web.bucket}"
   key     = "team_authorized_worker_keys.json"
