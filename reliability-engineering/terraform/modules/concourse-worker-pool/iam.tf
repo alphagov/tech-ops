@@ -1,22 +1,3 @@
-resource "aws_iam_role" "concourse_worker" {
-  name = "${var.deployment}-${var.name}-concourse-worker"
-
-  assume_role_policy = <<-ARP
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-          "Service": "ec2.amazonaws.com"
-        },
-        "Effect": "Allow"
-      }
-    ]
-  }
-  ARP
-}
-
 resource "aws_iam_policy" "concourse_worker_base" {
   name = "${var.deployment}-${var.name}-concourse-worker-base"
 
@@ -145,13 +126,14 @@ resource "aws_iam_policy" "concourse_worker_base" {
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_worker_concourse_worker_base" {
-  role       = "${aws_iam_role.concourse_worker.name}"
+  role       = "${var.worker_iam_role_name}"
   policy_arn = "${aws_iam_policy.concourse_worker_base.arn}"
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_worker_additional" {
   count = "${length(var.additional_concourse_worker_iam_policies)}"
-  role  = "${aws_iam_role.concourse_worker.name}"
+
+  role = "${var.worker_iam_role_name}"
 
   policy_arn = "${element(
     var.additional_concourse_worker_iam_policies,
@@ -160,6 +142,6 @@ resource "aws_iam_role_policy_attachment" "concourse_worker_additional" {
 }
 
 resource "aws_iam_instance_profile" "concourse_worker" {
-  name = "${aws_iam_role.concourse_worker.name}"
-  role = "${aws_iam_role.concourse_worker.name}"
+  name = "${var.worker_iam_role_name}"
+  role = "${var.worker_iam_role_name}"
 }

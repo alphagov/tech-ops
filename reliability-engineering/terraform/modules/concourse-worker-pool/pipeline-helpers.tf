@@ -142,16 +142,12 @@ resource "aws_ssm_parameter" "concourse_worker_secrets_path_prefix" {
   }
 }
 
-data "aws_kms_key" "worker_shared_key" {
-  key_id = "${var.kms_key_arn}"
-}
-
 resource "aws_ssm_parameter" "concourse_worker_secrets_kms_key_id" {
   name = "/${var.deployment}/concourse/pipelines/${var.name}/readonly_secrets_kms_key_id"
 
   type        = "String"
   description = "KMS key id for ${var.deployment}/${var.name}"
-  value       = "${data.aws_kms_key.worker_shared_key.id}"
+  value       = "${var.kms_key_id}"
 
   tags = {
     Deployment = "${var.deployment}"

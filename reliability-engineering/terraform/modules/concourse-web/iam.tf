@@ -1,22 +1,3 @@
-resource "aws_iam_role" "concourse_web" {
-  name = "${var.deployment}-concourse-web"
-
-  assume_role_policy = <<-ARP
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-          "Service": "ec2.amazonaws.com"
-        },
-        "Effect": "Allow"
-      }
-    ]
-  }
-  ARP
-}
-
 resource "aws_iam_policy" "concourse_web" {
   name = "${var.deployment}-concourse-web"
 
@@ -60,8 +41,8 @@ resource "aws_iam_policy" "concourse_web" {
           "kms:Decrypt"
         ],
         "Resource": [
-          "${aws_kms_key.concourse_web.arn}",
-          "${aws_kms_key.concourse_worker_shared.arn}"
+          "${var.web_kms_key_arn}",
+          "${var.worker_kms_key_arn}"
         ]
       }, {
         "Effect": "Allow",
@@ -98,11 +79,11 @@ resource "aws_iam_policy" "concourse_web" {
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_web_concourse_web" {
-  role       = "${aws_iam_role.concourse_web.name}"
+  role       = "${var.web_iam_role_name}"
   policy_arn = "${aws_iam_policy.concourse_web.arn}"
 }
 
 resource "aws_iam_instance_profile" "concourse_web" {
-  name = "${aws_iam_role.concourse_web.name}"
-  role = "${aws_iam_role.concourse_web.name}"
+  name = "${var.web_iam_role_name}"
+  role = "${var.web_iam_role_name}"
 }
