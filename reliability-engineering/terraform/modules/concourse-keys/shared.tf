@@ -1,19 +1,10 @@
 locals {
-  kms_principal_template = "arn:aws:iam::${data.aws_caller_identity.account.account_id}"
-
-  kms_root_principal = "${local.kms_principal_template}:root"
-
-  kms_worker_principals = "${formatlist(
-    "${local.kms_principal_template}:role/${var.deployment}-%s-concourse-worker",
-    var.worker_team_names
-  )}"
-
   kms_principals = "${concat(
     list(
-      local.kms_root_principal,
+      "arn:aws:iam::${data.aws_caller_identity.account.account_id}:root",
       aws_iam_role.concourse_web.arn,
     ),
-    local.kms_worker_principals
+    aws_iam_role.concourse_workers.*.arn
   )}"
 }
 
