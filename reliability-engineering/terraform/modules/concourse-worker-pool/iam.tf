@@ -117,6 +117,24 @@ resource "aws_iam_policy" "concourse_worker_base" {
         ]
       }, {
         "Effect": "Allow",
+        "Action": [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:BatchGetImage",
+          "ecr:CompleteLayerUpload",
+          "ecr:DescribeImages",
+          "ecr:DescribeRepositories",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:InitiateLayerUpload",
+          "ecr:ListImages",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
+        ],
+        "Resource": [
+          "${aws_ecr_repository.concourse_worker_private.arn}",
+          "${aws_ecr_repository.concourse_worker_private.arn}/*"
+        ]
+      }, {
+        "Effect": "Allow",
         "Action": ["ecr:GetAuthorizationToken"],
         "Resource": "*"
       }
