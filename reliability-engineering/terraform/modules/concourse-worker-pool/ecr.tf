@@ -50,18 +50,6 @@ resource "aws_ecr_repository_policy" "concourse_worker_private" {
   {
     "Version": "2012-10-17",
     "Statement": [{
-      "Effect": "Deny",
-      "Action": [
-        "ecr:GetDownloadUrlForLayer",
-        "ecr:BatchGetImage",
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:PutImage",
-        "ecr:InitiateLayerUpload",
-        "ecr:UploadLayerPart",
-        "ecr:CompleteLayerUpload"
-      ],
-      "Principal": {"AWS": ["*"]}
-    }, {
       "Effect": "Allow",
       "Action": [
         "ecr:GetDownloadUrlForLayer",
