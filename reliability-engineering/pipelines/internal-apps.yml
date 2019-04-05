@@ -1,0 +1,128 @@
+resources:
+  - name: re-team-manual-git
+    type: git
+    source:
+      uri: https://github.com/alphagov/re-team-manual.git
+      branch: master
+
+  - name: reliability-engineering-git
+    type: git
+    source:
+      uri: https://github.com/alphagov/reliability-engineering.git
+      branch: master
+
+jobs:
+  - name: deploy-re-team-manual
+    serial: true
+    plan:
+      - get: re-team-manual-git
+        trigger: true
+      - task: bundle-re-team-manual
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: gdsre/aws-ruby
+              tag: 2.6.1-3.0.1
+          inputs:
+            - name: re-team-manual-git
+          outputs:
+            - name: re-team-manual-bundled
+          run:
+            path: sh
+            args:
+            - -c
+            - |
+              cd re-team-manual-git
+              apt-get update
+              apt-get install -y nodejs
+              bundle install --without development
+              bundle exec middleman build
+              cp -r . ../re-team-manual-bundled
+      - task: deploy-re-team-manual-to-paas
+        timeout: 5m
+        config: 
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+              tag: b77e27029dfcb85f6c58f0a59298d05cc5eeb903
+          params:
+            CF_API: api.cloud.service.gov.uk
+            CF_ORG: gds-tech-ops
+            CF_USER: ((cf_user))
+            CF_PASS: ((cf_password))
+            CF_SPACE: docs
+          inputs:
+            - name: re-team-manual-bundled
+          run:
+            path: bash
+            dir: re-team-manual
+            args:
+              - -c
+              - |
+                set -eu
+                cd ../re-team-manual-bundled
+                cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
+                cf push -f manifest.yml re-team-manual
+
+  - name: deploy-reliability-engineering
+    serial: true
+    plan:
+      - get: reliability-engineering-git
+        trigger: true
+      - task: bundle-reliability-engineering
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: gdsre/aws-ruby
+              tag: 2.6.1-3.0.1
+          inputs:
+            - name: reliability-engineering-git
+          outputs:
+            - name: reliability-engineering-bundled
+          run:
+            path: sh
+            args:
+            - -c
+            - |
+              cd reliability-engineering-git
+              apt-get update
+              apt-get install -y nodejs
+              bundle install --without development
+              bundle exec middleman build
+              cp -r . ../reliability-engineering-bundled
+      - task: deploy-reliability-engineering-to-paas
+        timeout: 5m
+        config: 
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+              tag: b77e27029dfcb85f6c58f0a59298d05cc5eeb903
+          params:
+            CF_API: api.cloud.service.gov.uk
+            CF_ORG: gds-tech-ops
+            CF_USER: ((cf_user))
+            CF_PASS: ((cf_password))
+            CF_SPACE: docs
+          inputs:
+            - name: reliability-engineering-bundled
+          run:
+            path: bash
+            dir: reliability-engineering
+            args:
+              - -c
+              - |
+                set -eu
+                cd ../reliability-engineering-bundled
+                cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
+                cf push -f manifest.yml reliability-engineering
+
