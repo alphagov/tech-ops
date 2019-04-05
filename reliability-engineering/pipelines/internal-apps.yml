@@ -27,7 +27,7 @@ resources:
       space: docs
 
 jobs:
-  - name: deploy-re-team-manual
+  - name: build-re-team-manual
     serial: true
     plan:
       - get: re-team-manual-git
@@ -63,7 +63,7 @@ jobs:
           show_app_log: true
           path: bundled
 
-  - name: deploy-reliability-engineering
+  - name: build-reliability-engineering
     serial: true
     plan:
       - get: reliability-engineering-git
@@ -89,7 +89,7 @@ jobs:
           show_app_log: true
           path: bundled
 
-  - name: deploy-gds-way
+  - name: build-gds-way
     serial: true
     plan:
       - get: gds-way-git
