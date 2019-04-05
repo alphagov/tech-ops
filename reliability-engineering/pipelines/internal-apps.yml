@@ -11,6 +11,12 @@ resources:
       uri: https://github.com/alphagov/reliability-engineering.git
       branch: master
 
+  - name: gds-way-git
+    type: git
+    source:
+      uri: https://github.com/alphagov/gds-way.git
+      branch: master
+
 jobs:
   - name: deploy-re-team-manual
     serial: true
@@ -116,3 +122,47 @@ jobs:
           inputs:
             - name: reliability-engineering-bundled
           run: *deploy
+
+  - name: deploy-gds-way
+    serial: true
+    plan:
+      - get: gds-way-git
+        trigger: true
+      - task: bundle-gds-way
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: gdsre/aws-ruby
+              tag: 2.6.1-3.0.1
+          params:
+            GIT_DIR: gds-way-git
+            BUNDLE_DIR: gds-way-bundled              
+          inputs:
+            - name: gds-way-git
+          outputs:
+            - name: gds-way-bundled
+          run: *bundle
+      - task: deploy-gds-way-to-paas
+        timeout: 5m
+        config: 
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+              tag: b77e27029dfcb85f6c58f0a59298d05cc5eeb903
+          params:
+            CF_API: api.cloud.service.gov.uk
+            CF_ORG: gds-tech-ops
+            CF_USER: ((cf_user))
+            CF_PASS: ((cf_password))
+            CF_SPACE: docs
+            BUNDLE_DIR: gds-way-bundled
+            APP_NAME: gds-way
+          inputs:
+            - name: gds-way-bundled
+          run: *deploy
+
