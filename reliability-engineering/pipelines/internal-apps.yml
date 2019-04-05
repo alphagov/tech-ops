@@ -17,8 +17,17 @@ resources:
       uri: https://github.com/alphagov/gds-way.git
       branch: master
 
+  - name: deploy-to-paas-docs-space
+    type: cf
+    source:
+      api: https://api.cloud.service.gov.uk
+      username: ((cf_user))
+      password: ((cf_password))
+      organization: gds-tech-ops
+      space: docs
+
 jobs:
-  - name: deploy-re-team-manual
+  - name: build-re-team-manual
     serial: true
     plan:
       - get: re-team-manual-git
@@ -32,55 +41,29 @@ jobs:
             source:
               repository: gdsre/aws-ruby
               tag: 2.6.1-3.0.1
-          params: 
-            GIT_DIR: re-team-manual-git
-            BUNDLE_DIR: re-team-manual-bundled   
           inputs:
             - name: re-team-manual-git
+              path: repo
           outputs:
-            - name: re-team-manual-bundled
+            - name: bundled
           run: &bundle
             path: sh
+            dir: repo
             args:
             - -c
             - |
-              cd $GIT_DIR
               apt-get update
               apt-get install -y nodejs
               bundle install --without development
               bundle exec middleman build
-              cp -r . ../$BUNDLE_DIR
-      - task: deploy-re-team-manual-to-paas
-        timeout: 5m
-        config: 
-          platform: linux
-          image_resource:
-            type: docker-image
-            source:
-              repository: governmentpaas/cf-cli
-              tag: b77e27029dfcb85f6c58f0a59298d05cc5eeb903
-          params:
-            CF_API: api.cloud.service.gov.uk
-            CF_ORG: gds-tech-ops
-            CF_USER: ((cf_user))
-            CF_PASS: ((cf_password))
-            CF_SPACE: docs
-            BUNDLE_DIR: re-team-manual-bundled
-            APP_NAME: re-team-manual
-          inputs:
-            - name: re-team-manual-bundled
-          run: &deploy
-            path: bash
-            dir: re-team-manual
-            args:
-              - -c
-              - |
-                set -eu
-                cd ../$BUNDLE_DIR
-                cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
-                cf push -f manifest.yml $APP_NAME
+              cp -r . ../bundled/
+      - put: deploy-to-paas-docs-space
+        params:
+          manifest: bundled/manifest.yml
+          show_app_log: true
+          path: bundled
 
-  - name: deploy-reliability-engineering
+  - name: build-reliability-engineering
     serial: true
     plan:
       - get: reliability-engineering-git
@@ -94,36 +77,19 @@ jobs:
             source:
               repository: gdsre/aws-ruby
               tag: 2.6.1-3.0.1
-          params:
-            GIT_DIR: reliability-engineering-git
-            BUNDLE_DIR: reliability-engineering-bundled              
           inputs:
             - name: reliability-engineering-git
+              path: repo
           outputs:
-            - name: reliability-engineering-bundled
+            - name: bundled
           run: *bundle
-      - task: deploy-reliability-engineering-to-paas
-        timeout: 5m
-        config: 
-          platform: linux
-          image_resource:
-            type: docker-image
-            source:
-              repository: governmentpaas/cf-cli
-              tag: b77e27029dfcb85f6c58f0a59298d05cc5eeb903
-          params:
-            CF_API: api.cloud.service.gov.uk
-            CF_ORG: gds-tech-ops
-            CF_USER: ((cf_user))
-            CF_PASS: ((cf_password))
-            CF_SPACE: docs
-            BUNDLE_DIR: reliability-engineering-bundled
-            APP_NAME: reliability-engineering
-          inputs:
-            - name: reliability-engineering-bundled
-          run: *deploy
+      - put: deploy-to-paas-docs-space
+        params:
+          manifest: bundled/manifest.yml
+          show_app_log: true
+          path: bundled
 
-  - name: deploy-gds-way
+  - name: build-gds-way
     serial: true
     plan:
       - get: gds-way-git
@@ -137,32 +103,14 @@ jobs:
             source:
               repository: gdsre/aws-ruby
               tag: 2.6.1-3.0.1
-          params:
-            GIT_DIR: gds-way-git
-            BUNDLE_DIR: gds-way-bundled              
           inputs:
             - name: gds-way-git
+              path: repo
           outputs:
-            - name: gds-way-bundled
+            - name: bundled
           run: *bundle
-      - task: deploy-gds-way-to-paas
-        timeout: 5m
-        config: 
-          platform: linux
-          image_resource:
-            type: docker-image
-            source:
-              repository: governmentpaas/cf-cli
-              tag: b77e27029dfcb85f6c58f0a59298d05cc5eeb903
-          params:
-            CF_API: api.cloud.service.gov.uk
-            CF_ORG: gds-tech-ops
-            CF_USER: ((cf_user))
-            CF_PASS: ((cf_password))
-            CF_SPACE: docs
-            BUNDLE_DIR: gds-way-bundled
-            APP_NAME: gds-way
-          inputs:
-            - name: gds-way-bundled
-          run: *deploy
-
+      - put: deploy-to-paas-docs-space
+        params:
+          manifest: bundled/manifest.yml
+          show_app_log: true
+          path: bundled
