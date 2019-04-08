@@ -17,6 +17,21 @@ resources:
       uri: https://github.com/alphagov/gds-way.git
       branch: master
 
+  - name: re-request-an-aws-account-git
+    type: git
+    source:
+      uri: https://github.com/alphagov/re-request-an-aws-account.git
+      branch: master
+
+  - name: deploy-to-paas-aws-account-management-space
+    type: cf
+    source:
+      api: https://api.cloud.service.gov.uk
+      username: ((cf_user))
+      password: ((cf_password))
+      organization: gds-tech-ops
+      space: re-aws-account-management
+
   - name: deploy-to-paas-docs-space
     type: cf
     source:
@@ -112,5 +127,39 @@ jobs:
       - put: deploy-to-paas-docs-space
         params:
           manifest: bundled/manifest.yml
+          show_app_log: true
+          path: bundled
+
+  - name: build-re-request-an-aws-account
+    serial: true
+    plan:
+      - get: re-request-an-aws-account-git
+        trigger: true
+      - task: bundle-re-request-an-aws-account
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: gdsre/aws-ruby
+              tag: 2.6.1-3.0.1
+          inputs:
+            - name: re-request-an-aws-account-git
+              path: repo
+          outputs:
+            - name: bundled
+          run:
+            path: sh
+            dir: repo
+            args:
+            - -c
+            - |
+              apt-get update
+              bundle install --without development
+              cp -r . ../bundled/
+      - put: deploy-to-paas-aws-account-management-space
+        params:
+          manifest: re-request-an-aws-account-git/manifest.yml
           show_app_log: true
           path: bundled
