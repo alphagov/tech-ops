@@ -46,7 +46,7 @@ ExecStart=/usr/local/bin/concourse worker \
   --tsa-public-key /opt/concourse/keys/web_pub_key \
   --tsa-worker-private-key /opt/concourse/keys/ssh_key \
   --garden-dns-server 169.254.169.253 \
-  --ephemeral \
+  --ephemeral --baggageclaim-driver=overlay \
   --team ${worker_team_name}
 Type=simple
 RestartSec=3s
