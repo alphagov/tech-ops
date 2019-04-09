@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -ueo pipefail
 
+export DEBIAN_FRONTEND=noninteractive
+
 apt-get update --yes
 apt-get upgrade --yes
 

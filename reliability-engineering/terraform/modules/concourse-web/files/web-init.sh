@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -ueo pipefail
 
+export DEBIAN_FRONTEND=noninteractive
+
 apt-get update --yes
 
 export AWS_REGION=eu-west-2
