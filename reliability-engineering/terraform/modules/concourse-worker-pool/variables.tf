@@ -46,8 +46,12 @@ variable "instance_type" {
   default = "t3.small"
 }
 
+variable "volume_size" {
+  default = 50
+}
+
 variable "additional_concourse_worker_iam_policies" {
-  type = "list"
+  type    = "list"
   default = []
 }
 
