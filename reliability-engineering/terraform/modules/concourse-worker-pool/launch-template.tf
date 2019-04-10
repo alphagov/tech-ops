@@ -38,7 +38,7 @@ resource "aws_launch_template" "concourse_worker" {
     device_name = "/dev/sda1"
 
     ebs {
-      volume_size = 50
+      volume_size = "${var.volume_size}"
     }
   }
 
