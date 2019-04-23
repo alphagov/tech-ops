@@ -36,6 +36,11 @@ variable "worker_team_names" {
   type        = "list"
 }
 
+variable "local_user_passwords" {
+  description = "The map of team to generated password, used for local users."
+  type        = "map"
+}
+
 variable "worker_ssh_public_keys_openssh" {
   type = "map"
 }

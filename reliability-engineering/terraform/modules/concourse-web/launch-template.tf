@@ -10,6 +10,14 @@ data "aws_ami" "ubuntu_bionic" {
   }
 }
 
+locals {
+  usernames_and_passwords = "${join(",", formatlist(
+    "%s:%s",
+    keys(var.local_user_passwords),
+    values(var.local_user_passwords),
+  ))}"
+}
+
 data "template_file" "concourse_web_cloud_init" {
   template = "${file("${path.module}/files/web-init.sh")}"
 
@@ -23,6 +31,8 @@ data "template_file" "concourse_web_cloud_init" {
 
     concourse_web_bucket      = "${aws_s3_bucket.concourse_web.bucket}"
     worker_keys_s3_object_key = "${aws_s3_bucket_object.concourse_web_team_authorized_worker_keys.id}"
+
+    local_users = "${local.usernames_and_passwords}"
   }
 }
 

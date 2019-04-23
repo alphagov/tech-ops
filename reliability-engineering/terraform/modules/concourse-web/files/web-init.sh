@@ -103,6 +103,8 @@ ExecStart=/usr/local/bin/concourse web \
   --prometheus-bind-port 9391    \
   \
   --peer-url http://$${local_ip}:8080 \
+  \
+  --add-local-user ${local_users} \
 
 Type=simple
 RestartSec=3s
