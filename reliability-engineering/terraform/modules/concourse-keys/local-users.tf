@@ -8,7 +8,7 @@ output "local_user_passwords" {
   value = "${
     zipmap(
       var.worker_team_names,
-      random_string.local_user_password
+      random_string.local_user_password.*.result
     )
   }"
 }
