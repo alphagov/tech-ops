@@ -43,6 +43,7 @@ resources:
 
 jobs:
   - name: build-re-team-manual
+    exposed: true
     serial: true
     plan:
       - get: re-team-manual-git
@@ -79,6 +80,7 @@ jobs:
           path: bundled
 
   - name: build-reliability-engineering
+    exposed: true
     serial: true
     plan:
       - get: reliability-engineering-git
@@ -105,6 +107,7 @@ jobs:
           path: bundled
 
   - name: build-gds-way
+    exposed: true
     serial: true
     plan:
       - get: gds-way-git
@@ -131,6 +134,7 @@ jobs:
           path: bundled
 
   - name: build-re-request-an-aws-account
+    exposed: true
     serial: true
     plan:
       - get: re-request-an-aws-account-git
