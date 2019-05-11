@@ -31,8 +31,6 @@ data "template_file" "concourse_web_cloud_init" {
 
     concourse_web_bucket      = "${aws_s3_bucket.concourse_web.bucket}"
     worker_keys_s3_object_key = "${aws_s3_bucket_object.concourse_web_team_authorized_worker_keys.id}"
-
-    local_users = "${local.usernames_and_passwords}"
   }
 }
 

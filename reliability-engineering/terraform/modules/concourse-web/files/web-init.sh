@@ -44,6 +44,12 @@ postgres_password="$(
     --with-decryption \
   | jq -r .Parameter.Value
 )"
+local_users="$(
+  aws ssm get-parameter \
+    --name /${deployment}/concourse/web/local_users \
+    --with-decryption \
+  | jq -r .Parameter.Value
+)"
 
 aws ssm get-parameter \
   --name /${deployment}/concourse/web/ssh_key \
@@ -104,7 +110,7 @@ ExecStart=/usr/local/bin/concourse web \
   \
   --peer-url http://$${local_ip}:8080 \
   \
-  --add-local-user ${local_users} \
+  --add-local-user $${local_users} \
 
 Type=simple
 RestartSec=3s

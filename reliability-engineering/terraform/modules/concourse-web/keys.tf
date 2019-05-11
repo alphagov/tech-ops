@@ -34,6 +34,18 @@ resource "aws_ssm_parameter" "concourse_web_db_password" {
   }
 }
 
+resource "aws_ssm_parameter" "concourse_web_local_users" {
+  name        = "/${var.deployment}/concourse/web/local_users"
+  type        = "SecureString"
+  description = "Usernames and passwords for local users"
+  value       = "${local.usernames_and_passwords}"
+  key_id      = "${var.web_kms_key_id}"
+
+  tags = {
+    Deployment = "${var.deployment}"
+  }
+}
+
 resource "aws_s3_bucket_object" "concourse_web_team_authorized_worker_keys" {
   bucket  = "${aws_s3_bucket.concourse_web.bucket}"
   key     = "team_authorized_worker_keys.json"
