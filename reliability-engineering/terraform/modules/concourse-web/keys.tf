@@ -38,7 +38,7 @@ resource "aws_ssm_parameter" "concourse_web_local_users" {
   name        = "/${var.deployment}/concourse/web/local_users"
   type        = "SecureString"
   description = "Usernames and passwords for local users"
-  value       = "${local.usernames_and_passwords}"
+  value       = "${jsonencode(var.local_user_passwords)}"
   key_id      = "${var.web_kms_key_id}"
 
   tags = {

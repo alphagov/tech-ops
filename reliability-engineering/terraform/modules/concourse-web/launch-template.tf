@@ -10,14 +10,6 @@ data "aws_ami" "ubuntu_bionic" {
   }
 }
 
-locals {
-  usernames_and_passwords = "${join(",", formatlist(
-    "%s:%s",
-    keys(var.local_user_passwords),
-    values(var.local_user_passwords),
-  ))}"
-}
-
 data "template_file" "concourse_web_cloud_init" {
   template = "${file("${path.module}/files/web-init.sh")}"
 
