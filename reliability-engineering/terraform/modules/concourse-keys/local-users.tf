@@ -1,6 +1,7 @@
 resource "random_string" "local_user_password" {
   count = "${length(var.worker_team_names)}"
 
+  special = false
   length  = 32
 }
 
