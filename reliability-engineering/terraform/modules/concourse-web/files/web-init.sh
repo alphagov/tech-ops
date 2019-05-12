@@ -110,7 +110,7 @@ ExecStart=/usr/local/bin/concourse web \
   \
   --peer-url http://$${local_ip}:8080 \
   \
-  --add-local-user $${local_users} \
+  $(jq -r 'to_entries | map("--add-local-user \(.key):\(.value)") | join(" ")' <<< $local_users) \
   --main-team-local-user=main \
 
 Type=simple
