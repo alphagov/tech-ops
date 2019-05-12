@@ -111,6 +111,7 @@ ExecStart=/usr/local/bin/concourse web \
   --peer-url http://$${local_ip}:8080 \
   \
   --add-local-user $${local_users} \
+  --main-team-local-user=main \
 
 Type=simple
 RestartSec=3s
