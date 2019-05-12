@@ -104,6 +104,16 @@ resource "aws_security_group_rule" "concourse_lb_ingress_from_outside_80" {
   cidr_blocks       = ["${var.whitelisted_cidr_blocks}"]
 }
 
+resource "aws_security_group_rule" "concourse_lb_ingress_from_workers_443" {
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  security_group_id = "${aws_security_group.concourse_lb.id}"
+  cidr_blocks       = ["${formatlist("%s/32", var.worker_pool_egress_eips)}"]
+}
+
 resource "aws_security_group_rule" "concourse_web_egress_to_outside" {
   type      = "egress"
   protocol  = "all"

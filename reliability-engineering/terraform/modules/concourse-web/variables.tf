@@ -41,6 +41,11 @@ variable "local_user_passwords" {
   type        = "map"
 }
 
+variable "worker_pool_egress_eips" {
+  type        = "list"
+  description = "A list of all of the egress IPs of all of the worker pools"
+}
+
 variable "worker_ssh_public_keys_openssh" {
   type = "map"
 }
