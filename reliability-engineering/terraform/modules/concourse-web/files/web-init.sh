@@ -44,6 +44,12 @@ postgres_password="$(
     --with-decryption \
   | jq -r .Parameter.Value
 )"
+local_users="$(
+  aws ssm get-parameter \
+    --name /${deployment}/concourse/web/local_users \
+    --with-decryption \
+  | jq -r .Parameter.Value
+)"
 
 aws ssm get-parameter \
   --name /${deployment}/concourse/web/ssh_key \
@@ -103,6 +109,9 @@ ExecStart=/usr/local/bin/concourse web \
   --prometheus-bind-port 9391    \
   \
   --peer-url http://$${local_ip}:8080 \
+  \
+  $(jq -r 'to_entries | map("--add-local-user \(.key):\(.value)") | join(" ")' <<< $local_users) \
+  --main-team-local-user=main \
 
 Type=simple
 RestartSec=3s
