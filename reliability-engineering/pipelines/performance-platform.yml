@@ -1,0 +1,82 @@
+resources:
+  - name: stagecraft-git
+    type: git
+    source:
+      uri: https://github.com/alphagov/stagecraft.git
+      branch: master
+
+jobs:
+  - name: deploy-stagecraft-to-paas-staging
+    serial: true
+    plan:
+      - get: stagecraft-git
+        trigger: true
+      - task: deploy-stagecraft-to-paas-staging
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+          inputs:
+            - name: stagecraft-git
+              path: repo
+          params:
+            APP_SECRET_KEY: ((app_secret_key_staging))
+            APP_FERNET_KEY: ((app_fernet_key))
+            FLOWER_BASIC_AUTH: ((flower_basic_auth_staging))
+            PAAS_USER: ((cf_user))
+            PAAS_PASSWORD: ((cf_password))
+            SIGNON_CLIENT_ID: ((signon_client_id))
+            GOVUK_APP_DOMAIN: 'staging.publishing.service.gov.uk'
+            GOVUK_WEBSITE_ROOT: 'https://www-origin.staging.publishing.service.gov.uk'
+            BACKDROP_PUBLIC_DOMAIN: 'performance-platform-backdrop-read.cloudapps.digital'
+            REDIS_DATABASE_NUMBER: '0'
+            STAGECRAFT_COLLECTION_ENDPOINT_TOKEN: ((stagecraft_collection_endpoint_token))
+            DJANGO_SETTINGS_MODULE: 'stagecraft.settings.staging'
+          run:
+            path: sh
+            dir: repo
+            args:
+              - -c
+              - |
+                etc/deploy.sh staging
+
+  - name: deploy-stagecraft-to-paas-production
+    serial: true
+    plan:
+      - get: stagecraft-git
+        trigger: true
+        passed: [deploy-stagecraft-to-paas-staging]
+      - task: deploy-stagecraft-to-paas-production
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+          inputs:
+            - name: stagecraft-git
+              path: repo
+          params:
+            APP_SECRET_KEY: ((app_secret_key_production))
+            APP_FERNET_KEY: ((app_fernet_key))
+            FLOWER_BASIC_AUTH: ((flower_basic_auth_production))
+            PAAS_USER: ((cf_user))
+            PAAS_PASSWORD: ((cf_password))
+            SIGNON_CLIENT_ID: ((signon_client_id))
+            GOVUK_APP_DOMAIN: 'publishing.service.gov.uk'
+            GOVUK_WEBSITE_ROOT: 'https://www.gov.uk'
+            BACKDROP_PUBLIC_DOMAIN: 'performance.service.gov.uk'
+            REDIS_DATABASE_NUMBER: '1'
+            STAGECRAFT_COLLECTION_ENDPOINT_TOKEN: ((stagecraft_collection_endpoint_token))
+            DJANGO_SETTINGS_MODULE: 'stagecraft.settings.production'
+          run:
+            path: sh
+            dir: repo
+            args:
+              - -c
+              - |
+                etc/deploy.sh production
