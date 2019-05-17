@@ -7,7 +7,7 @@ The task will validate the pipeline before applying.
 ### Parameters
 
 | Parameter | Description | Required | Default |
-|---|---|---|---|---|
+|---|---|---|---|
 | CONCOURSE_TEAM | Concourse team the pipeline will be applied to. Will also be used as the username. | Yes | N/A |
 | CONCOURSE_USERNAME | Concourse username authenticating the task with fly cli. | No | `${CONCOURSE_TEAM}` |
 | CONCOURSE_PASSWORD | Concourse password authenticating the task with fly cli. | Yes | N/A |
