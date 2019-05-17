@@ -1,0 +1,60 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: governmentpaas/curl-ssl
+
+inputs:
+  - name: repository
+
+params:
+  CONCOURSE_URL:
+  CONCOURSE_TEAM:
+  CONCOURSE_PASSWORD:
+  CONCOURSE_USERNAME:
+  PIPELINE_PATH:
+  PIPELINE_NAME:
+
+run:
+  path: sh
+  args:
+  - -uec
+  - |
+    : ${CONCOURSE_TEAM:?}
+    : ${CONCOURSE_PASSWORD:?}
+    : ${PIPELINE_PATH:?}
+    : ${PIPELINE_NAME:?}
+
+    CONCOURSE_USERNAME="${CONCOURSE_USERNAME:-$CONCOURSE_TEAM}"
+    CONCOURSE_URL="${CONCOURSE_URL:-https://cd.gds-reliability.engineering}"
+
+    > fly \
+      curl -L --fail \
+      "${CONCOURSE_URL}/api/v1/cli?arch=amd64&platform=linux"
+    
+    chmod +x fly
+
+    echo "Authenticating into concourse"
+    ./fly --target self \
+      login \
+      --concourse-url "${CONCOURSE_URL}" \
+      --username "${CONCOURSE_TEAM}" \
+      --password "${CONCOURSE_PASSWORD}" \
+      --team-name "${CONCOURSE_TEAM}"
+
+    echo "Validating the pipeline"
+    ./fly --target self \
+      validate-pipeline \
+      --config "./repository/${PIPELINE_PATH}"
+
+    echo "Updating Concourse pipeline"
+    ./fly --target self \
+      set-pipeline \
+      --check-creds \
+      --pipeline "${PIPELINE_NAME}" \
+      --config "./repository/${PIPELINE_PATH}" \
+      --non-interactive
+
+    echo "All done!"
