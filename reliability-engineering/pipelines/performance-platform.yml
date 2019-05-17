@@ -12,7 +12,7 @@ jobs:
       - get: stagecraft-git
         trigger: true
       - task: deploy-stagecraft-to-paas-staging
-        timeout: 15m
+        timeout: 35m
         config:
           platform: linux
           image_resource:
@@ -50,7 +50,7 @@ jobs:
         trigger: true
         passed: [deploy-stagecraft-to-paas-staging]
       - task: deploy-stagecraft-to-paas-production
-        timeout: 15m
+        timeout: 35m
         config:
           platform: linux
           image_resource:
