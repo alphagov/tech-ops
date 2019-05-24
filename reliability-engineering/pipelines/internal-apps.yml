@@ -1,3 +1,9 @@
+resource_types:
+- name: pull-request
+  type: docker-image
+  source:
+    repository: teliaoss/github-pr-resource
+
 resources:
   - name: re-team-manual-git
     type: git
@@ -5,11 +11,27 @@ resources:
       uri: https://github.com/alphagov/re-team-manual.git
       branch: master
 
+  - name: re-team-manual-pr
+    type: pull-request
+    check_every: 1m
+    source:
+      repository: alphagov/re-team-manual
+      access_token: ((pr-builds-status-github-token))
+      disable_forks: true
+
   - name: reliability-engineering-git
     type: git
     source:
       uri: https://github.com/alphagov/reliability-engineering.git
       branch: master
+
+  - name: reliability-engineering-pr
+    type: pull-request
+    check_every: 1m
+    source:
+      repository: alphagov/reliability-engineering
+      access_token: ((pr-builds-status-github-token))
+      disable_forks: true
 
   - name: gds-way-git
     type: git
@@ -17,11 +39,27 @@ resources:
       uri: https://github.com/alphagov/gds-way.git
       branch: master
 
+  - name: gds-way-pr
+    type: pull-request
+    check_every: 1m
+    source:
+      repository: alphagov/gds-way
+      access_token: ((pr-builds-status-github-token))
+      disable_forks: true
+
   - name: re-request-an-aws-account-git
     type: git
     source:
       uri: https://github.com/alphagov/re-request-an-aws-account.git
       branch: master
+
+  - name: re-request-an-aws-account-pr
+    type: pull-request
+    check_every: 1m
+    source:
+      repository: alphagov/re-request-an-aws-account
+      access_token: ((pr-builds-status-github-token))
+      disable_forks: true
 
   - name: deploy-to-paas-aws-account-management-space
     type: cf
@@ -42,6 +80,50 @@ resources:
       space: docs
 
 jobs:
+  - name: build-re-team-manual-pr
+    public: true
+    serial: true
+    plan:
+      - get: re-team-manual-pr
+        trigger: true
+        version: every
+      - put: re-team-manual-pr
+        params:
+          status: pending
+          path: re-team-manual-pr
+      - task: bundle-re-team-manual
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: gdsre/aws-ruby
+              tag: 2.6.1-3.0.1
+          inputs:
+            - name: re-team-manual-pr
+              path: repo
+          run: &bundle
+            path: sh
+            dir: repo
+            args:
+            - -c
+            - |
+              apt-get update
+              apt-get install -y nodejs
+              bundle install --without development
+              bundle exec middleman build
+    on_success:
+      put: re-team-manual-pr
+      params:
+        path: re-team-manual-pr
+        status: success
+    on_failure:
+      put: re-team-manual-pr
+      params:
+        path: re-team-manual-pr
+        status: failure
+
   - name: build-re-team-manual
     public: true
     serial: true
@@ -62,7 +144,7 @@ jobs:
               path: repo
           outputs:
             - name: bundled
-          run: &bundle
+          run: &bundle-pr
             path: sh
             dir: repo
             args:
@@ -78,6 +160,41 @@ jobs:
           manifest: bundled/manifest.yml
           show_app_log: true
           path: bundled
+
+  - name: build-reliability-engineering-pr
+    public: true
+    serial: true
+    plan:
+      - get: reliability-engineering-pr
+        trigger: true
+        version: every
+      - put: reliability-engineering-pr
+        params:
+          status: pending
+          path: reliability-engineering-pr
+      - task: bundle-reliability-engineering
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: gdsre/aws-ruby
+              tag: 2.6.1-3.0.1
+          inputs:
+            - name: reliability-engineering-pr
+              path: repo
+          run: *bundle-pr
+    on_success:
+      put: reliability-engineering-pr
+      params:
+        path: reliability-engineering-pr
+        status: success
+    on_failure:
+      put: reliability-engineering-pr
+      params:
+        path: reliability-engineering-pr
+        status: failure
 
   - name: build-reliability-engineering
     public: true
@@ -106,6 +223,41 @@ jobs:
           show_app_log: true
           path: bundled
 
+  - name: build-gds-way-pr
+    public: true
+    serial: true
+    plan:
+      - get: gds-way-pr
+        trigger: true
+        version: every
+      - put: gds-way-pr
+        params:
+          status: pending
+          path: gds-way-pr
+      - task: bundle-gds-way
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: gdsre/aws-ruby
+              tag: 2.6.1-3.0.1
+          inputs:
+            - name: gds-way-pr
+              path: repo
+          run: *bundle-pr
+    on_success:
+      put: gds-way-pr
+      params:
+        path: gds-way-pr
+        status: success
+    on_failure:
+      put: gds-way-pr
+      params:
+        path: gds-way-pr
+        status: failure
+
   - name: build-gds-way
     public: true
     serial: true
@@ -132,6 +284,50 @@ jobs:
           manifest: bundled/manifest.yml
           show_app_log: true
           path: bundled
+
+  - name: build-re-request-an-aws-account-pr
+    public: true
+    serial: true
+    plan:
+      - get: re-request-an-aws-account-pr
+        trigger: true
+        version: every
+      - put: re-request-an-aws-account-pr
+        params:
+          status: pending
+          path: re-request-an-aws-account-pr
+      - task: bundle-re-request-an-aws-account
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: gdsre/aws-ruby
+              tag: 2.6.1-3.0.1
+          inputs:
+            - name: re-request-an-aws-account-pr
+              path: repo
+          run:
+            path: sh
+            dir: repo
+            args:
+            - -c
+            - |
+              apt-get update
+              apt-get install -y nodejs
+              bundle install --without development
+              bundle exec rake
+    on_success:
+      put: re-request-an-aws-account-pr
+      params:
+        path: re-request-an-aws-account-pr
+        status: success
+    on_failure:
+      put: re-request-an-aws-account-pr
+      params:
+        path: re-request-an-aws-account-pr
+        status: failure
 
   - name: build-re-request-an-aws-account
     public: true
