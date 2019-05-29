@@ -103,7 +103,7 @@ jobs:
           inputs:
             - name: re-team-manual-pr
               path: repo
-          run: &bundle
+          run: &bundle-pr
             path: sh
             dir: repo
             args:
@@ -144,7 +144,7 @@ jobs:
               path: repo
           outputs:
             - name: bundled
-          run: &bundle-pr
+          run: &bundle
             path: sh
             dir: repo
             args:
