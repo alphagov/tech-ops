@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "sts_inline_policy_document" {
 }
 
 resource "aws_iam_role_policy" "sts_inline_policy" {
-  name    = "${var.prefix}GDSSecurityAuditInlineSupportPolicy"
+  name    = "${var.prefix}GDSSecurityAuditInlineSTSPolicy"
   role    = "${aws_iam_role.gds_security_audit_role.id}"
   policy  = "${data.aws_iam_policy_document.sts_inline_policy_document.json}"
 }
