@@ -1,3 +1,0 @@
-[submodule "reliability-engineering/bosh/modules/jumpbox-deployment"]
-	path = reliability-engineering/bosh/modules/jumpbox-deployment
-	url = git@github.com:cloudfoundry/jumpbox-deployment.git
