@@ -1,7 +1,7 @@
 data "aws_iam_policy_document" "support_inline_policy_document" {
   statement {
     effect    = "Allow"
-    actions   = ["support:Describe*"]
+    actions   = ["support:*"]
     resources = ["*"]
   }
 }
