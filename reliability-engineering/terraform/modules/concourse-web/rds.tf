@@ -22,6 +22,7 @@ resource "aws_db_instance" "concourse" {
   allocated_storage         = "${var.db_storage_gb}"
   storage_type              = "gp2"
   engine                    = "postgres"
+  engine_version            = "10.9"
   instance_class            = "${var.db_instance_type}"
   final_snapshot_identifier = "${var.deployment}-concourse-final"
   storage_encrypted         = true
