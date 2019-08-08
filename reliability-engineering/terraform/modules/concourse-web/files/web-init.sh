@@ -108,7 +108,6 @@ ExecStart=/usr/local/concourse/bin/concourse web \
   --prometheus-bind-ip   0.0.0.0 \
   --prometheus-bind-port 9391    \
   \
-  --peer-address http://$${local_ip}:8080 \
   \
   $(jq -r 'to_entries | map("--add-local-user \(.key):\(.value)") | join(" ")' <<< $local_users) \
   --main-team-local-user=main \
