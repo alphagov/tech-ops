@@ -11,8 +11,8 @@ resource "aws_autoscaling_group" "concourse_worker" {
   }
 
   tag {
-    key = "Deployment"
-    value = "${var.deployment}"
+    key                 = "Deployment"
+    value               = "${var.deployment}"
     propagate_at_launch = true
   }
 }
