@@ -25,7 +25,7 @@ resource "aws_route_table" "concourse_private" {
 }
 
 resource "aws_route_table_association" "concourse_private" {
-  count  = "${var.number_of_availability_zones}"
+  count = "${var.number_of_availability_zones}"
 
   subnet_id = "${element(
     aws_subnet.concourse_private.*.id,
@@ -54,7 +54,7 @@ resource "aws_route_table" "concourse_public" {
 }
 
 resource "aws_route_table_association" "concourse_public" {
-  count  = "${var.number_of_availability_zones}"
+  count = "${var.number_of_availability_zones}"
 
   subnet_id = "${element(
     aws_subnet.concourse_public.*.id,
