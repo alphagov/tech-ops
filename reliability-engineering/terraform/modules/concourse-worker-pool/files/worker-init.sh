@@ -47,7 +47,6 @@ ExecStart=/usr/local/concourse/bin/concourse worker \
   --tsa-host ${concourse_host}:2222 \
   --tsa-public-key /opt/concourse/keys/web_pub_key \
   --tsa-worker-private-key /opt/concourse/keys/ssh_key \
-  --garden-dns-server 169.254.169.253 \
   --ephemeral --baggageclaim-driver=overlay \
   --team ${worker_team_name}
 Type=simple
