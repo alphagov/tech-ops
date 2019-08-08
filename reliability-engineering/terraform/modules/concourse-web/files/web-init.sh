@@ -72,7 +72,7 @@ for team_name in $(jq -r 'keys | join("\n")' <<< "$team_keys"); do
 
   echo "Writing team_key_file for $team_name to $team_key_file_path"
   echo "$team_key_file_contents" > "$team_key_file_path"
-  concourse_tsa_team_key_args="$concourse_tsa_team_key_args --tsa-team-authorized-keys=$team_name=$team_key_file_path"
+  concourse_tsa_team_key_args="$concourse_tsa_team_key_args --tsa-team-authorized-keys=$team_name:$team_key_file_path"
 done
 
 cat <<EOF > /etc/systemd/system/concourse-web.service
@@ -81,7 +81,7 @@ Description=concourse-web
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/concourse web \
+ExecStart=/usr/local/concourse/bin/concourse web \
   \
   --tsa-authorized-keys /dev/null                       \
   $concourse_tsa_team_key_args                          \
@@ -108,7 +108,7 @@ ExecStart=/usr/local/bin/concourse web \
   --prometheus-bind-ip   0.0.0.0 \
   --prometheus-bind-port 9391    \
   \
-  --peer-url http://$${local_ip}:8080 \
+  --peer-address http://$${local_ip}:8080 \
   \
   $(jq -r 'to_entries | map("--add-local-user \(.key):\(.value)") | join(" ")' <<< $local_users) \
   --main-team-local-user=main \
