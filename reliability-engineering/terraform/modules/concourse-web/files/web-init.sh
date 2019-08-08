@@ -89,6 +89,7 @@ ExecStart=/usr/local/concourse/bin/concourse web \
   --session-signing-key /opt/concourse/keys/web_session \
   \
   --external-url https://${concourse_external_url} \
+  --peer-address $${local_ip}                      \
   \
   --aws-ssm-region eu-west-2 \
   --aws-ssm-pipeline-secret-template \
