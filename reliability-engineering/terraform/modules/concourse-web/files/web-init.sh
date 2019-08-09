@@ -122,6 +122,9 @@ MemoryLimit=infinity
 LimitNPROC=infinity
 LimitNOFILE=infinity
 
+Environment=CONCOURSE_SECRET_CACHE_ENABLED=true
+Environment=CONCOURSE_SECRET_CACHE_DURATION=5m
+
 [Install]
 WantedBy=multi-user.target
 EOF
