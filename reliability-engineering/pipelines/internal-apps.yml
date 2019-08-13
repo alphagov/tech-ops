@@ -154,7 +154,8 @@ jobs:
               apt-get install -y nodejs
               bundle install --without development
               bundle exec middleman build
-              cp -r . ../bundled/
+              cp manifest.yml ../bundled/manifest.yml
+              cp -r build/* ../bundled/
       - put: deploy-to-paas-docs-space
         params:
           manifest: bundled/manifest.yml
