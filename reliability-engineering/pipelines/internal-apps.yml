@@ -282,6 +282,7 @@ jobs:
           run: *bundle
       - put: deploy-to-paas-docs-space
         params:
+          current_app_name: gds-way
           manifest: bundled/manifest.yml
           show_app_log: true
           path: bundled
