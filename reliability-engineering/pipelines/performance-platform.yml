@@ -5,6 +5,13 @@ resources:
       uri: https://github.com/alphagov/stagecraft.git
       branch: master
 
+  - name: every-day-at-4am
+    type: time
+    source:
+      start: 3:45 AM
+      stop: 4:15 AM
+      location: Europe/London
+
 jobs:
   - name: deploy-stagecraft-to-paas-staging
     serial: true
@@ -80,3 +87,47 @@ jobs:
               - -c
               - |
                 etc/deploy.sh production
+
+  - name: restart-celery-workers
+    serial: true
+    plan:
+      - get: every-day-at-4am
+        trigger: true
+
+      - task: restart-staging
+        timeout: 10m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+          params: &restart-celery-workers-params
+            CF_USERNAME: ((cf_user))
+            CF_PASSWORD: ((cf_password))
+            CF_ORG: gds-performance-platform
+            CF_API: https://api.cloud.service.gov.uk
+            CF_SPACE: staging
+          run: &restart-celery-worker-run
+            path: sh
+            args:
+              - -c
+              - |
+                cf api "$CF_API"
+                cf auth
+                cf target -o "$CF_ORG" -s "$CF_SPACE"
+                cf restart performance-platform-stagecraft-celery-worker
+
+      - task: restart-production
+        timeout: 10m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+          params:
+            <<: *restart-celery-workers-params
+            CF_SPACE: production
+          run:
+            <<: *restart-celery-worker-run
