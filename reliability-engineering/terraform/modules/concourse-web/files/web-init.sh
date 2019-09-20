@@ -124,6 +124,15 @@ LimitNOFILE=infinity
 
 Environment=CONCOURSE_SECRET_CACHE_ENABLED=true
 Environment=CONCOURSE_SECRET_CACHE_DURATION=5m
+Environment=CONCOURSE_ENABLE_BUILD_AUDITING=true
+Environment=CONCOURSE_ENABLE_CONTAINER_AUDITING=true
+Environment=CONCOURSE_ENABLE_JOB_AUDITING=true
+Environment=CONCOURSE_ENABLE_PIPELINE_AUDITING=true
+Environment=CONCOURSE_ENABLE_RESOURCE_AUDITING=true
+Environment=CONCOURSE_ENABLE_SYSTEM_AUDITING=true
+Environment=CONCOURSE_ENABLE_TEAM_AUDITING=true
+Environment=CONCOURSE_ENABLE_WORKER_AUDITING=true
+Environment=CONCOURSE_ENABLE_VOLUME_AUDITING=true
 
 [Install]
 WantedBy=multi-user.target
@@ -136,3 +145,37 @@ systemctl start  concourse-web
 apt-get install prometheus-node-exporter
 systemctl enable prometheus-node-exporter
 systemctl start prometheus-node-exporter
+
+## install cloudwatch log agent
+curl -o /root/amazon-cloudwatch-agent.deb https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
+dpkg -i -E /root/amazon-cloudwatch-agent.deb
+usermod -aG adm cwagent
+
+# configure which log files are shipped to cloudwatch
+mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/
+cat <<EOF > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+{
+	"agent": {
+		"metrics_collection_interval": 60,
+		"run_as_user": "cwagent"
+	},
+	"logs": {
+		"logs_collected": {
+			"files": {
+				"collect_list": [
+					{
+						"file_path": "/var/log/syslog",
+						"log_group_name": "/aws/ec2/syslog",
+						"log_stream_name": "{hostname}/syslog",
+						"timestamp_format" :"%b %d %H:%M:%S"
+					}
+				]
+			}
+		}
+	}
+}
+EOF
+
+# start cloudwatch log agent
+systemctl enable amazon-cloudwatch-agent.service
+service amazon-cloudwatch-agent start
