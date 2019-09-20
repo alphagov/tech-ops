@@ -72,6 +72,17 @@ resource "aws_iam_policy" "concourse_web" {
           "${aws_s3_bucket.concourse_web.arn}",
           "${aws_s3_bucket.concourse_web.arn}/*"
         ]
+      }, {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
+        ],
+        "Resource": [
+          "arn:aws:logs:*:*:*"
+        ]
       }
     ]
   }
