@@ -95,3 +95,7 @@ variable "db_storage_gb" {
 }
 
 data "aws_caller_identity" "account" {}
+
+locals {
+  concourse_web_syslog_log_group_name = "/${var.deployment}/concourse/web"
+}

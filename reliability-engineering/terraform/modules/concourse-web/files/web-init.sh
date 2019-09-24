@@ -165,7 +165,7 @@ cat <<EOF > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
 				"collect_list": [
 					{
 						"file_path": "/var/log/syslog",
-						"log_group_name": "/${deployment}/concourse/web",
+						"log_group_name": "${concourse_web_syslog_log_group_name}",
 						"log_stream_name": "{hostname}/syslog",
 						"timestamp_format" :"%b %d %H:%M:%S"
 					}

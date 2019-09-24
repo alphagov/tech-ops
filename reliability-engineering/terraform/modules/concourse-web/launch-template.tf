@@ -23,7 +23,13 @@ data "template_file" "concourse_web_cloud_init" {
 
     concourse_web_bucket      = "${aws_s3_bucket.concourse_web.bucket}"
     worker_keys_s3_object_key = "${aws_s3_bucket_object.concourse_web_team_authorized_worker_keys.id}"
+
+    concourse_web_syslog_log_group_name = "${local.concourse_web_syslog_log_group_name}"
   }
+}
+
+output "concourse_web_syslog_log_group_name" {
+  value = "${local.concourse_web_syslog_log_group_name}"
 }
 
 resource "aws_launch_template" "concourse_web" {
