@@ -1,0 +1,13 @@
+---
+applications:
+  - name: domaininformation
+    routes:
+      - route: domaininformation.cloudapps.digital
+      #  - route: domaininformation.service.gov.uk
+    buildpacks:
+      - staticfile_buildpack
+    metadata:
+     labels:
+       owned_by: reliability-engineering
+       deployed_by: ((deployed-by))
+       last_deployed: ((current-datetime))
