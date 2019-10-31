@@ -129,13 +129,13 @@ resource "aws_instance" "web_page_test_controller" {
   iq=80
   pngss=1
 
-  host=localhost
-
   EC2.default=eu-west-1
   EC2.eu-west-1.min=1
   EC2.eu-west-1.max=3
   EC2.eu-west-1.subnetId=${aws_subnet.private.id}
   EC2.eu-west-1.securityGroup=${aws_security_group.web_page_test_agent.id}
+
+  host=localhost
   EOF
 
   tags = {
@@ -162,6 +162,22 @@ resource "aws_lb_target_group_attachment" "web_page_test_controller" {
   target_group_arn = "${aws_lb_target_group.web_page_test_controller.arn}"
   target_id        = "${aws_instance.web_page_test_controller.id}"
   port             = 80
+}
+
+resource "aws_lb_listener" "web_page_test_controller_redirect" {
+  load_balancer_arn = "${aws_lb.web_page_test_controller.arn}"
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
 }
 
 resource "aws_lb_listener" "web_page_test_controller" {
