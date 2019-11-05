@@ -73,6 +73,7 @@ resource "aws_iam_policy" "concourse_worker_base" {
           "s3:DeleteObjectTagging",
           "s3:DeleteObjectVersion",
           "s3:DeleteObjectVersionTagging",
+          "GetBucketVersioning",
           "s3:GetObject",
           "s3:GetObjectAcl",
           "s3:GetObjectTagging",
