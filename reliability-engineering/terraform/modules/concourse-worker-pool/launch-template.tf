@@ -18,8 +18,8 @@ data "template_file" "concourse_worker_cloud_init" {
     worker_team_name = "${var.name}"
 
     concourse_host    = "${local.concourse_url}"
-    concourse_version = "5.6.0"
-    concourse_sha1    = "8833a6d2f3c3af0025220b9cec31a0f39ace9fc5  concourse-5.6.0-linux-amd64.tgz"
+    concourse_version = "5.7.0"
+    concourse_sha1    = "2ed57a17149ac8a2cdb3d38f7d6d70b86d11c449  concourse-5.7.0-linux-amd64.tgz"
   }
 }
 
