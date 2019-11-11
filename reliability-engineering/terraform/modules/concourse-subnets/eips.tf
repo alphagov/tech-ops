@@ -5,6 +5,10 @@ resource "aws_eip" "concourse_egress" {
     Name       = "${var.deployment}-${var.name}"
     Deployment = "${var.deployment}"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 output "concourse_egress_public_ips" {
