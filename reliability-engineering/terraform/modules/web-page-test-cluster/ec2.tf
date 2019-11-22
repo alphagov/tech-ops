@@ -218,15 +218,15 @@ resource "null_resource" "web_page_test_controller_provisioning" {
     instance_id           = "${aws_instance.web_page_test_controller.id}"
   }
 
-  provisioner "file" {
-    source      = "${path.module}/files/ec2_locations.ini"
-    destination = "/tmp/ec2_locations.ini"
-  }
+  // provisioner "file" {
+  //   source      = "${path.module}/files/ec2_locations.ini"
+  //   destination = "/tmp/ec2_locations.ini"
+  // }
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo mv /tmp/ec2_locations.ini /var/www/webpagetest/www/settings/ec2_locations.ini",
-      "sudo chown www-data:www-data /var/www/webpagetest/www/settings/ec2_locations.ini",
-    ]
-  }
+  // provisioner "remote-exec" {
+  //   inline = [
+  //     "sudo mv /tmp/ec2_locations.ini /var/www/webpagetest/www/settings/ec2_locations.ini",
+  //     "sudo chown www-data:www-data /var/www/webpagetest/www/settings/ec2_locations.ini",
+  //   ]
+  // }
 }
