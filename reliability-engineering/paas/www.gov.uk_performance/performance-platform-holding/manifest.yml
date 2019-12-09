@@ -4,4 +4,4 @@ applications:
   memory: 64M
   instances: 3
   buildpacks:
-  - staticfile_buildpack
+  - nginx_buildpack
