@@ -1,0 +1,7 @@
+---
+applications:
+- name: performance-platform-holding
+  memory: 64M
+  instances: 3
+  buildpacks:
+  - staticfile_buildpack
