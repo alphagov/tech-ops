@@ -1,0 +1,8 @@
+---
+applications:
+- name: performance-platform-spotlight-static
+  memory: 64M
+  instances: 3
+  buildpacks:
+  - nginx_buildpack
+
