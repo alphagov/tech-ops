@@ -2,7 +2,7 @@
 from bs4 import BeautifulSoup, Comment
 import os, os.path
 
-for root, dirs, files in os.walk('static/performance'):
+for root, dirs, files in os.walk('.'):
     for file in files:
         if file.endswith('.html'):
             try:
