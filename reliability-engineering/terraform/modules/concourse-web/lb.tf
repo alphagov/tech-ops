@@ -21,7 +21,7 @@ resource "aws_lb_target_group" "concourse_web" {
 resource "aws_lb_listener" "concourse_web_https" {
   load_balancer_arn = "${aws_lb.concourse_web.arn}"
   port              = "443"
-  protocol          = "HTTPS"
+  protocol          = "TLS"
   ssl_policy        = "ELBSecurityPolicy-2015-05"
   certificate_arn   = "${aws_acm_certificate_validation.concourse_public_deployment.certificate_arn}"
 
