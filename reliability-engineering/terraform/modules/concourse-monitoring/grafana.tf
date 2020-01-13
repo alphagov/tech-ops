@@ -57,11 +57,11 @@ data "template_file" "concourse_grafana_container_def" {
   template = "${file("${path.module}/files/grafana-container-def.json")}"
 
   vars {
-    deployment      = "${var.deployment}"
-    grafana_url     = "${local.grafana_url}"
-    database_host   = "${aws_db_instance.concourse_grafana_db.endpoint}"
-    aws_account_id  = "${data.aws_caller_identity.account.account_id}"
-    github_team_ids = "${join(",", var.grafana_allowed_github_team_ids)}"
+    deployment                   = "${var.deployment}"
+    grafana_url                  = "${local.grafana_url}"
+    database_host                = "${aws_db_instance.concourse_grafana_db.endpoint}"
+    aws_account_id               = "${data.aws_caller_identity.account.account_id}"
+    github_allowed_organizations = "${join(",", var.grafana_github_allowed_organizations)}"
   }
 }
 

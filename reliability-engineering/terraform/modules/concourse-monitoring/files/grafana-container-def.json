@@ -40,8 +40,8 @@
         "value": "true"
       },
       {
-        "name": "GF_AUTH_GITHUB_TEAM_IDS",
-        "value": "${github_team_ids}"
+        "name": "GF_AUTH_GITHUB_ALLOWED_ORGANIZATIONS",
+        "value": "${github_allowed_organizations}"
       },
       {
         "name": "GF_EXPLORE_ENABLED",
