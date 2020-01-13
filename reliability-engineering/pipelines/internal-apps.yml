@@ -306,7 +306,7 @@ jobs:
             type: docker-image
             source:
               repository: ruby
-              tag: 2.6.3
+              tag: 2.6.4
           inputs:
             - name: re-request-an-aws-account-pr
               path: repo
@@ -345,7 +345,7 @@ jobs:
             type: docker-image
             source:
               repository: ruby
-              tag: 2.6.3
+              tag: 2.6.4
           inputs:
             - name: re-request-an-aws-account-git
               path: repo
