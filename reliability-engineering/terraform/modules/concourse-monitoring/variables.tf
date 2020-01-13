@@ -30,7 +30,7 @@ variable "whitelisted_cidr_blocks" {
   type = "list"
 }
 
-variable "grafana_allowed_github_team_ids" {
+variable "grafana_github_allowed_organizations" {
   type = "list"
 }
 
