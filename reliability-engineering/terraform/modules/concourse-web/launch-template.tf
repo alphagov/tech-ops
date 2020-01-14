@@ -18,8 +18,8 @@ data "template_file" "concourse_web_cloud_init" {
     main_team_github_team  = "${var.main_team_github_team}"
     concourse_external_url = "${aws_route53_record.concourse_public_deployment.fqdn}"
     concourse_db_url       = "${aws_route53_record.concourse_private_db.fqdn}"
-    concourse_version      = "5.7.0"
-    concourse_sha1         = "2ed57a17149ac8a2cdb3d38f7d6d70b86d11c449  concourse-5.7.0-linux-amd64.tgz"
+    concourse_version      = "5.8.0"
+    concourse_sha1         = "1988895c4c6ee94bdd48eb35c92ff45586ae5841  concourse-5.8.0-linux-amd64.tgz"
 
     concourse_web_bucket      = "${aws_s3_bucket.concourse_web.bucket}"
     worker_keys_s3_object_key = "${aws_s3_bucket_object.concourse_web_team_authorized_worker_keys.id}"
