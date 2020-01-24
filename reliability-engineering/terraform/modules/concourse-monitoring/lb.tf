@@ -67,7 +67,7 @@ resource "aws_lb_listener_rule" "concourse_prometheus" {
   action {
     type = "forward"
 
-    target_group_arn = element(aws_lb_target_group.concourse_prometheus.*.arn, count.index)
+    target_group_arn = aws_lb_target_group.concourse_prometheus[count.index].arn
   }
 
   condition {

@@ -12,7 +12,7 @@ resource "aws_route_table" "concourse_private" {
   route {
     cidr_block = "0.0.0.0/0"
 
-    nat_gateway_id = element(aws_nat_gateway.concourse_egress.*.id, count.index)
+    nat_gateway_id = aws_nat_gateway.concourse_egress[count.index].id
   }
 
   tags = {
@@ -24,9 +24,9 @@ resource "aws_route_table" "concourse_private" {
 resource "aws_route_table_association" "concourse_private" {
   count = var.number_of_availability_zones
 
-  subnet_id = element(aws_subnet.concourse_private.*.id, count.index)
+  subnet_id = aws_subnet.concourse_private[count.index].id
 
-  route_table_id = element(aws_route_table.concourse_private.*.id, count.index)
+  route_table_id = aws_route_table.concourse_private[count.index].id
 }
 
 resource "aws_route_table" "concourse_public" {
@@ -47,7 +47,7 @@ resource "aws_route_table" "concourse_public" {
 resource "aws_route_table_association" "concourse_public" {
   count = var.number_of_availability_zones
 
-  subnet_id = element(aws_subnet.concourse_public.*.id, count.index)
+  subnet_id = aws_subnet.concourse_public[count.index].id
 
-  route_table_id = element(aws_route_table.concourse_public.*.id, count.index)
+  route_table_id = aws_route_table.concourse_public[count.index].id
 }

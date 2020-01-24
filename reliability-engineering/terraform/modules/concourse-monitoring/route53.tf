@@ -47,7 +47,7 @@ resource "aws_route53_record" "concourse_private_prometheis" {
   ttl     = 10
 
   records = [
-    element(aws_instance.concourse_prometheus.*.private_ip, count.index),
+    aws_instance.concourse_prometheus[count.index].private_ip,
   ]
 }
 

@@ -21,7 +21,7 @@ data "template_file" "concourse_prometheus_cloud_init" {
 data "aws_subnet" "concourse_prometheus" {
   count = 2
 
-  id = element(var.private_subnet_ids, count.index)
+  id = var.private_subnet_ids[count.index]
 }
 
 resource "aws_instance" "concourse_prometheus" {
@@ -29,7 +29,7 @@ resource "aws_instance" "concourse_prometheus" {
 
   ami                    = data.aws_ami.ubuntu_bionic.id
   instance_type          = var.prometheus_instance_type
-  subnet_id              = element(var.private_subnet_ids, count.index)
+  subnet_id              = var.private_subnet_ids[count.index]
   vpc_security_group_ids = [var.prometheus_security_group_id]
 
   iam_instance_profile = aws_iam_instance_profile.concourse_prometheus.name
@@ -69,16 +69,16 @@ resource "aws_volume_attachment" "concourse_prometheus_concourse_prometheus" {
 
   device_name = "/dev/xvdp"
 
-  volume_id = element(aws_ebs_volume.concourse_prometheus.*.id, count.index)
+  volume_id = aws_ebs_volume.concourse_prometheus[count.index].id
 
-  instance_id = element(aws_instance.concourse_prometheus.*.id, count.index)
+  instance_id = aws_instance.concourse_prometheus[count.index].id
 }
 
 resource "aws_lb_target_group_attachment" "concourse_prometheus" {
   count = 2
   port  = 9090
 
-  target_group_arn = element(aws_lb_target_group.concourse_prometheus.*.arn, count.index)
+  target_group_arn = aws_lb_target_group.concourse_prometheus[count.index].arn
 
-  target_id = element(aws_instance.concourse_prometheus.*.id, count.index)
+  target_id = aws_instance.concourse_prometheus[count.index].id
 }

@@ -28,7 +28,7 @@ output "concourse_worker_ssh_private_keys_pem" {
 resource "aws_iam_role" "concourse_workers" {
   count = length(var.worker_team_names)
 
-  name = "${var.deployment}-${element(var.worker_team_names, count.index)}-concourse-worker"
+  name = "${var.deployment}-${var.worker_team_names[count.index]}-concourse-worker"
 
   assume_role_policy = <<-ARP
   {

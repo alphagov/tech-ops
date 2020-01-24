@@ -1,10 +1,10 @@
 resource "aws_subnet" "concourse_ingress" {
   count = var.number_of_availability_zones
 
-  availability_zone = element(local.availability_zone_names, count.index)
+  availability_zone = local.availability_zone_names[count.index]
 
   vpc_id     = aws_vpc.concourse.id
-  cidr_block = element(var.ingress_subnet_cidrs, count.index)
+  cidr_block = var.ingress_subnet_cidrs[count.index]
 
   tags = {
     Name       = "${var.deployment}-ingress"
@@ -29,7 +29,7 @@ resource "aws_route_table" "concourse_ingress" {
 resource "aws_route_table_association" "concourse_ingress" {
   count = var.number_of_availability_zones
 
-  subnet_id      = element(aws_subnet.concourse_ingress.*.id, count.index)
+  subnet_id      = aws_subnet.concourse_ingress[count.index].id
   route_table_id = aws_route_table.concourse_ingress.id
 }
 

@@ -11,7 +11,7 @@ resource "aws_ssm_parameter" "concourse_local_usernames_and_passwords" {
   name        = "/${var.deployment}/concourse/pipelines/${element(var.worker_team_names, count.index)}/readonly_local_user_password"
   type        = "SecureString"
   description = "Password for the local user with admin access to team ${element(var.worker_team_names, count.index)}"
-  value       = element(random_string.local_user_password.*.result, count.index)
+  value       = random_string.local_user_password[count.index].result
   key_id      = aws_kms_key.concourse_worker_shared.key_id
 
   tags = {
