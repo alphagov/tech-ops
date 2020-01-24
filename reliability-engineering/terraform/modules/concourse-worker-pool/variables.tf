@@ -1,41 +1,41 @@
 variable "deployment" {
-  type = "string"
+  type = string
 }
 
 variable "name" {
-  type = "string"
+  type = string
 }
 
 variable "subnet_ids" {
-  type = "list"
+  type = list(string)
 }
 
 variable "security_group_ids" {
-  type = "list"
+  type = list(string)
 }
 
 variable "private_root_zone_id" {
-  type = "string"
+  type = string
 }
 
 variable "web_ssh_public_key_openssh" {
-  type = "string"
+  type = string
 }
 
 variable "worker_ssh_private_key_pem" {
-  type = "string"
+  type = string
 }
 
 variable "kms_key_id" {
-  type = "string"
+  type = string
 }
 
 variable "kms_key_arn" {
-  type = "string"
+  type = string
 }
 
 variable "worker_iam_role_name" {
-  type = "string"
+  type = string
 }
 
 variable "desired_capacity" {
@@ -51,7 +51,7 @@ variable "volume_size" {
 }
 
 variable "additional_concourse_worker_iam_policies" {
-  type    = "list"
+  type    = list(string)
   default = []
 }
 

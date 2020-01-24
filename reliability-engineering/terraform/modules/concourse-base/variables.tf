@@ -1,13 +1,13 @@
 variable "deployment" {
-  type = "string"
+  type = string
 }
 
 variable "vpc_cidr" {
-  type = "string"
+  type = string
 }
 
 variable "ingress_subnet_cidrs" {
-  type = "list"
+  type = list(string)
 }
 
 variable "number_of_availability_zones" {
@@ -17,13 +17,15 @@ variable "number_of_availability_zones" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  availability_zone_names = "${slice(
+  availability_zone_names = slice(
     data.aws_availability_zones.available.names,
-    0, var.number_of_availability_zones
-  )}"
+    0,
+    var.number_of_availability_zones,
+  )
 
-  availability_zone_ids = "${slice(
+  availability_zone_ids = slice(
     data.aws_availability_zones.available.zone_ids,
-    0, var.number_of_availability_zones
-  )}"
+    0,
+    var.number_of_availability_zones,
+  )
 }

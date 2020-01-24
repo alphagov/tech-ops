@@ -141,26 +141,23 @@ resource "aws_iam_policy" "concourse_worker_base" {
       }
     ]
   }
-  POLICY
+POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_worker_concourse_worker_base" {
-  role       = "${var.worker_iam_role_name}"
-  policy_arn = "${aws_iam_policy.concourse_worker_base.arn}"
+  role       = var.worker_iam_role_name
+  policy_arn = aws_iam_policy.concourse_worker_base.arn
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_worker_additional" {
-  count = "${length(var.additional_concourse_worker_iam_policies)}"
+  count = length(var.additional_concourse_worker_iam_policies)
 
-  role = "${var.worker_iam_role_name}"
+  role = var.worker_iam_role_name
 
-  policy_arn = "${element(
-    var.additional_concourse_worker_iam_policies,
-    count.index
-  )}"
+  policy_arn = element(var.additional_concourse_worker_iam_policies, count.index)
 }
 
 resource "aws_iam_instance_profile" "concourse_worker" {
-  name = "${var.worker_iam_role_name}"
-  role = "${var.worker_iam_role_name}"
+  name = var.worker_iam_role_name
+  role = var.worker_iam_role_name
 }

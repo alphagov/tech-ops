@@ -1,81 +1,81 @@
 variable "deployment" {
-  type = "string"
+  type = string
 }
 
 variable "vpc_id" {
-  type = "string"
+  type = string
 }
 
 variable "public_subnet_ids" {
-  type = "list"
+  type = list(string)
 }
 
 variable "private_subnet_ids" {
-  type = "list"
+  type = list(string)
 }
 
 variable "public_root_zone_id" {
-  type = "string"
+  type = string
 }
 
 variable "private_root_zone_id" {
-  type = "string"
+  type = string
 }
 
 variable "whitelisted_cidr_blocks" {
-  type = "list"
+  type = list(string)
 }
 
 variable "main_team_github_team" {
   description = "GitHub Global Admin team $org:$teamName"
-  type        = "string"
+  type        = string
 }
 
 variable "worker_team_names" {
   description = "The names of concourse worker team names, i.e. hosts, for keygen."
-  type        = "list"
+  type        = list(string)
 }
 
 variable "local_user_passwords" {
   description = "The map of team to generated password, used for local users."
-  type        = "map"
+  type        = map(string)
 }
 
 variable "worker_pool_egress_eips" {
-  type        = "list"
+  type        = list(string)
   description = "A list of all of the egress IPs of all of the worker pools"
 }
 
 variable "worker_ssh_public_keys_openssh" {
-  type = "map"
+  type = map(string)
 }
 
 variable "web_ssh_private_key_pem" {
-  type = "string"
+  type = string
 }
 
 variable "web_session_private_key_pem" {
-  type = "string"
+  type = string
 }
 
 variable "web_kms_key_id" {
-  type = "string"
+  type = string
 }
 
 variable "web_kms_key_arn" {
-  type = "string"
+  type = string
 }
 
 variable "worker_kms_key_id" {
-  type = "string"
+  type = string
 }
 
 variable "worker_kms_key_arn" {
-  type = "string"
+  type = string
 }
 
 variable "web_iam_role_name" {
-  type = "string"
+  type = string
 }
 
 variable "desired_capacity" {

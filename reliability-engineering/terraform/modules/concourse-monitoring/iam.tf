@@ -14,7 +14,7 @@ resource "aws_iam_role" "concourse_prometheus" {
       }
     ]
   }
-  ARP
+ARP
 }
 
 resource "aws_iam_policy" "concourse_prometheus" {
@@ -48,17 +48,17 @@ resource "aws_iam_policy" "concourse_prometheus" {
       }
     ]
   }
-  POLICY
+POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_prometheus_concourse_prometheus" {
-  role       = "${aws_iam_role.concourse_prometheus.name}"
-  policy_arn = "${aws_iam_policy.concourse_prometheus.arn}"
+  role       = aws_iam_role.concourse_prometheus.name
+  policy_arn = aws_iam_policy.concourse_prometheus.arn
 }
 
 resource "aws_iam_instance_profile" "concourse_prometheus" {
-  name = "${aws_iam_role.concourse_prometheus.name}"
-  role = "${aws_iam_role.concourse_prometheus.name}"
+  name = aws_iam_role.concourse_prometheus.name
+  role = aws_iam_role.concourse_prometheus.name
 }
 
 resource "aws_iam_role" "concourse_grafana_execution" {
@@ -77,7 +77,7 @@ resource "aws_iam_role" "concourse_grafana_execution" {
       }
     ]
   }
-  EOF
+EOF
 }
 
 resource "aws_iam_policy" "concourse_grafana_execution" {
@@ -109,10 +109,10 @@ resource "aws_iam_policy" "concourse_grafana_execution" {
       }
     ]
   }
-  EOF
+EOF
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_grafana_execution_concourse_grafana_execution" {
-  role       = "${aws_iam_role.concourse_grafana_execution.name}"
-  policy_arn = "${aws_iam_policy.concourse_grafana_execution.arn}"
+  role       = aws_iam_role.concourse_grafana_execution.name
+  policy_arn = aws_iam_policy.concourse_grafana_execution.arn
 }

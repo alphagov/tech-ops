@@ -2,21 +2,21 @@ resource "aws_lb" "concourse_monitoring" {
   name               = "${var.deployment}-concourse-monitoring"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = ["${aws_security_group.concourse_monitoring_lb.id}"]
-  subnets            = ["${var.public_subnet_ids}"]
+  security_groups    = [aws_security_group.concourse_monitoring_lb.id]
+  subnets            = var.public_subnet_ids
 
   tags = {
     Name       = "${var.deployment}-concourse-monitoring"
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }
 
 resource "aws_lb_listener" "concourse_monitoring_https" {
-  load_balancer_arn = "${aws_lb.concourse_monitoring.arn}"
+  load_balancer_arn = aws_lb.concourse_monitoring.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2015-05"
-  certificate_arn   = "${aws_acm_certificate_validation.concourse_web.certificate_arn}"
+  certificate_arn   = aws_acm_certificate_validation.concourse_web.certificate_arn
 
   default_action {
     type = "fixed-response"
@@ -30,7 +30,7 @@ resource "aws_lb_listener" "concourse_monitoring_https" {
 }
 
 resource "aws_lb_listener" "concourse_monitoring_http" {
-  load_balancer_arn = "${aws_lb.concourse_monitoring.arn}"
+  load_balancer_arn = aws_lb.concourse_monitoring.arn
   port              = "80"
   protocol          = "HTTP"
 
@@ -51,7 +51,7 @@ resource "aws_lb_target_group" "concourse_prometheus" {
   name     = "${var.deployment}-concourse-prometheus"
   port     = 9090
   protocol = "HTTP"
-  vpc_id   = "${var.vpc_id}"
+  vpc_id   = var.vpc_id
 
   health_check {
     path = "/api/v1/status/config"
@@ -61,21 +61,18 @@ resource "aws_lb_target_group" "concourse_prometheus" {
 resource "aws_lb_listener_rule" "concourse_prometheus" {
   count = 2
 
-  listener_arn = "${aws_lb_listener.concourse_monitoring_https.arn}"
-  priority     = "${100 + count.index}"
+  listener_arn = aws_lb_listener.concourse_monitoring_https.arn
+  priority     = 100 + count.index
 
   action {
     type = "forward"
 
-    target_group_arn = "${element(
-      aws_lb_target_group.concourse_prometheus.*.arn,
-      count.index
-    )}"
+    target_group_arn = element(aws_lb_target_group.concourse_prometheus.*.arn, count.index)
   }
 
   condition {
     field  = "host-header"
-    values = ["prom-${count.index+1}.*"]
+    values = ["prom-${count.index + 1}.*"]
   }
 }
 
@@ -83,7 +80,7 @@ resource "aws_lb_target_group" "concourse_grafana" {
   name        = "${var.deployment}-concourse-grafana"
   port        = 8080
   protocol    = "HTTP"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = var.vpc_id
   target_type = "ip"
 
   health_check {
@@ -97,16 +94,17 @@ resource "aws_lb_target_group" "concourse_grafana" {
 }
 
 resource "aws_lb_listener_rule" "concourse_grafana" {
-  listener_arn = "${aws_lb_listener.concourse_monitoring_https.arn}"
+  listener_arn = aws_lb_listener.concourse_monitoring_https.arn
   priority     = 110
 
   action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.concourse_grafana.arn}"
+    target_group_arn = aws_lb_target_group.concourse_grafana.arn
   }
 
   condition {
-    field  = "host-header"
-    values = ["grafana.*"]
+    host_header {
+      values = ["grafana.*"]
+    }
   }
 }
