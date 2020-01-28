@@ -86,15 +86,15 @@ resource "aws_iam_policy" "concourse_web" {
       }
     ]
   }
-  POLICY
+POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_web_concourse_web" {
-  role       = "${var.web_iam_role_name}"
-  policy_arn = "${aws_iam_policy.concourse_web.arn}"
+  role       = var.web_iam_role_name
+  policy_arn = aws_iam_policy.concourse_web.arn
 }
 
 resource "aws_iam_instance_profile" "concourse_web" {
-  name = "${var.web_iam_role_name}"
-  role = "${var.web_iam_role_name}"
+  name = var.web_iam_role_name
+  role = var.web_iam_role_name
 }

@@ -11,13 +11,12 @@ data "aws_ami" "ubuntu_bionic" {
 }
 
 data "template_file" "concourse_worker_cloud_init" {
-  template = "${file("${path.module}/files/worker-init.sh")}"
+  template = file("${path.module}/files/worker-init.sh")
 
-  vars {
-    deployment       = "${var.deployment}"
-    worker_team_name = "${var.name}"
-
-    concourse_host    = "${local.concourse_url}"
+  vars = {
+    deployment        = var.deployment
+    worker_team_name  = var.name
+    concourse_host    = local.concourse_url
     concourse_version = "5.8.0"
     concourse_sha1    = "1988895c4c6ee94bdd48eb35c92ff45586ae5841  concourse-5.8.0-linux-amd64.tgz"
   }
@@ -26,24 +25,22 @@ data "template_file" "concourse_worker_cloud_init" {
 resource "aws_launch_template" "concourse_worker" {
   name_prefix            = "${var.deployment}-${var.name}-concourse-worker-"
   ebs_optimized          = true
-  image_id               = "${data.aws_ami.ubuntu_bionic.id}"
-  instance_type          = "${var.instance_type}"
-  vpc_security_group_ids = ["${var.security_group_ids}"]
+  image_id               = data.aws_ami.ubuntu_bionic.id
+  instance_type          = var.instance_type
+  vpc_security_group_ids = var.security_group_ids
 
-  user_data = "${
-    base64encode(data.template_file.concourse_worker_cloud_init.rendered)
-  }"
+  user_data = base64encode(data.template_file.concourse_worker_cloud_init.rendered)
 
   block_device_mappings {
     device_name = "/dev/sda1"
 
     ebs {
-      volume_size = "${var.volume_size}"
+      volume_size = var.volume_size
     }
   }
 
   iam_instance_profile {
-    name = "${aws_iam_instance_profile.concourse_worker.name}"
+    name = aws_iam_instance_profile.concourse_worker.name
   }
 
   monitoring {
@@ -55,9 +52,9 @@ resource "aws_launch_template" "concourse_worker" {
 
     tags = {
       Name       = "${var.deployment}-${var.name}-concourse-worker"
-      Deployment = "${var.deployment}"
+      Deployment = var.deployment
       Role       = "concourse-worker"
-      Team       = "${var.name}"
+      Team       = var.name
     }
   }
 
@@ -66,11 +63,11 @@ resource "aws_launch_template" "concourse_worker" {
 
     tags = {
       Name       = "${var.deployment}-${var.name}-concourse-worker"
-      Deployment = "${var.deployment}"
+      Deployment = var.deployment
     }
   }
 
-  tags {
-    Deployment = "${var.deployment}"
+  tags = {
+    Deployment = var.deployment
   }
 }

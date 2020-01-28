@@ -1,9 +1,9 @@
 resource "aws_eip" "concourse_egress" {
-  count = "${var.number_of_availability_zones}"
+  count = var.number_of_availability_zones
 
-  tags {
+  tags = {
     Name       = "${var.deployment}-${var.name}"
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 
   lifecycle {
@@ -12,5 +12,5 @@ resource "aws_eip" "concourse_egress" {
 }
 
 output "concourse_egress_public_ips" {
-  value = "${aws_eip.concourse_egress.*.public_ip}"
+  value = aws_eip.concourse_egress.*.public_ip
 }

@@ -5,8 +5,8 @@ resource "aws_elb" "concourse_web" {
   connection_draining_timeout = 60
   idle_timeout                = 60
   internal                    = true
-  subnets                     = ["${var.private_subnet_ids}"]
-  security_groups             = ["${aws_security_group.concourse_elb.id}"]
+  subnets                     = var.private_subnet_ids
+  security_groups             = [aws_security_group.concourse_elb.id]
 
   listener {
     instance_port     = 2222
@@ -25,6 +25,6 @@ resource "aws_elb" "concourse_web" {
 
   tags = {
     Name       = "${var.deployment}-concourse-web"
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }

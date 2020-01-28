@@ -11,42 +11,38 @@ data "aws_ami" "ubuntu_bionic" {
 }
 
 data "template_file" "concourse_prometheus_cloud_init" {
-  template = "${file("${path.module}/files/prometheus-init.sh")}"
+  template = file("${path.module}/files/prometheus-init.sh")
 
-  vars {
-    deployment = "${var.deployment}"
+  vars = {
+    deployment = var.deployment
   }
 }
 
 data "aws_subnet" "concourse_prometheus" {
   count = 2
 
-  id = "${element(var.private_subnet_ids, count.index)}"
+  id = var.private_subnet_ids[count.index]
 }
 
 resource "aws_instance" "concourse_prometheus" {
   count = 2
 
-  ami                    = "${data.aws_ami.ubuntu_bionic.id}"
-  instance_type          = "${var.prometheus_instance_type}"
-  subnet_id              = "${element(var.private_subnet_ids, count.index)}"
-  vpc_security_group_ids = ["${var.prometheus_security_group_id}"]
+  ami                    = data.aws_ami.ubuntu_bionic.id
+  instance_type          = var.prometheus_instance_type
+  subnet_id              = var.private_subnet_ids[count.index]
+  vpc_security_group_ids = [var.prometheus_security_group_id]
 
-  iam_instance_profile = "${
-    aws_iam_instance_profile.concourse_prometheus.name
-  }"
+  iam_instance_profile = aws_iam_instance_profile.concourse_prometheus.name
 
-  user_data = "${
-    data.template_file.concourse_prometheus_cloud_init.rendered
-  }"
+  user_data = data.template_file.concourse_prometheus_cloud_init.rendered
 
   root_block_device {
     volume_size = 20
   }
 
-  tags {
+  tags = {
     Name       = "${var.deployment}-concourse-prometheus"
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
     Role       = "prometheus"
   }
 }
@@ -57,14 +53,14 @@ resource "aws_ebs_volume" "concourse_prometheus" {
   size      = 100
   encrypted = true
 
-  availability_zone = "${element(
+  availability_zone = element(
     data.aws_subnet.concourse_prometheus.*.availability_zone,
-    count.index
-  )}"
+    count.index,
+  )
 
   tags = {
     Name       = "${var.deployment}-concourse-prometheus"
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }
 
@@ -73,27 +69,16 @@ resource "aws_volume_attachment" "concourse_prometheus_concourse_prometheus" {
 
   device_name = "/dev/xvdp"
 
-  volume_id = "${element(
-    aws_ebs_volume.concourse_prometheus.*.id,
-    count.index
-  )}"
+  volume_id = aws_ebs_volume.concourse_prometheus[count.index].id
 
-  instance_id = "${element(
-    aws_instance.concourse_prometheus.*.id,
-    count.index
-  )}"
+  instance_id = aws_instance.concourse_prometheus[count.index].id
 }
 
 resource "aws_lb_target_group_attachment" "concourse_prometheus" {
   count = 2
   port  = 9090
 
-  target_group_arn = "${
-    element(aws_lb_target_group.concourse_prometheus.*.arn, count.index)
-  }"
+  target_group_arn = aws_lb_target_group.concourse_prometheus[count.index].arn
 
-  target_id = "${element(
-    aws_instance.concourse_prometheus.*.id,
-    count.index
-  )}"
+  target_id = aws_instance.concourse_prometheus[count.index].id
 }

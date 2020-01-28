@@ -1,24 +1,24 @@
 resource "aws_vpc" "concourse" {
-  cidr_block = "${var.vpc_cidr}"
+  cidr_block = var.vpc_cidr
 
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags {
+  tags = {
     Name       = "${var.deployment}-concourse"
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }
 
 resource "aws_internet_gateway" "concourse" {
-  vpc_id = "${aws_vpc.concourse.id}"
+  vpc_id = aws_vpc.concourse.id
 
-  tags {
+  tags = {
     Name       = "${var.deployment}-concourse"
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }
 
 output "concourse_vpc_id" {
-  value = "${aws_vpc.concourse.id}"
+  value = aws_vpc.concourse.id
 }

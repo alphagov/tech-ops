@@ -1,37 +1,37 @@
 variable "deployment" {
-  type = "string"
+  type = string
 }
 
 variable "vpc_id" {
-  type = "string"
+  type = string
 }
 
 variable "private_subnet_ids" {
-  type = "list"
+  type = list(string)
 }
 
 variable "public_subnet_ids" {
-  type = "list"
+  type = list(string)
 }
 
 variable "prometheus_security_group_id" {
-  type = "string"
+  type = string
 }
 
 variable "public_root_zone_id" {
-  type = "string"
+  type = string
 }
 
 variable "private_root_zone_id" {
-  type = "string"
+  type = string
 }
 
 variable "whitelisted_cidr_blocks" {
-  type = "list"
+  type = list(string)
 }
 
 variable "grafana_github_allowed_organizations" {
-  type = "list"
+  type = list(string)
 }
 
 variable "prometheus_instance_type" {

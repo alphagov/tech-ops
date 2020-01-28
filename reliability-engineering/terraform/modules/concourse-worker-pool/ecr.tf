@@ -1,5 +1,5 @@
 data "aws_iam_role" "concourse_worker" {
-  name = "${var.worker_iam_role_name}"
+  name = var.worker_iam_role_name
 }
 
 resource "random_string" "concourse_worker_private_ecr_repo" {
@@ -10,18 +10,23 @@ resource "random_string" "concourse_worker_private_ecr_repo" {
 }
 
 resource "aws_ecr_repository" "concourse_worker_private" {
-  name = "${ join("-", list(
-    var.deployment, var.name, "private",
-    random_string.concourse_worker_private_ecr_repo.result
-  ))}"
+  name = join(
+    "-",
+    [
+      var.deployment,
+      var.name,
+      "private",
+      random_string.concourse_worker_private_ecr_repo.result,
+    ],
+  )
 
-  tags {
-    Deployment = "${var.deployment}"
+  tags = {
+    Deployment = var.deployment
   }
 }
 
 resource "aws_ecr_lifecycle_policy" "concourse_worker_private_last_900" {
-  repository = "${aws_ecr_repository.concourse_worker_private.name}"
+  repository = aws_ecr_repository.concourse_worker_private.name
 
   policy = <<-POLICY
   {
@@ -40,11 +45,11 @@ resource "aws_ecr_lifecycle_policy" "concourse_worker_private_last_900" {
       }
     ]
   }
-  POLICY
+POLICY
 }
 
 resource "aws_ecr_repository_policy" "concourse_worker_private" {
-  repository = "${aws_ecr_repository.concourse_worker_private.name}"
+  repository = aws_ecr_repository.concourse_worker_private.name
 
   policy = <<-EOF
   {
@@ -65,5 +70,5 @@ resource "aws_ecr_repository_policy" "concourse_worker_private" {
       }
     }]
   }
-  EOF
+EOF
 }

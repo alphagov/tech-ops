@@ -2,11 +2,11 @@ resource "aws_ssm_parameter" "concourse_web_ssh_key" {
   name        = "/${var.deployment}/concourse/web/ssh_key"
   type        = "SecureString"
   description = "Concourse web ssh private key"
-  value       = "${var.web_ssh_private_key_pem}"
-  key_id      = "${var.web_kms_key_id}"
+  value       = var.web_ssh_private_key_pem
+  key_id      = var.web_kms_key_id
 
   tags = {
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }
 
@@ -14,11 +14,11 @@ resource "aws_ssm_parameter" "concourse_web_session_key" {
   name        = "/${var.deployment}/concourse/web/session_key"
   type        = "SecureString"
   description = "Concourse web session key"
-  value       = "${var.web_session_private_key_pem}"
-  key_id      = "${var.web_kms_key_id}"
+  value       = var.web_session_private_key_pem
+  key_id      = var.web_kms_key_id
 
   tags = {
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }
 
@@ -26,11 +26,11 @@ resource "aws_ssm_parameter" "concourse_web_db_password" {
   name        = "/${var.deployment}/concourse/web/db_password"
   type        = "SecureString"
   description = "Password to Concourse Postgres Database"
-  value       = "${random_string.concourse_db_password.result}"
-  key_id      = "${var.web_kms_key_id}"
+  value       = random_string.concourse_db_password.result
+  key_id      = var.web_kms_key_id
 
   tags = {
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }
 
@@ -38,17 +38,17 @@ resource "aws_ssm_parameter" "concourse_web_local_users" {
   name        = "/${var.deployment}/concourse/web/local_users"
   type        = "SecureString"
   description = "Usernames and passwords for local users"
-  value       = "${jsonencode(var.local_user_passwords)}"
-  key_id      = "${var.web_kms_key_id}"
+  value       = jsonencode(var.local_user_passwords)
+  key_id      = var.web_kms_key_id
 
   tags = {
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }
 
 resource "aws_s3_bucket_object" "concourse_web_team_authorized_worker_keys" {
-  bucket  = "${aws_s3_bucket.concourse_web.bucket}"
+  bucket  = aws_s3_bucket.concourse_web.bucket
   key     = "team_authorized_worker_keys.json"
-  content = "${jsonencode(var.worker_ssh_public_keys_openssh)}"
-  etag    = "${md5(jsonencode(var.worker_ssh_public_keys_openssh))}"
+  content = jsonencode(var.worker_ssh_public_keys_openssh)
+  etag    = md5(jsonencode(var.worker_ssh_public_keys_openssh))
 }

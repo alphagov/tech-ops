@@ -1,11 +1,11 @@
 resource "aws_nat_gateway" "concourse_egress" {
-  count = "${var.number_of_availability_zones}"
+  count = var.number_of_availability_zones
 
-  allocation_id = "${element(aws_eip.concourse_egress.*.id, count.index)}"
-  subnet_id     = "${element(aws_subnet.concourse_public.*.id, count.index)}"
+  allocation_id = aws_eip.concourse_egress[count.index].id
+  subnet_id     = aws_subnet.concourse_public[count.index].id
 
-  tags {
+  tags = {
     Name       = "${var.deployment}-${var.name}"
-    Deployment = "${var.deployment}"
+    Deployment = var.deployment
   }
 }
