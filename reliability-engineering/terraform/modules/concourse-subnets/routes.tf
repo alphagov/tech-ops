@@ -49,5 +49,5 @@ resource "aws_route_table_association" "concourse_public" {
 
   subnet_id = aws_subnet.concourse_public[count.index].id
 
-  route_table_id = aws_route_table.concourse_public[count.index].id
+  route_table_id = element(aws_route_table.concourse_public.*.id, count.index)
 }
