@@ -22,11 +22,12 @@ resource "aws_db_instance" "concourse" {
   allocated_storage         = var.db_storage_gb
   storage_type              = "gp2"
   engine                    = "postgres"
-  engine_version            = "10.9"
+  engine_version            = "10.10"
   instance_class            = var.db_instance_type
   final_snapshot_identifier = "${var.deployment}-concourse-final"
   storage_encrypted         = true
   vpc_security_group_ids    = [aws_security_group.concourse_db.id]
+  ca_cert_identifier        = "rds-ca-2019"
 
   tags = {
     Name       = "${var.deployment}-concourse"

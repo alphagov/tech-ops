@@ -41,7 +41,7 @@ resource "aws_db_instance" "concourse_grafana_db" {
   allocated_storage         = 25
   storage_type              = "gp2"
   engine                    = "postgres"
-  engine_version            = "10.9"
+  engine_version            = "10.10"
   instance_class            = "db.t2.small"
   name                      = "grafana"
   username                  = "grafana"
@@ -51,6 +51,7 @@ resource "aws_db_instance" "concourse_grafana_db" {
   final_snapshot_identifier = "${var.deployment}-concourse-grafana-final"
   backup_retention_period   = 7
   storage_encrypted         = true
+  ca_cert_identifier        = "rds-ca-2019"
 }
 
 data "template_file" "concourse_grafana_container_def" {
