@@ -1,0 +1,2 @@
+splunk-sdk==1.6.11
+click

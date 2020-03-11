@@ -1,0 +1,187 @@
+---
+
+resource_types:
+
+- name: s3-iam
+  type: registry-image
+  source:
+    repository: governmentpaas/s3-resource
+    tag: 97e441efbfb06ac7fb09786fd74c64b05f9cc907
+
+- name: terraform
+  type: registry-image
+  source:
+    repository: ljfranklin/terraform-resource
+    tag: latest
+
+resources:
+
+- name: src
+  icon: github-circle
+  type: git
+  source:
+    branch: http-logger
+    uri: https://github.com/alphagov/tech-ops.git
+    paths:
+      - cyber-security/components/csls-splunk-broker
+
+- name: adapter-zip
+  icon: file
+  type: s3-iam
+  source:
+    bucket: ((readonly_private_bucket_name))
+    region_name: eu-west-2
+    versioned_file: adapter.zip
+
+- name: broker-zip
+  icon: file
+  type: s3-iam
+  source:
+    bucket: ((readonly_private_bucket_name))
+    region_name: eu-west-2
+    versioned_file: broker.zip
+
+- name: stub-zip
+  icon: file
+  type: s3-iam
+  source:
+    bucket: ((readonly_private_bucket_name))
+    region_name: eu-west-2
+    versioned_file: stub.zip
+
+- name: staging
+  icon: terraform
+  type: terraform
+  source:
+    env_name: test
+    backend_type: s3
+    backend_config:
+      bucket: ((readonly_private_bucket_name))
+      key: syslog-http-adapter-test.tfstate
+      region: eu-west-2
+    vars:
+      target_deployer_role_arn: ((test-deployer-role-arn))
+      target_zone_name: staging.gds-cyber-security.digital.
+      target_deployment_name: test
+      csls_deployer_role_arn: ((csls-deployer-role-arn))
+      csls_stream_name: csls_data_stream_prod
+      csls_broker_username: ((csls-broker-username))
+      csls_broker_password: ((csls-broker-password))
+      cf_username: ((cf-username))
+      cf_password: ((cf-password))
+      cf_org: gds-security
+      cf_space: cyber-sec-sandbox
+
+- name: production
+  icon: terraform
+  type: terraform
+  source:
+    env_name: prod
+    backend_type: s3
+    backend_config:
+      bucket: ((readonly_private_bucket_name))
+      key: syslog-http-adapter-prod.tfstate
+      region: eu-west-2
+    vars:
+      target_deployer_role_arn: ((csls-deployer-role-arn))
+      target_zone_name: csls.gds-cyber-security.digital.
+      target_deployment_name: prod
+      csls_deployer_role_arn: ((csls-deployer-role-arn))
+      csls_stream_name: csls_data_stream_prod
+      csls_broker_username: ((csls-broker-username))
+      csls_broker_password: ((csls-broker-password))
+      cf_username: ((cf-username))
+      cf_password: ((cf-password))
+      cf_org: gds-security
+      cf_space: cyber-sec-sandbox
+
+jobs:
+
+- name: update
+  serial: true
+  serial_groups: [build, test, deploy]
+  plan:
+  - get: src
+    trigger: true
+  - set_pipeline: csls-splunk-broker
+    file: src/cyber-security/components/csls-splunk-broker/ci/pipeline.yml
+
+- name: build
+  serial: true
+  serial_groups: [build]
+  plan:
+  - get: src
+    trigger: true
+    # passed: [update]
+  - task: build
+    file: src/cyber-security/components/csls-splunk-broker/ci/build.yml
+  - in_parallel:
+    - put: adapter-zip
+      params:
+        file: builds/adapter.zip
+    - put: broker-zip
+      params:
+        file: builds/broker.zip
+    - put: stub-zip
+      params:
+        file: builds/stub.zip
+
+- name: test
+  serial: true
+  serial_groups: [test]
+  plan:
+  - in_parallel:
+    - get: src
+      passed: [build]
+      trigger: true
+    - get: adapter-zip
+      trigger: true
+      passed: [build]
+    - get: broker-zip
+      trigger: true
+      passed: [build]
+    - get: stub-zip
+      trigger: true
+      passed: [build]
+  - put: staging
+    params:
+      env_name: test
+      terraform_source: src/cyber-security/components/csls-splunk-broker/terraform
+      vars:
+        adapter_zip_path: ../../../../../adapter-zip/adapter.zip
+        broker_zip_path: ../../../../../broker-zip/broker.zip
+        stub_zip_path: ../../../../../stub-zip/stub.zip
+  - task: end-to-end-test
+    file: src/cyber-security/components/csls-splunk-broker/ci/test.yml
+    vars:
+      stub-url: https://test-csls-stub.cloudapps.digital
+
+- name: deploy
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: src
+      passed: [test]
+      trigger: true
+    - get: adapter-zip
+      trigger: true
+      passed: [test]
+    - get: broker-zip
+      trigger: true
+      passed: [test]
+    - get: stub-zip
+      trigger: true
+      passed: [test]
+  - put: production
+    params:
+      env_name: test
+      terraform_source: src/cyber-security/components/csls-splunk-broker/terraform
+      vars:
+        adapter_zip_path: ../../../../../adapter-zip/adapter.zip
+        broker_zip_path: ../../../../../broker-zip/broker.zip
+        stub_zip_path: ../../../../../stub-zip/stub.zip
+  - task: end-to-end-test
+    file: src/cyber-security/components/csls-splunk-broker/ci/test.yml
+    vars:
+      stub-url: https://prod-csls-stub.cloudapps.digital

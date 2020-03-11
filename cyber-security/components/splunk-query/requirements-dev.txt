@@ -1,0 +1,8 @@
+black
+flake8
+mypy
+watchdog
+pyyaml
+argh
+pytest
+isort
