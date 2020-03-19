@@ -112,7 +112,7 @@ jobs:
   plan:
   - get: src
     trigger: true
-    # passed: [update]
+    passed: [update]
   - task: build
     file: src/cyber-security/components/csls-splunk-broker/ci/build.yml
   - in_parallel:
