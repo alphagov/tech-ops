@@ -12,7 +12,7 @@ resource_types:
   type: registry-image
   source:
     repository: ljfranklin/terraform-resource
-    tag: latest
+    tag: 0.12.24
 
 resources:
 

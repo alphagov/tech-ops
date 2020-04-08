@@ -4,7 +4,7 @@ terraform {
   required_providers {
     cloudfoundry = ">= 0.11.0"
   }
-  required_version = "= 0.12.23"
+  required_version = "= 0.12.24"
 }
 
 provider "cloudfoundry" {
