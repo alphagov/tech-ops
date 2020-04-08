@@ -20,7 +20,7 @@ resources:
   icon: github-circle
   type: git
   source:
-    branch: http-logger
+    branch: master
     uri: https://github.com/alphagov/tech-ops.git
     paths:
       - cyber-security/components/csls-splunk-broker
