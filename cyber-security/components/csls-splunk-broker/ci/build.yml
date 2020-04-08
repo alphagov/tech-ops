@@ -1,0 +1,40 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: golang
+    tag: 1.13
+params:
+  CGO_ENABLE: "0"
+  GOOS: "linux"
+  GOARCH: "amd64"
+  DEBIAN_FRONTEND: "noninteractive"
+inputs:
+- name: src
+outputs:
+- name: builds
+run:
+  path: /bin/bash
+  args:
+    - -euo
+    - pipefail
+    - -c
+    - |
+      echo "setting up build environment..."
+      apt-get update
+      apt install -y zip
+      root=$(pwd)
+      mkdir -p builds
+      cd src/cyber-security/components/csls-splunk-broker
+      echo "running unit tests..."
+      go test ./...
+      echo "building adapter..."
+      go build -o adapter ./cmd/adapter
+      zip ${root}/builds/adapter.zip adapter
+      echo "building broker..."
+      go build -o broker ./cmd/broker
+      zip ${root}/builds/broker.zip broker
+      echo "building stub..."
+      go build -o stub ./cmd/stub
+      zip ${root}/builds/stub.zip stub

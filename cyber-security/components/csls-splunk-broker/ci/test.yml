@@ -1,0 +1,30 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: python
+    tag: 3-buster
+inputs:
+- name: src
+params:
+  SPLUNK_USERNAME: ((csls_concourse_smoketest_splunk_creds_username))
+  SPLUNK_PASSWORD: ((csls_concourse_smoketest_splunk_creds_password))
+  SPLUNK_HOST: gds.splunkcloud.com
+  SPLUNK_PORT: 8089
+  STUB_URL: ((stub-url))
+run:
+  path: /bin/bash
+  args:
+    - -euo
+    - pipefail
+    - -c
+    - |
+      echo "installing splunk-query..."
+      cd src/cyber-security/components/splunk-query
+      make install-run
+      echo "telling stub cloudfoundry app to generate some logs..."
+      UUID=$(python -c 'import uuid; print(uuid.uuid1())' | tr -d '\n')
+      curl --fail "${STUB_URL}?cycles=10&delay=10ms&text=${UUID}"
+      echo "waiting for logs to appear in splunk..."
+      python cli.py poll --search "search index=* ${UUID}" --timeout 180 --sleeptime=10 -d True
