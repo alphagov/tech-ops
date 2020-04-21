@@ -153,3 +153,15 @@ resource "aws_ssm_parameter" "concourse_worker_secrets_kms_key_id" {
     Deployment = var.deployment
   }
 }
+
+resource "aws_ssm_parameter" "concourse_worker_egress_ips" {
+  name = "/${var.deployment}/concourse/pipelines/${var.name}/readonly_egress_ips"
+
+  type        = "StringList"
+  description = "Egress IPs for ${var.deployment}/${var.name}"
+  value       = var.egress_ips
+
+  tags = {
+    Deployment = var.deployment
+  }
+}
