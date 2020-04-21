@@ -20,12 +20,13 @@ import (
 
 var _ = Describe("Handler", func() {
 	var (
-		appGUID   = "DF3FB5F4-311D-497C-A245-3F63642958CE"
-		secretKey = "correct-horse-battery-staple"
-		stream    *cslsfakes.FakeCloudfoundryLogPutter
-		handler   http.Handler
-		ts        *httptest.Server
-		logs      egress.WriteCloser
+		appGUID             = "DF3FB5F4-311D-497C-A245-3F63642958CE"
+		serviceInstanceGUID = "6B1107E7-57DC-4BC4-A766-5D73AD51EC26"
+		secretKey           = "correct-horse-battery-staple"
+		stream              *cslsfakes.FakeCloudfoundryLogPutter
+		handler             http.Handler
+		ts                  *httptest.Server
+		logs                egress.WriteCloser
 	)
 
 	BeforeEach(func() {
@@ -38,6 +39,7 @@ var _ = Describe("Handler", func() {
 		logs = newSyslogHTTPSWriter(
 			ts.URL,
 			appGUID,
+			serviceInstanceGUID,
 			secretKey,
 		)
 	})
@@ -52,20 +54,24 @@ var _ = Describe("Handler", func() {
 		Expect(logs.Write(log1)).To(Succeed())
 		Expect(logs.Write(log2)).To(Succeed())
 		Expect(stream.PutCloudfoundryLogCallCount()).To(Equal(2))
-		Expect(stream.PutCloudfoundryLogArgsForCall(0)).To(BeEquivalentTo(cloudfoundry.Log{
+		logArg0, logGroup0 := stream.PutCloudfoundryLogArgsForCall(0)
+		Expect(logArg0).To(BeEquivalentTo(cloudfoundry.Log{
 			Timestamp: time.Unix(0, log1.Timestamp).UTC(),
 			Hostname:  "org.space.app",
 			AppID:     appGUID,
 			ProcessID: "[APP/1]",
 			Message:   "APP_OUT_LOG_MESSAGE\n",
 		}))
-		Expect(stream.PutCloudfoundryLogArgsForCall(1)).To(BeEquivalentTo(cloudfoundry.Log{
+		Expect(logGroup0).To(Equal(serviceInstanceGUID))
+		logArg1, logGroup1 := stream.PutCloudfoundryLogArgsForCall(1)
+		Expect(logArg1).To(BeEquivalentTo(cloudfoundry.Log{
 			Timestamp: time.Unix(0, log2.Timestamp).UTC(),
 			Hostname:  "org.space.app",
 			AppID:     appGUID,
 			ProcessID: "[APP/1]",
 			Message:   "APP_ERR_LOG_MESSAGE\n",
 		}))
+		Expect(logGroup1).To(Equal(serviceInstanceGUID))
 	})
 
 	It("should handle logs with multi line structured data", func() {
@@ -82,8 +88,8 @@ var _ = Describe("Handler", func() {
 
 // newSyslogHTTPSWriter borrows some parts from loggregator to simulate how
 // cloudfoundry logs are sent over http
-func newSyslogHTTPSWriter(handlerURL, appGUID, secretKey string) egress.WriteCloser {
-	drainURL, err := csls.NewSyslogDrainURL(handlerURL, appGUID, secretKey)
+func newSyslogHTTPSWriter(handlerURL, appGUID, serviceInstanceGUID, secretKey string) egress.WriteCloser {
+	drainURL, err := csls.NewSyslogDrainURL(handlerURL, appGUID, serviceInstanceGUID, secretKey)
 	if err != nil {
 		panic(err)
 	}

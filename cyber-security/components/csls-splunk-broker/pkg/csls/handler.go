@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	ParamMAC = "mac"
+	ParamMAC               = "mac"
+	ParamServiceInstanceID = "instance_id"
 )
 
 var (
@@ -33,7 +34,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	q := r.URL.Query()
 	code := q.Get(ParamMAC)
-	if err := h.process(r.Body, code); err != nil {
+	serviceInstanceGUID := q.Get(ParamServiceInstanceID)
+	if err := h.process(r.Body, code, serviceInstanceGUID); err != nil {
 		switch err {
 		case ErrUnauthorizedAppGUID:
 			w.WriteHeader(http.StatusForbidden)
@@ -61,8 +63,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "OK")
 }
 
-// process decodes a cloudfoundry format syslog line and forward it to kinesis stream
-func (h *Handler) process(r io.Reader, code string) error {
+// process decodes a cloudfoundry format syslog line and forward it to kinesis
+// stream with the service instance GUID as the log group name
+func (h *Handler) process(r io.Reader, code, serviceInstanceGUID string) error {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		// TODO: log
@@ -73,11 +76,16 @@ func (h *Handler) process(r io.Reader, code string) error {
 		// TODO: log
 		return ErrBadRequestBody
 	}
-	ok, _ := VerifyMAC(log.AppID, h.Secret, code)
+	ok, _ := VerifyMAC(
+		log.AppID,
+		serviceInstanceGUID,
+		h.Secret,
+		code,
+	)
 	if !ok {
 		return ErrUnauthorizedAppGUID
 	}
-	if err := h.Stream.PutCloudfoundryLog(log); err != nil {
+	if err := h.Stream.PutCloudfoundryLog(log, serviceInstanceGUID); err != nil {
 		// TODO: log
 		return ErrFailForwardStream
 	}
