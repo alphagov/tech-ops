@@ -46,9 +46,11 @@ messages are from a authorized source and forwards them on to the CSLS system
 * [ADR003: Implementing a Service Broker][ADR003]
 * [ADR004: Deploying the Broker as Lambda][ADR004]
 * [ADR005: Authenticating log events][ADR005]
+* [ADR006: Mapping log events to indexes][ADR006]
 
 [ADR001]: ./adr/ADR001-syslog-http-to-csls-adapter.md
 [ADR002]: ./adr/ADR002-deploy-adatper-as-lambda.md
 [ADR003]: ./adr/ADR003-service-broker.md
 [ADR004]: ./adr/ADR004-deploy-broker-as-lambda.md
 [ADR005]: ./adr/ADR005-authenticating-log-events.md
+[ADR006]: ./adr/ADR006-mapping-log-events-to-indexes.md
