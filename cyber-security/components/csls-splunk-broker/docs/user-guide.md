@@ -12,7 +12,7 @@ logs to the GDS Cyber Security managed Splunk service.
 The Splunk service is not available to all GOV.UK PaaS tenants by default, and
 access to view/query logs via the Splunk UI is granted to Google accounts on a
 per-user basis. So before you can make use of the service there are a couple of
-manual steps that need to be processed processed:
+manual steps that need to be processed:
 
 1. Communicate your needs to the GDS Cyber Security team. By visting the
    `#cyber-security-help` channel in slack and requesting that you would like
@@ -49,7 +49,8 @@ manual steps that need to be processed processed:
    cf create-service splunk unlimited SERVICE_NAME
    ```
 
-   Where `SERVICE_NAME` is a is a unique descriptive name for this service instance. For example:
+   Where `SERVICE_NAME` is a is a unique descriptive name for this service
+   instance. For example:
 
    ```
    cf create-service splunk unlimited my-splunk-service
@@ -67,7 +68,8 @@ manual steps that need to be processed processed:
    cf service my-splunk-service
    ```
 
-   When cf service SERVICE_NAME returns a create succeeded status, you have set up the service instance. An example output could be:
+   When cf service SERVICE_NAME returns a create succeeded status, you have set
+   up the service instance. An example output could be:
 
    ```
    name:            my-splunk-service
@@ -85,7 +87,8 @@ manual steps that need to be processed processed:
 
 You must bind your app to the Splunk service to access the Splunk database from your app.
 
-1. Use the [app’s manifest][manifest] to bind the app to the service instance. It will bind automatically when you next deploy your app.
+1. Use the [app’s manifest][manifest] to bind the app to the service instance.
+   It will bind automatically when you next deploy your app.
 2. Deploy your app in line with your normal deployment process.
 
 Refer to the [Cloud Foundry documentation on deploying with app
@@ -117,21 +120,47 @@ If your app does not have a manifest file, you can manually bind your service in
 ## Using the Splunk service
 
 Once an application has been bound to the service, it will automatically begin
-sending any log traffic written by your application to [`stdout`][app-logging] or [`stderr`][app-logging] to Splunk.
+sending any log traffic written by your application to [`stdout`][app-logging]
+or [`stderr`][app-logging] to Splunk.
 
 Assuming you have been given the requisite access, you will be able to view
 and query your logs in the [Splunk UI][splunk-ui].
+
+### Routing logs to splunk indexes
+
+Splunk stores logs in seperate buckets that it calls "indexes". Initially all
+your logs will end up in the "test_data" index, but you will likely want to
+request that your logs are routed to your own private index.
+
+Log events shipped to splunk have their `sourcetype` metadata set to the
+service instance GUID of the service you have bound your application to. (see
+the metadata section below).
+
+Log events are routed to splunk indexes based on the the GUID of the service
+instance that you created.
+
+To have your logs routed to your own index you need to:
+
+1. Discover the GUID of your service instance `cf service mu-splunk-service --guid`
+2. Make a request to Cyber Security team that you want your logs shipped to a
+   seperate index and provide them with the service-instance GUID obtained
+   above.
+
+### Log event metadata
 
 Your logs will have the following metadata fields added to them to aid with
 indexing and querying:
 
 #### Source field
 
-The `source` field contains details about which stream from which process from which app from which space from which org the log originated from. For example:
+The `source` field contains details about which stream from which process from
+which app from which space from which org the log originated from. For example:
 
-A `source` field for `my-app` in `my-space` which is part of `my-org` might look like `gov.uk_paas:/my-org/my-space/my-app/my-process/0`
+A `source` field for `my-app` in `my-space` which is part of `my-org` might
+look like `gov.uk_paas:/my-org/my-space/my-app/my-process/0`
 
-Splunk supports wildcard queries so it is often useful to use this field to query for logs from multiple sources within the same org or space. For example:
+Splunk supports wildcard queries so it is often useful to use this field to
+query for logs from multiple sources within the same org or space. For example:
 
 ```
 source="gov.uk_paas:/ORG_NAME/SPACE_NAME/*"
@@ -141,17 +170,30 @@ Where `ORG_NAME` and `SPACE_NAME` are replaced by your unique values.
 
 #### Timestamp field
 
-The `timestamp` field will be set to the time that the log line was received by GOV.UK PaaS.
+The `timestamp` field will be set to the time that the log line was received by
+GOV.UK PaaS.
 
 #### Sourcetype field
 
-The `sourcetype` field denotes that the log was originally in the RFC5424
-format supported by GOV.UK PaaS. It isn't very useful.
+The `sourcetype` field contains the service instance GUID of the GOV.UK PaaS
+service instance that the application was bound to. This value is used by the
+[CSLS processor][processor] to route log events to the correct index.
 
-For example:
+You can use this field to filter your logs to the specific service instance you
+have bound your application logs to. For example you may have serpate `splunk`
+services for your `production` and `staging` logs, and each will have a unique
+GUID that can be used to find all logs for that environment.
+
+You can view the guid for your service instance using the following command:
 
 ```
-sourcetype="rfc5424_syslog"
+cf service SERVICE_NAME --guid
+```
+
+You may then use that value in a splunk query, for example:
+
+```
+sourcetype="608BA116-EF5C-4AF6-9AF1-7400FE1C3DFD"
 ```
 
 ## Removing the Splunk service
@@ -203,3 +245,4 @@ Logs are stored in splunk for 1 year.
 [manifest-deploy]: https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#services-block
 [splunk-ui]: https://gds.splunkcloud.com/
 [app-logging]: https://docs.cloud.service.gov.uk/monitoring_apps.html#logs
+[processor]: https://github.com/alphagov/centralised-security-logging-service/tree/master/kinesis_processor
