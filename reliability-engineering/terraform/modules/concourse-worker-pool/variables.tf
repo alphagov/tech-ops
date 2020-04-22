@@ -10,6 +10,10 @@ variable "subnet_ids" {
   type = list(string)
 }
 
+variable "egress_ips" {
+  type = list(string)
+}
+
 variable "security_group_ids" {
   type = list(string)
 }
