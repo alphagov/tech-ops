@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/alphagov/tech-ops/cyber-security/components/csls-splunk-broker/pkg/cloudfoundry"
+	uuid "github.com/satori/go.uuid"
 )
 
 const (
@@ -19,6 +20,7 @@ var (
 	ErrUnauthorizedAppGUID    = fmt.Errorf("unauthorized-log-attempt")
 	ErrUnauthenticatedRequest = fmt.Errorf("unauthenticated-request")
 	ErrBadRequestBody         = fmt.Errorf("failed-to-read-body")
+	ErrBadRequestParams       = fmt.Errorf("invalid-request-arguments")
 	ErrFailForwardStream      = fmt.Errorf("failed-to-forward-to-stream")
 )
 
@@ -34,7 +36,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	q := r.URL.Query()
 	code := q.Get(ParamMAC)
-	serviceInstanceGUID := q.Get(ParamServiceInstanceID)
+	serviceInstanceGUID := uuid.FromStringOrNil(q.Get(ParamServiceInstanceID))
 	if err := h.process(r.Body, code, serviceInstanceGUID); err != nil {
 		switch err {
 		case ErrUnauthorizedAppGUID:
@@ -65,7 +67,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // process decodes a cloudfoundry format syslog line and forward it to kinesis
 // stream with the service instance GUID as the log group name
-func (h *Handler) process(r io.Reader, code, serviceInstanceGUID string) error {
+func (h *Handler) process(r io.Reader, code string, serviceInstanceGUID uuid.UUID) error {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		// TODO: log
@@ -77,7 +79,7 @@ func (h *Handler) process(r io.Reader, code, serviceInstanceGUID string) error {
 		return ErrBadRequestBody
 	}
 	ok, _ := VerifyMAC(
-		log.AppID,
+		uuid.FromStringOrNil(log.AppID),
 		serviceInstanceGUID,
 		h.Secret,
 		code,
@@ -85,7 +87,7 @@ func (h *Handler) process(r io.Reader, code, serviceInstanceGUID string) error {
 	if !ok {
 		return ErrUnauthorizedAppGUID
 	}
-	if err := h.Stream.PutCloudfoundryLog(log, serviceInstanceGUID); err != nil {
+	if err := h.Stream.PutCloudfoundryLog(log, serviceInstanceGUID.String()); err != nil {
 		// TODO: log
 		return ErrFailForwardStream
 	}

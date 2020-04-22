@@ -10,6 +10,7 @@ import (
 	provideriface "github.com/alphagov/paas-service-broker-base/provider"
 	"github.com/pivotal-cf/brokerapi"
 	"github.com/pivotal-cf/brokerapi/domain"
+	uuid "github.com/satori/go.uuid"
 )
 
 type SplunkProvider struct {
@@ -79,18 +80,30 @@ func (s *SplunkProvider) LastOperation(ctx context.Context, lastOperationData pr
 	return brokerapi.Succeeded, "Last operation polling not required. All operations are synchronous.", nil
 }
 
-func NewSyslogDrainURL(baseURL, appGUID, serviceInstanceID, secretKey string) (*url.URL, error) {
+func NewSyslogDrainURL(baseURL, appID, instanceID, secretKey string) (*url.URL, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, err
 	}
-	code, err := GenerateMAC(appGUID, serviceInstanceID, secretKey)
+	appGUID, err := uuid.FromString(appID)
+	if err != nil {
+		return nil, err
+	}
+	instanceGUID, err := uuid.FromString(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	code, err := GenerateMAC(
+		appGUID,
+		instanceGUID,
+		secretKey,
+	)
 	if err != nil {
 		return nil, err
 	}
 	q := u.Query()
 	q.Add(ParamMAC, code)
-	q.Add(ParamServiceInstanceID, serviceInstanceID)
+	q.Add(ParamServiceInstanceID, instanceID)
 	u.RawQuery = q.Encode()
 	return u, nil
 }

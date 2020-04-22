@@ -5,6 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	uuid "github.com/satori/go.uuid"
 
 	"context"
 
@@ -79,7 +80,12 @@ var _ = Describe("Provider", func() {
 			Expect(bindingCode).ToNot(BeZero())
 			bindingInstanceID := bindingQuery.Get(csls.ParamServiceInstanceID)
 			Expect(bindingInstanceID).ToNot(BeZero())
-			ok, err := csls.VerifyMAC(bindData.Details.AppGUID, bindingInstanceID, secretKey, bindingCode)
+			ok, err := csls.VerifyMAC(
+				uuid.Must(uuid.FromString(bindData.Details.AppGUID)),
+				uuid.Must(uuid.FromString(bindingInstanceID)),
+				secretKey,
+				bindingCode,
+			)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ok).To(BeTrue())
 		})

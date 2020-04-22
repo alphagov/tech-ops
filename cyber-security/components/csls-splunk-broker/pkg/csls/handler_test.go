@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
@@ -62,7 +63,7 @@ var _ = Describe("Handler", func() {
 			ProcessID: "[APP/1]",
 			Message:   "APP_OUT_LOG_MESSAGE\n",
 		}))
-		Expect(logGroup0).To(Equal(serviceInstanceGUID))
+		Expect(logGroup0).To(Equal(strings.ToLower(serviceInstanceGUID)))
 		logArg1, logGroup1 := stream.PutCloudfoundryLogArgsForCall(1)
 		Expect(logArg1).To(BeEquivalentTo(cloudfoundry.Log{
 			Timestamp: time.Unix(0, log2.Timestamp).UTC(),
@@ -71,7 +72,19 @@ var _ = Describe("Handler", func() {
 			ProcessID: "[APP/1]",
 			Message:   "APP_ERR_LOG_MESSAGE\n",
 		}))
-		Expect(logGroup1).To(Equal(serviceInstanceGUID))
+		Expect(logGroup1).To(Equal(strings.ToLower(serviceInstanceGUID)))
+	})
+
+	It("should output the service instance GUID in lowercase format", func() {
+		log := newAppLog(appGUID, "APP_OUT_LOG_MESSAGE\n")
+		Expect(logs.Write(log)).To(Succeed())
+		_, logGroup0 := stream.PutCloudfoundryLogArgsForCall(0)
+		By("ensuring original service guid was in uppercase form", func() {
+			Expect(strings.ToUpper(serviceInstanceGUID)).To(Equal(serviceInstanceGUID))
+		})
+		By("ensuring log group is set to a lower case version of the service guid", func() {
+			Expect(logGroup0).To(Equal(strings.ToLower(serviceInstanceGUID)))
+		})
 	})
 
 	It("should handle logs with multi line structured data", func() {
