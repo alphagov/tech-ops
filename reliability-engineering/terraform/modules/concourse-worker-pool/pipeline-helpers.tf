@@ -159,7 +159,7 @@ resource "aws_ssm_parameter" "concourse_worker_egress_ips" {
 
   type        = "String"
   description = "Egress IPs for ${var.deployment}/${var.name}"
-  value       = join(',', var.egress_ips)
+  value       = join(",", var.egress_ips)
 
   tags = {
     Deployment = var.deployment
