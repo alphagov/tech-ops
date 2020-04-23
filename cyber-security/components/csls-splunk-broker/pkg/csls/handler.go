@@ -37,7 +37,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	code := q.Get(ParamMAC)
 	serviceInstanceGUID := uuid.FromStringOrNil(q.Get(ParamServiceInstanceID))
-	if err := h.process(r.Body, code, serviceInstanceGUID); err != nil {
+	if err := h.transformAndForwardLogEvent(r.Body, code, serviceInstanceGUID); err != nil {
 		switch err {
 		case ErrUnauthorizedAppGUID:
 			w.WriteHeader(http.StatusForbidden)
@@ -65,9 +65,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "OK")
 }
 
-// process decodes a cloudfoundry format syslog line and forward it to kinesis
-// stream with the service instance GUID as the log group name
-func (h *Handler) process(r io.Reader, code string, serviceInstanceGUID uuid.UUID) error {
+// transformAndForwardLogEvent decodes a cloudfoundry format syslog line and
+// forwards to kinesis with the service instance GUID as the logGroupName
+func (h *Handler) transformAndForwardLogEvent(r io.Reader, code string, serviceInstanceGUID uuid.UUID) error {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		// TODO: log
