@@ -141,7 +141,7 @@ instance that you created.
 
 To have your logs routed to your own index you need to:
 
-1. Discover the GUID of your service instance `cf service mu-splunk-service --guid`
+1. Discover the GUID of your service instance `cf service my-splunk-service --guid`
 2. Make a request to Cyber Security team that you want your logs shipped to a
    seperate index and provide them with the service-instance GUID obtained
    above.
