@@ -49,7 +49,7 @@ manual steps that need to be processed:
    cf create-service splunk unlimited SERVICE_NAME
    ```
 
-   Where `SERVICE_NAME` is a is a unique descriptive name for this service
+   Where `SERVICE_NAME` is a unique descriptive name for this service
    instance. For example:
 
    ```
