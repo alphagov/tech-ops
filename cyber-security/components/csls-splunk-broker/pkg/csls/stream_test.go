@@ -15,10 +15,11 @@ import (
 var _ = Describe("Stream", func() {
 
 	var (
-		stream *csls.Stream
-		client *awsfakes.FakeClient
-		input  cloudfoundry.Log
-		output csls.Log
+		stream       *csls.Stream
+		client       *awsfakes.FakeClient
+		input        cloudfoundry.Log
+		output       csls.Log
+		logGroupName = "/example/log/group"
 	)
 
 	BeforeEach(func() {
@@ -34,7 +35,7 @@ var _ = Describe("Stream", func() {
 			ProcessID: "[APP/1]",
 			Message:   "hello world\n",
 		}
-		Expect(stream.PutCloudfoundryLog(input)).To(Succeed())
+		Expect(stream.PutCloudfoundryLog(input, logGroupName)).To(Succeed())
 		Expect(client.PutRecordCallCount()).To(Equal(1))
 		Expect(json.Unmarshal(client.PutRecordArgsForCall(0).Data, &output)).To(Succeed())
 	})
@@ -53,11 +54,11 @@ var _ = Describe("Stream", func() {
 		Expect(output.Owner).To(Equal("GOV.UK_PaaS"))
 	})
 
-	It("should set the log group on output log", func() {
-		Expect(output.LogGroup).To(Equal("rfc5424_syslog"))
+	It("should set the log group name on output log", func() {
+		Expect(output.LogGroup).To(Equal(logGroupName))
 	})
 
-	It("should set the log stream on output log", func() {
+	It("should set the log stream name from the host name on output log", func() {
 		Expect(output.LogStream).To(Equal("org.space.app"))
 	})
 

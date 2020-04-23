@@ -9,10 +9,11 @@ import (
 )
 
 type FakeCloudfoundryLogPutter struct {
-	PutCloudfoundryLogStub        func(cloudfoundry.Log) error
+	PutCloudfoundryLogStub        func(cloudfoundry.Log, string) error
 	putCloudfoundryLogMutex       sync.RWMutex
 	putCloudfoundryLogArgsForCall []struct {
 		arg1 cloudfoundry.Log
+		arg2 string
 	}
 	putCloudfoundryLogReturns struct {
 		result1 error
@@ -24,16 +25,17 @@ type FakeCloudfoundryLogPutter struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCloudfoundryLogPutter) PutCloudfoundryLog(arg1 cloudfoundry.Log) error {
+func (fake *FakeCloudfoundryLogPutter) PutCloudfoundryLog(arg1 cloudfoundry.Log, arg2 string) error {
 	fake.putCloudfoundryLogMutex.Lock()
 	ret, specificReturn := fake.putCloudfoundryLogReturnsOnCall[len(fake.putCloudfoundryLogArgsForCall)]
 	fake.putCloudfoundryLogArgsForCall = append(fake.putCloudfoundryLogArgsForCall, struct {
 		arg1 cloudfoundry.Log
-	}{arg1})
-	fake.recordInvocation("PutCloudfoundryLog", []interface{}{arg1})
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("PutCloudfoundryLog", []interface{}{arg1, arg2})
 	fake.putCloudfoundryLogMutex.Unlock()
 	if fake.PutCloudfoundryLogStub != nil {
-		return fake.PutCloudfoundryLogStub(arg1)
+		return fake.PutCloudfoundryLogStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
@@ -48,17 +50,17 @@ func (fake *FakeCloudfoundryLogPutter) PutCloudfoundryLogCallCount() int {
 	return len(fake.putCloudfoundryLogArgsForCall)
 }
 
-func (fake *FakeCloudfoundryLogPutter) PutCloudfoundryLogCalls(stub func(cloudfoundry.Log) error) {
+func (fake *FakeCloudfoundryLogPutter) PutCloudfoundryLogCalls(stub func(cloudfoundry.Log, string) error) {
 	fake.putCloudfoundryLogMutex.Lock()
 	defer fake.putCloudfoundryLogMutex.Unlock()
 	fake.PutCloudfoundryLogStub = stub
 }
 
-func (fake *FakeCloudfoundryLogPutter) PutCloudfoundryLogArgsForCall(i int) cloudfoundry.Log {
+func (fake *FakeCloudfoundryLogPutter) PutCloudfoundryLogArgsForCall(i int) (cloudfoundry.Log, string) {
 	fake.putCloudfoundryLogMutex.RLock()
 	defer fake.putCloudfoundryLogMutex.RUnlock()
 	argsForCall := fake.putCloudfoundryLogArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCloudfoundryLogPutter) PutCloudfoundryLogReturns(result1 error) {

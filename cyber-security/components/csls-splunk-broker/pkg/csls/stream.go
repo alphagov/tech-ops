@@ -39,7 +39,7 @@ type Log struct {
 
 // CloudfoundryLogPutter forwards cloudfoundry format Logs to stream
 type CloudfoundryLogPutter interface {
-	PutCloudfoundryLog(cloudfoundry.Log) error
+	PutCloudfoundryLog(log cloudfoundry.Log, logGroupName string) error
 }
 
 // Stream represents the input to the csls logging pipeline
@@ -51,11 +51,12 @@ type Stream struct {
 }
 
 // PutCloudfoundryLog transforms cloudfoundry format logs into csls format
-// (cloudwatch format) logs and writes them to the csls kinesis stream
-func (w *Stream) PutCloudfoundryLog(log cloudfoundry.Log) error {
+// (cloudwatch format) logs and writes them to the csls kinesis stream with a
+// given log group name
+func (w *Stream) PutCloudfoundryLog(log cloudfoundry.Log, groupName string) error {
 	data := Log{
 		Owner:       SyslogOwner,
-		LogGroup:    SyslogLogGroup,
+		LogGroup:    groupName,
 		LogStream:   log.Hostname,
 		MessageType: SyslogDataType,
 		LogEvents: []LogEvent{

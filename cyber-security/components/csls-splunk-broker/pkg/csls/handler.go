@@ -8,16 +8,19 @@ import (
 	"os"
 
 	"github.com/alphagov/tech-ops/cyber-security/components/csls-splunk-broker/pkg/cloudfoundry"
+	uuid "github.com/satori/go.uuid"
 )
 
 const (
-	ParamMAC = "mac"
+	ParamMAC               = "mac"
+	ParamServiceInstanceID = "instance_id"
 )
 
 var (
 	ErrUnauthorizedAppGUID    = fmt.Errorf("unauthorized-log-attempt")
 	ErrUnauthenticatedRequest = fmt.Errorf("unauthenticated-request")
 	ErrBadRequestBody         = fmt.Errorf("failed-to-read-body")
+	ErrBadRequestParams       = fmt.Errorf("invalid-request-arguments")
 	ErrFailForwardStream      = fmt.Errorf("failed-to-forward-to-stream")
 )
 
@@ -33,7 +36,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	q := r.URL.Query()
 	code := q.Get(ParamMAC)
-	if err := h.process(r.Body, code); err != nil {
+	serviceInstanceGUID := uuid.FromStringOrNil(q.Get(ParamServiceInstanceID))
+	if err := h.transformAndForwardLogEvent(r.Body, code, serviceInstanceGUID); err != nil {
 		switch err {
 		case ErrUnauthorizedAppGUID:
 			w.WriteHeader(http.StatusForbidden)
@@ -61,8 +65,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "OK")
 }
 
-// process decodes a cloudfoundry format syslog line and forward it to kinesis stream
-func (h *Handler) process(r io.Reader, code string) error {
+// transformAndForwardLogEvent decodes a cloudfoundry format syslog line and
+// forwards to kinesis with the service instance GUID as the logGroupName
+func (h *Handler) transformAndForwardLogEvent(r io.Reader, code string, serviceInstanceGUID uuid.UUID) error {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		// TODO: log
@@ -73,11 +78,29 @@ func (h *Handler) process(r io.Reader, code string) error {
 		// TODO: log
 		return ErrBadRequestBody
 	}
-	ok, _ := VerifyMAC(log.AppID, h.Secret, code)
-	if !ok {
-		return ErrUnauthorizedAppGUID
+	logGroupName := serviceInstanceGUID.String()
+	// FIXME: Remove this "if" guard now!!!!!  Revert this commit!! We are
+	// skipping verification on "old style" URL (ones without service instance
+	// guid) to give us a chance to re-bind all the apps currently using the
+	// log drain This should be removed in a follow up PR almost immediately,
+	// if you are from the future and still seeing this here then that is BAD
+	// and verification is broken.  This is fine before Pay are using it, they
+	// are the team with the strict requirement around log tampering but
+	// obviously nobody wants that
+	if uuid.Equal(serviceInstanceGUID, uuid.Nil) {
+		logGroupName = "rfc5424_syslog" // legacy
+	} else {
+		ok, _ := VerifyMAC(
+			uuid.FromStringOrNil(log.AppID),
+			serviceInstanceGUID,
+			h.Secret,
+			code,
+		)
+		if !ok {
+			return ErrUnauthorizedAppGUID
+		}
 	}
-	if err := h.Stream.PutCloudfoundryLog(log); err != nil {
+	if err := h.Stream.PutCloudfoundryLog(log, logGroupName); err != nil {
 		// TODO: log
 		return ErrFailForwardStream
 	}

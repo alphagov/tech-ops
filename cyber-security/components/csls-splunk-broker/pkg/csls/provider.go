@@ -10,6 +10,7 @@ import (
 	provideriface "github.com/alphagov/paas-service-broker-base/provider"
 	"github.com/pivotal-cf/brokerapi"
 	"github.com/pivotal-cf/brokerapi/domain"
+	uuid "github.com/satori/go.uuid"
 )
 
 type SplunkProvider struct {
@@ -46,7 +47,12 @@ func (s *SplunkProvider) Deprovision(ctx context.Context, deprovisionData provid
 
 func (s *SplunkProvider) Bind(ctx context.Context, bindData provideriface.BindData) (binding domain.Binding, err error) {
 	// generate a signed url that only works for this app id or service id if per index
-	drainURL, err := NewSyslogDrainURL(s.SyslogDrainURL, bindData.Details.AppGUID, s.SecretKey)
+	drainURL, err := NewSyslogDrainURL(
+		s.SyslogDrainURL,
+		bindData.Details.AppGUID,
+		bindData.InstanceID,
+		s.SecretKey,
+	)
 	if err != nil {
 		return domain.Binding{}, err // TODO: this should be 403 or 400
 	}
@@ -74,17 +80,30 @@ func (s *SplunkProvider) LastOperation(ctx context.Context, lastOperationData pr
 	return brokerapi.Succeeded, "Last operation polling not required. All operations are synchronous.", nil
 }
 
-func NewSyslogDrainURL(baseURL, appGUID, secretKey string) (*url.URL, error) {
+func NewSyslogDrainURL(baseURL, appID, instanceID, secretKey string) (*url.URL, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, err
 	}
-	code, err := GenerateMAC(appGUID, secretKey)
+	appGUID, err := uuid.FromString(appID)
+	if err != nil {
+		return nil, err
+	}
+	instanceGUID, err := uuid.FromString(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	code, err := GenerateMAC(
+		appGUID,
+		instanceGUID,
+		secretKey,
+	)
 	if err != nil {
 		return nil, err
 	}
 	q := u.Query()
 	q.Add(ParamMAC, code)
+	q.Add(ParamServiceInstanceID, instanceID)
 	u.RawQuery = q.Encode()
 	return u, nil
 }
