@@ -129,8 +129,8 @@ and query your logs in the [Splunk UI][splunk-ui].
 ### Routing logs to splunk indexes
 
 Splunk stores logs in seperate buckets that it calls "indexes". Initially all
-your logs will end up in the "test_data" index, but you will likely want to
-request that your logs are routed to your own private index.
+your logs will end up in the `csls_unrecognised_data` index, but you will
+likely want to request that your logs are routed to your own private index.
 
 Log events shipped to splunk have their `sourcetype` metadata set to the
 service instance GUID of the service you have bound your application to. (see
