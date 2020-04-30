@@ -17,8 +17,8 @@ data "template_file" "concourse_worker_cloud_init" {
     deployment        = var.deployment
     worker_team_name  = var.name
     concourse_host    = local.concourse_url
-    concourse_version = "5.8.0"
-    concourse_sha1    = "1988895c4c6ee94bdd48eb35c92ff45586ae5841  concourse-5.8.0-linux-amd64.tgz"
+    concourse_version = "6.0.0"
+    concourse_sha1    = "b8696c55bea47363580e81e3710814a9cdea26ef  concourse-6.0.0-linux-amd64.tgz"
   }
 }
 
