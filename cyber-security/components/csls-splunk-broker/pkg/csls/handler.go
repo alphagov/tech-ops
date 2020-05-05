@@ -78,29 +78,16 @@ func (h *Handler) transformAndForwardLogEvent(r io.Reader, code string, serviceI
 		// TODO: log
 		return ErrBadRequestBody
 	}
-	logGroupName := serviceInstanceGUID.String()
-	// FIXME: Remove this "if" guard now!!!!!  Revert this commit!! We are
-	// skipping verification on "old style" URL (ones without service instance
-	// guid) to give us a chance to re-bind all the apps currently using the
-	// log drain This should be removed in a follow up PR almost immediately,
-	// if you are from the future and still seeing this here then that is BAD
-	// and verification is broken.  This is fine before Pay are using it, they
-	// are the team with the strict requirement around log tampering but
-	// obviously nobody wants that
-	if uuid.Equal(serviceInstanceGUID, uuid.Nil) {
-		logGroupName = "rfc5424_syslog" // legacy
-	} else {
-		ok, _ := VerifyMAC(
-			uuid.FromStringOrNil(log.AppID),
-			serviceInstanceGUID,
-			h.Secret,
-			code,
-		)
-		if !ok {
-			return ErrUnauthorizedAppGUID
-		}
+	ok, _ := VerifyMAC(
+		uuid.FromStringOrNil(log.AppID),
+		serviceInstanceGUID,
+		h.Secret,
+		code,
+	)
+	if !ok {
+		return ErrUnauthorizedAppGUID
 	}
-	if err := h.Stream.PutCloudfoundryLog(log, logGroupName); err != nil {
+	if err := h.Stream.PutCloudfoundryLog(log, serviceInstanceGUID.String()); err != nil {
 		// TODO: log
 		return ErrFailForwardStream
 	}
