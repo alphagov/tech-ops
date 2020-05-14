@@ -109,8 +109,13 @@ jobs:
             args:
             - -c
             - |
-              apt-get update
-              apt-get install -y nodejs
+              # install node
+              VERSION=v12.16.3
+              mkdir -p /usr/local/lib/nodejs
+              wget https://nodejs.org/dist/v12.16.3/node-$VERSION-linux-x64.tar.xz
+              tar -xJvf node-$VERSION-linux-x64.tar.xz -C /usr/local/lib/nodejs
+              export PATH="/usr/local/lib/nodejs/node-$VERSION-linux-x64/bin:$PATH"
+              # build
               bundle install --without development
               bundle exec middleman build
     on_success:
@@ -150,8 +155,13 @@ jobs:
             args:
             - -c
             - |
-              apt-get update
-              apt-get install -y nodejs
+              # install node
+              VERSION=v12.16.3
+              mkdir -p /usr/local/lib/nodejs
+              wget https://nodejs.org/dist/v12.16.3/node-$VERSION-linux-x64.tar.xz
+              tar -xJvf node-$VERSION-linux-x64.tar.xz -C /usr/local/lib/nodejs
+              export PATH="/usr/local/lib/nodejs/node-$VERSION-linux-x64/bin:$PATH"
+              # build
               bundle install --without development
               bundle exec middleman build
               cp manifest.yml ../bundled/manifest.yml
