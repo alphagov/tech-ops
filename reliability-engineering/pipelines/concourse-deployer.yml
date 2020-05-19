@@ -1,0 +1,150 @@
+
+resource_types:
+
+- name: terraform
+  type: registry-image
+  source:
+    repository: ljfranklin/terraform-resource
+    tag: 0.12.25
+
+resources:
+
+- name: config
+  icon: github-circle
+  type: git
+  source:
+    branch: master
+    uri: git@github.com:alphagov/tech-ops-private.git
+    private_key: ((re-autom8-ci-github-ssh-private-key))
+    paths:
+      - reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+- name: modules
+  icon: github-circle
+  type: git
+  source:
+    branch: selfdeploy
+    uri: git@github.com:alphagov/tech-ops.git
+    private_key: ((re-autom8-ci-github-ssh-private-key))
+    paths:
+      - reliability-engineering/terraform/modules
+      - reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+      - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
+      - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+      - reliability-engineering/pipelines/concourse-deployer.yml
+- name: deployment
+  icon: terraform
+  type: terraform
+  source:
+    env_name: default
+    backend_type: s3
+    private_key: ((re-autom8-ci-github-ssh-private-key))
+    backend_config:
+      bucket: gds-tech-ops-tfstate
+      region: eu-west-2
+      key: ((deployment_name)).tfstate
+
+jobs:
+
+- name: update
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: config
+      trigger: true
+    - get: modules
+      trigger: true
+    - get: deployment
+  - set_pipeline: deploy
+    file: modules/reliability-engineering/pipelines/concourse-deployer.yml
+    vars:
+      deployment_name: ((deployment_name))
+
+- name: deploy
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: config
+      passed: [update]
+      trigger: true
+    - get: modules
+      passed: [update]
+      trigger: true
+    - get: deployment
+      passed: [update]
+  - task: configure-providers
+    file: modules/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
+  - put: deployment
+    params:
+      terraform_source: config/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+      override_files:
+      - concourse-provider-config/provider_concourse_override.tf.json
+
+- name: scale-out
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: config
+      passed: [deploy]
+      trigger: true
+    - get: modules
+      passed: [deploy]
+      trigger: true
+    - get: deployment
+      passed: [deploy]
+  - task: configure-providers
+    file: modules/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
+  - do:
+    - task: get-current-workers
+      file: modules/reliability-engineering/pipelines/tasks/concourse-get-workers.yml
+      params:
+        DEPLOYMENT_NAME: ((deployment_name))
+    - in_parallel:
+      - task: scale-out-web-node-asg
+        file: modules/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+        params:
+          ASG_PREFIX: ((deployment_name))-concourse-web
+      - task: scale-out-main-team-workers-asg
+        file: modules/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+        params:
+          ASG_PREFIX: ((deployment_name))-main-concourse-worker
+    - task: land-old-workers
+      file: modules/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
+      params:
+        DEPLOYMENT_NAME: ((deployment_name))
+    on_failure:
+      put: deployment # try to scale back in on failure to stay in sync
+      attempts: 10
+      params:
+        terraform_source: config/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+        override_files:
+        - concourse-provider-config/provider_concourse_override.tf.json
+
+- name: scale-in
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: config
+      passed: [scale-out]
+      trigger: true
+    - get: modules
+      passed: [scale-out]
+      trigger: true
+    - get: deployment
+      passed: [scale-out]
+  - task: configure-providers
+    file: modules/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
+  - put: deployment
+    params:
+      terraform_source: config/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+      override_files:
+      - concourse-provider-config/provider_concourse_override.tf.json

@@ -1,0 +1,34 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: concourse/concourse-pipeline-resource
+    tag: 2.2.0
+params:
+  DEPLOYMENT_NAME: cd-staging
+  FLY_USERNAME: main
+  FLY_TEAM: main
+inputs:
+- name: concourse-provider-config
+outputs:
+- name: workers
+run:
+  path: sh
+  args:
+  - -euo
+  - pipefail
+  - -c
+  - |
+    echo "configuring fly..."
+    export PATH="$PATH:/opt/resource"
+    FLY_PASSWORD=$(cat concourse-provider-config/main_team_password)
+    fly -t concourse login \
+      -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" \
+      -u "${FLY_USERNAME}" \
+      -p "${FLY_PASSWORD}" \
+      -n "${FLY_TEAM}"
+    fly -t concourse sync
+    echo "fetching concourse worker names for ${FLY_TEAM}..."
+    mkdir -p workers
+    fly -t concourse workers | grep "${FLY_TEAM}" | awk '{print $1}' > workers/names
+    echo "OK!"

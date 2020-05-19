@@ -1,0 +1,49 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: concourse/concourse-pipeline-resource
+    tag: 2.2.0
+params:
+  DEPLOYMENT_NAME: cd-staging
+  FLY_USERNAME: main
+  FLY_TEAM: main
+inputs:
+- name: concourse-provider-config
+- name: workers
+run:
+  path: sh
+  args:
+  - -euo
+  - pipefail
+  - -c
+  - |
+    echo "configuring fly..."
+    export PATH="$PATH:/opt/resource"
+    FLY_PASSWORD=$(cat concourse-provider-config/main_team_password)
+    fly -t concourse login \
+      -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" \
+      -u "${FLY_USERNAME}" \
+      -p "${FLY_PASSWORD}" \
+      -n "${FLY_TEAM}"
+    fly -t concourse sync
+    echo "waiting for the new workers to appear..."
+    function get_current_worker_count() {
+      fly -t concourse workers | grep "${FLY_TEAM}" | wc -l
+    }
+    function get_old_worker_count() {
+      wc -l <workers/names
+    }
+    while [ "$(get_current_worker_count)" = "$(get_old_worker_count)" ]; do
+      echo "...still only $(get_old_worker_count) workers"
+      sleep 3
+    done
+    echo "OK!"
+    echo "landing old workers..."
+    for worker in $(cat workers/names); do
+      echo "--> ${worker} coming in for landing!"
+      fly -t concourse land-worker --worker "${worker}"
+    done
+    echo "wait for landing..."
+    sleep 15 # TODO: we can do better!
+    echo "OK!"

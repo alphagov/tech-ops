@@ -1,0 +1,37 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: govsvc/task-toolbox
+    tag: latest
+inputs:
+- name: deployment
+outputs:
+- name: concourse-provider-config
+params:
+  DEPLOYMENT_NAME:
+run:
+  path: /bin/bash
+  args:
+  - -euo
+  - pipefail
+  - -c
+  - |
+    echo "genertaing concourse provider config..."
+    mkdir -p concourse-provider-config
+    cat <<EOF > concourse-provider-config/provider_concourse_override.tf.json
+    {
+      "provider": {
+        "concourse": {
+          "target": "",
+          "url": "https://${DEPLOYMENT_NAME}.gds-reliability.engineering",
+          "team": "main",
+          "username": "main",
+          "password": "$(jq -r .main_team_password <deployment/metadata)"
+        }
+      }
+    }
+    EOF
+    echo "writing main team password to file..."
+    jq -r .main_team_password <deployment/metadata > concourse-provider-config/main_team_password
+    echo "OK!"
