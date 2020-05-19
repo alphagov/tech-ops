@@ -43,3 +43,7 @@ variable "grafana_instance_type" {
 }
 
 data "aws_caller_identity" "account" {}
+
+variable "prometheus_volume_size" {
+  default = 100
+}
