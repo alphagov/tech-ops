@@ -105,3 +105,21 @@ module "concourse_prometheus_can_talk_to_concourse_grafana_over_9100" {
   from_port         = 9100
   to_port           = 9100
 }
+
+module "concourse_prometheus_can_talk_to_concourse_prometheus_over_9090" {
+  source = "../sg-access-pair"
+
+  source_sg_id      = var.prometheus_security_group_id
+  destination_sg_id = var.prometheus_security_group_id
+  from_port         = 9090
+  to_port           = 9090
+}
+
+module "concourse_prometheus_can_talk_to_concourse_prometheus_node_exporter_over_9100" {
+  source = "../sg-access-pair"
+
+  source_sg_id      = var.prometheus_security_group_id
+  destination_sg_id = var.prometheus_security_group_id
+  from_port         = 9100
+  to_port           = 9100
+}
