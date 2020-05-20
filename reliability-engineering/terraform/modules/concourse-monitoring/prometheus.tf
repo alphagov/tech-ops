@@ -14,7 +14,8 @@ data "template_file" "concourse_prometheus_cloud_init" {
   template = file("${path.module}/files/prometheus-init.sh")
 
   vars = {
-    deployment = var.deployment
+    deployment       = var.deployment
+    data_volume_size = var.prometheus_volume_size
   }
 }
 
@@ -50,7 +51,7 @@ resource "aws_instance" "concourse_prometheus" {
 resource "aws_ebs_volume" "concourse_prometheus" {
   count = 2
 
-  size      = 100
+  size      = var.prometheus_volume_size
   encrypted = true
 
   availability_zone = element(
