@@ -196,20 +196,22 @@ jobs:
   on_success:
     do:
     - in_parallel:
-      - put: tech-ops
-        params:
+      - task: tag-tech-ops
+        file: tech-ops/reliability-engineering/pipelines/tasks/git-tag.yml
+        input_mapping:
           repository: tech-ops
-          tag: version/version
-          tag_prefix: ((deployment_name))-
-          tag_only: true
-          # force: true # do we need this?
-      - put: tech-ops-private
         params:
+          PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
+          TAG_FILE: version/version
+          TAG_PREFIX: ((deployment_name))-
+      - task: tag-tech-ops-private
+        file: tech-ops/reliability-engineering/pipelines/tasks/git-tag.yml
+        input_mapping:
           repository: tech-ops-private
-          tag: version/version
-          tag_prefix: ((deployment_name))-
-          tag_only: true
-          # force: true # do we need this?
+        params:
+          PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
+          TAG_FILE: version/version
+          TAG_PREFIX: ((deployment_name))-
     - put: version
       params:
         file: version/version
