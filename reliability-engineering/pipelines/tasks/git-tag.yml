@@ -1,0 +1,39 @@
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: alpine/git
+    tag: v2.24.3
+inputs:
+- name: repository
+- name: version
+params:
+  PRIVATE_KEY:
+  TAG_FILE: version/version
+  TAG_PREFIX: v
+  TAG_MESSAGE: passed
+run:
+  path: sh
+  args:
+    - -euo
+    - pipefail
+    - -c
+    - |
+      echo "generating tag..."
+      TAG_VERSION="$(cat ${TAG_FILE})"
+      TAG_NAME="${TAG_PREFIX}${TAG_VERSION}"
+      echo "configuring git ssh access..."
+      mkdir -p ~/.ssh
+      echo "${PRIVATE_KEY}" > ~/.ssh/id_rsa
+      echo "Host *" > ~/.ssh/config
+      echo "  AddKeysToAgent yes" >> ~/.ssh/config
+      echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+      chmod -R 700 ~/.ssh
+      echo "configuring git user..."
+      cd repository
+      git config --global user.email "automate-team@digital.cabinet-office.gov.uk"
+      git config --global user.name "re-autom8-ci"
+      echo "tagging repo with ${TAG_NAME}..."
+      git tag -f -m "${TAG_MESSAGE}" "${TAG_NAME}"
+      echo "pushing ${TAG_NAME}..."
+      git push -f origin "refs/tags/${TAG_NAME}"
