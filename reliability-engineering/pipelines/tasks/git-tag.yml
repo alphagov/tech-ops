@@ -10,7 +10,7 @@ inputs:
 params:
   PRIVATE_KEY:
   TAG_FILE: version/version
-  TAG_PREFIX:
+  TAG_PREFIX: v
   TAG_MESSAGE: passed
 run:
   path: sh
@@ -19,6 +19,9 @@ run:
     - pipefail
     - -c
     - |
+      echo "generating tag..."
+      TAG_VERSION="$(cat ${TAG_FILE})"
+      TAG_NAME="${TAG_PREFIX}${TAG_VERSION}"
       echo "configuring git ssh access..."
       mkdir -p ~/.ssh
       echo "${PRIVATE_KEY}" > ~/.ssh/id_rsa
@@ -30,9 +33,6 @@ run:
       cd repository
       git config --global user.email "automate-team@digital.cabinet-office.gov.uk"
       git config --global user.name "re-autom8-ci"
-      echo "generating tag..."
-      TAG_VERSION="$(cat ${TAG_FILE})"
-      TAG_NAME="${TAG_PREFIX}${TAG_VALUE}"
       echo "tagging repo with ${TAG_NAME}..."
       git tag -m "${TAG_MESSAGE}" "${TAG_NAME}"
       echo "pushing ${TAG_NAME}..."
