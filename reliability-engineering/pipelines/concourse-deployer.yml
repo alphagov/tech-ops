@@ -37,6 +37,7 @@ resources:
       - reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
       - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+      - reliability-engineering/pipelines/tasks/git-tag.yml
       - reliability-engineering/pipelines/concourse-deployer.yml
       - reliability-engineering/dockerfiles/test.Dockerfile
 - name: infra
