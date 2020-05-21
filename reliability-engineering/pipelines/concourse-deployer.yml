@@ -177,13 +177,16 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops-private
+      attempts: 50
       passed: [scale-in]
       trigger: true
     - get: tech-ops
+      attempts: 50
       passed: [scale-in]
       trigger: true
-  - get: version
-    params: {bump: minor}
+    - get: version
+      attempts: 50
+      params: {bump: minor}
   - put: ecr # this is a simple check to ensure push to ecr works
     params:
       build: version
