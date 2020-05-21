@@ -1,0 +1,62 @@
+resource_types:
+- name: paas-semver
+  type: docker-image
+  source:
+    repository: governmentpaas/semver-resource
+    tag: latest
+
+resources:
+- name: src
+  type: git
+  source:
+    uri: https://github.com/alphagov/tech-ops.git
+    branch: cd-smoke-test # TODO
+    paths:
+    - ci/cd-smoke-test.Dockerfile
+    - ci/cd-smoke-test.yaml
+- name: timer
+  type: time
+  icon: update
+  source:
+    interval: 2m
+- name: semver
+  type: paas-semver
+  source:
+    driver: s3
+    key: cd-smoke-test-version
+    bucket: ((readonly_private_bucket_name))
+    region_name: eu-west-2
+    initial_version: '1.0.0'
+- name: ecr
+  type: docker-image
+  icon: layers
+  source:
+    repository: ((readonly_private_ecr_repo_url))
+
+jobs:
+- name: selfupdate
+  serial: true
+  plan:
+  - get: src
+    trigger: true
+  - set_pipeline: cd-smoke-test
+    file: src/ci/cd-smoke-test.yaml
+- name: build
+  serial: true
+  plan:
+  - get: src
+    passed:
+    - selfupdate
+    trigger: true
+  - get: timer
+    trigger: true
+  - get: semver
+  - put: ecr
+    params:
+      build: src/ci
+      dockerfile: src/ci/cd-smoke-test.Dockerfile
+      tag: semver/version
+      tag_as_latest: true
+  - put: semver
+    params:
+      file: semver/version
