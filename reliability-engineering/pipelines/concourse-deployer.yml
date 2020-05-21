@@ -6,6 +6,11 @@ resource_types:
   source:
     repository: ljfranklin/terraform-resource
     tag: 0.12.25
+- name: paas-semver
+  type: docker-image
+  source:
+    repository: governmentpaas/semver-resource
+    tag: latest
 
 resources:
 
@@ -14,6 +19,7 @@ resources:
   type: git
   source:
     branch: ((deployment_branch))
+    tag_filter: ((deployment_tag))
     uri: git@github.com:alphagov/tech-ops-private.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -22,7 +28,8 @@ resources:
   icon: github-circle
   type: git
   source:
-    branch: ((deployment_branch))
+    branch: continuousness # FIXME: ((deployment_branch))
+    tag_filter: ((deployment_tag))
     uri: git@github.com:alphagov/tech-ops.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -31,6 +38,7 @@ resources:
       - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
       - reliability-engineering/pipelines/concourse-deployer.yml
+      - reliability-engineering/dockerfiles/scratch.Dockerfile
 - name: infra
   icon: terraform
   type: terraform
@@ -42,6 +50,19 @@ resources:
       bucket: gds-tech-ops-tfstate
       region: eu-west-2
       key: ((deployment_name)).tfstate
+- name: version
+  type: paas-semver
+  source:
+    driver: s3
+    key: ((deployment_name))-version
+    bucket: ((readonly_private_bucket_name))
+    region_name: eu-west-2
+    initial_version: '1.0.0'
+- name: ecr
+  type: docker-image
+  icon: layers
+  source:
+    repository: ((readonly_private_ecr_repo_url))
 
 jobs:
 
@@ -149,3 +170,42 @@ jobs:
       terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
       override_files:
       - concourse-provider-config/provider_concourse_override.tf.json
+
+- name: test
+  serial: true
+  plan:
+  - in_parallel:
+    - get: tech-ops-private
+      # passed: [scale-in]
+      trigger: true
+    - get: tech-ops
+      # passed: [scale-in]
+      trigger: true
+  - get: version
+    params: {bump: minor}
+  - put: ecr # it should be able to push an image
+    params:
+      build: version
+      dockerfile: tech-ops/reliability-engineering/dockerfiles/scratch.Dockerfile
+      tag: version/version
+      tag_prefix: ((deployment_name))-
+  on_success:
+    in_parallel:
+    - put: tech-ops
+      params:
+        repository: tech-ops
+        tag: version/version
+        tag_prefix: ((deployment_name))-
+        tag_only: true
+        # force: true # do we need this?
+    - put: tech-ops-private
+      params:
+        repository: tech-ops-private
+        tag: version/version
+        tag_prefix: ((deployment_name))-
+        tag_only: true
+        # force: true # do we need this?
+    on_success:
+      put: version
+      params:
+        file: version/version
