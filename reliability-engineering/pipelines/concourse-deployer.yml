@@ -81,6 +81,7 @@ jobs:
     vars:
       deployment_name: ((deployment_name))
       deployment_branch: ((deployment_branch))
+      deployment_tag: ((deployment_tag))
 
 - name: deploy
   serial: true
