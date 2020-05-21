@@ -36,4 +36,4 @@ run:
       echo "tagging repo with ${TAG_NAME}..."
       git tag -f -m "${TAG_MESSAGE}" "${TAG_NAME}"
       echo "pushing ${TAG_NAME}..."
-      git push origin "${TAG_NAME}"
+      git push -f origin "refs/tags/${TAG_NAME}"
