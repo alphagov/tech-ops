@@ -17,7 +17,7 @@ run:
   - pipefail
   - -c
   - |
-    echo "genertaing concourse provider config..."
+    echo "generating concourse provider config..."
     mkdir -p concourse-provider-config
     cat <<EOF > concourse-provider-config/provider_concourse_override.tf.json
     {
