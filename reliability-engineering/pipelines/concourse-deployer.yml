@@ -13,7 +13,7 @@ resources:
   icon: github-circle
   type: git
   source:
-    branch: module-paths
+    branch: ((deployment_branch))
     uri: git@github.com:alphagov/tech-ops-private.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -22,7 +22,7 @@ resources:
   icon: github-circle
   type: git
   source:
-    branch: selfdeploy
+    branch: ((deployment_branch))
     uri: git@github.com:alphagov/tech-ops.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -59,6 +59,7 @@ jobs:
     file: tech-ops/reliability-engineering/pipelines/concourse-deployer.yml
     vars:
       deployment_name: ((deployment_name))
+      deployment_branch: ((deployment_branch))
 
 - name: deploy
   serial: true
