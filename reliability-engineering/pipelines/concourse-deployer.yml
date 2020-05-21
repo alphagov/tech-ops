@@ -9,16 +9,16 @@ resource_types:
 
 resources:
 
-- name: config
+- name: tech-ops-private
   icon: github-circle
   type: git
   source:
-    branch: master
+    branch: module-paths
     uri: git@github.com:alphagov/tech-ops-private.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
       - reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
-- name: modules
+- name: tech-ops
   icon: github-circle
   type: git
   source:
@@ -31,7 +31,7 @@ resources:
       - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
       - reliability-engineering/pipelines/concourse-deployer.yml
-- name: deployment
+- name: infra
   icon: terraform
   type: terraform
   source:
@@ -50,13 +50,13 @@ jobs:
   serial_groups: [deploy]
   plan:
   - in_parallel:
-    - get: config
+    - get: tech-ops-private
       trigger: true
-    - get: modules
+    - get: tech-ops
       trigger: true
-    - get: deployment
+    - get: infra
   - set_pipeline: deploy
-    file: modules/reliability-engineering/pipelines/concourse-deployer.yml
+    file: tech-ops/reliability-engineering/pipelines/concourse-deployer.yml
     vars:
       deployment_name: ((deployment_name))
 
@@ -65,21 +65,21 @@ jobs:
   serial_groups: [deploy]
   plan:
   - in_parallel:
-    - get: config
+    - get: tech-ops-private
       passed: [update]
       trigger: true
-    - get: modules
+    - get: tech-ops
       passed: [update]
       trigger: true
-    - get: deployment
+    - get: infra
       passed: [update]
   - task: configure-providers
-    file: modules/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
-  - put: deployment
+  - put: infra
     params:
-      terraform_source: config/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+      terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
       override_files:
       - concourse-provider-config/provider_concourse_override.tf.json
 
@@ -88,41 +88,41 @@ jobs:
   serial_groups: [deploy]
   plan:
   - in_parallel:
-    - get: config
+    - get: tech-ops-private
       passed: [deploy]
       trigger: true
-    - get: modules
+    - get: tech-ops
       passed: [deploy]
       trigger: true
-    - get: deployment
+    - get: infra
       passed: [deploy]
   - task: configure-providers
-    file: modules/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
   - do:
     - task: get-current-workers
-      file: modules/reliability-engineering/pipelines/tasks/concourse-get-workers.yml
+      file: tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml
       params:
         DEPLOYMENT_NAME: ((deployment_name))
     - in_parallel:
       - task: scale-out-web-node-asg
-        file: modules/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
         params:
           ASG_PREFIX: ((deployment_name))-concourse-web
       - task: scale-out-main-team-workers-asg
-        file: modules/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
         params:
           ASG_PREFIX: ((deployment_name))-main-concourse-worker
     - task: land-old-workers
-      file: modules/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
+      file: tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       params:
         DEPLOYMENT_NAME: ((deployment_name))
     on_failure:
-      put: deployment # try to scale back in on failure to stay in sync
+      put: infra # try to scale back in on failure to stay in sync
       attempts: 10
       params:
-        terraform_source: config/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+        terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
         override_files:
         - concourse-provider-config/provider_concourse_override.tf.json
 
@@ -131,20 +131,20 @@ jobs:
   serial_groups: [deploy]
   plan:
   - in_parallel:
-    - get: config
+    - get: tech-ops-private
       passed: [scale-out]
       trigger: true
-    - get: modules
+    - get: tech-ops
       passed: [scale-out]
       trigger: true
-    - get: deployment
+    - get: infra
       passed: [scale-out]
   - task: configure-providers
-    file: modules/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
-  - put: deployment
+  - put: infra
     params:
-      terraform_source: config/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+      terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
       override_files:
       - concourse-provider-config/provider_concourse_override.tf.json

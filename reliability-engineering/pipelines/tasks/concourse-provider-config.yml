@@ -5,7 +5,7 @@ image_resource:
     repository: govsvc/task-toolbox
     tag: latest
 inputs:
-- name: deployment
+- name: infra # terraform metadata
 outputs:
 - name: concourse-provider-config
 params:
@@ -27,11 +27,11 @@ run:
           "url": "https://${DEPLOYMENT_NAME}.gds-reliability.engineering",
           "team": "main",
           "username": "main",
-          "password": "$(jq -r .main_team_password <deployment/metadata)"
+          "password": "$(jq -r .main_team_password <infra/metadata)"
         }
       }
     }
     EOF
     echo "writing main team password to file..."
-    jq -r .main_team_password <deployment/metadata > concourse-provider-config/main_team_password
+    jq -r .main_team_password <infra/metadata > concourse-provider-config/main_team_password
     echo "OK!"
