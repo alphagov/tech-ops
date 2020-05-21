@@ -34,6 +34,6 @@ run:
       git config --global user.email "automate-team@digital.cabinet-office.gov.uk"
       git config --global user.name "re-autom8-ci"
       echo "tagging repo with ${TAG_NAME}..."
-      git tag -m "${TAG_MESSAGE}" "${TAG_NAME}"
+      git tag -f -m "${TAG_MESSAGE}" "${TAG_NAME}"
       echo "pushing ${TAG_NAME}..."
       git push origin "${TAG_NAME}"

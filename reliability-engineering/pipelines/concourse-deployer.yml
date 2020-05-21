@@ -187,7 +187,7 @@ jobs:
       trigger: true
     - get: version
       attempts: 50
-      # params: {bump: minor}
+      params: {bump: minor}
   - put: ecr # this is a simple check to ensure push to ecr works
     params:
       build: version
@@ -199,6 +199,7 @@ jobs:
       file: tech-ops/reliability-engineering/pipelines/tasks/git-tag.yml
       input_mapping:
         repository: tech-ops
+        version: version
       params:
         PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
         TAG_PREFIX: ((deployment_name))-
@@ -206,6 +207,7 @@ jobs:
       file: tech-ops/reliability-engineering/pipelines/tasks/git-tag.yml
       input_mapping:
         repository: tech-ops-private
+        version: version
       params:
         PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
         TAG_PREFIX: ((deployment_name))-
