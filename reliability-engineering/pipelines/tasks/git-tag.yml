@@ -19,21 +19,21 @@ run:
     - pipefail
     - -c
     - |
-    echo "configuring git ssh access..."
-    mkdir -p ~/.ssh
-    echo "${PRIVATE_KEY}" > ~/.ssh/id_rsa
-    echo "Host *" > ~/.ssh/config
-    echo "  AddKeysToAgent yes" >> ~/.ssh/config
-    echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-    chmod -R 700 ~/.ssh
-    echo "configuring git user..."
-    cd repo
-    git config --global user.email "automate-team@digital.cabinet-office.gov.uk"
-    git config --global user.name "re-autom8-ci"
-    echo "generating tag..."
-    TAG_VERSION="$(cat ${TAG_FILE})"
-    TAG_NAME="${TAG_PREFIX}${TAG_VALUE}"
-    echo "tagging repo with ${TAG_NAME}..."
-    git tag -m "${TAG_MESSAGE}" "${TAG_NAME}"
-    echo "pushing ${TAG_NAME}..."
-    git push origin "${TAG_NAME}"
+      echo "configuring git ssh access..."
+      mkdir -p ~/.ssh
+      echo "${PRIVATE_KEY}" > ~/.ssh/id_rsa
+      echo "Host *" > ~/.ssh/config
+      echo "  AddKeysToAgent yes" >> ~/.ssh/config
+      echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+      chmod -R 700 ~/.ssh
+      echo "configuring git user..."
+      cd repo
+      git config --global user.email "automate-team@digital.cabinet-office.gov.uk"
+      git config --global user.name "re-autom8-ci"
+      echo "generating tag..."
+      TAG_VERSION="$(cat ${TAG_FILE})"
+      TAG_NAME="${TAG_PREFIX}${TAG_VALUE}"
+      echo "tagging repo with ${TAG_NAME}..."
+      git tag -m "${TAG_MESSAGE}" "${TAG_NAME}"
+      echo "pushing ${TAG_NAME}..."
+      git push origin "${TAG_NAME}"
