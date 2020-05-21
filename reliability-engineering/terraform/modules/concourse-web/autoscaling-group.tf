@@ -7,6 +7,11 @@ resource "aws_autoscaling_group" "concourse_web" {
   target_group_arns   = [aws_lb_target_group.concourse_web.arn]
   load_balancers      = [aws_elb.concourse_web.name]
 
+  termination_policies = [
+    "OldestLaunchConfiguration",
+    "OldestInstance",
+  ]
+
   launch_template {
     id      = aws_launch_template.concourse_web.id
     version = "$Latest"
