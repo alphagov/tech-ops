@@ -6,11 +6,12 @@ image_resource:
     tag: v2.24.3
 inputs:
 - name: repo
+- name: version
 params:
   PRIVATE_KEY:
-  TAG_FILE:
+  TAG_FILE: version/version
   TAG_PREFIX:
-  TAG_MESSAGE: "passed ci"
+  TAG_MESSAGE: passed
 run:
   path: sh
   args:
