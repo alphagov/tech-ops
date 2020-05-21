@@ -38,7 +38,7 @@ resources:
       - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
       - reliability-engineering/pipelines/concourse-deployer.yml
-      - reliability-engineering/dockerfiles/scratch.Dockerfile
+      - reliability-engineering/dockerfiles/test.Dockerfile
 - name: infra
   icon: terraform
   type: terraform
@@ -176,36 +176,36 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops-private
-      # passed: [scale-in]
+      passed: [scale-in]
       trigger: true
     - get: tech-ops
-      # passed: [scale-in]
+      passed: [scale-in]
       trigger: true
   - get: version
     params: {bump: minor}
-  - put: ecr # it should be able to push an image
+  - put: ecr # this is a simple check to ensure push to ecr works
     params:
       build: version
-      dockerfile: tech-ops/reliability-engineering/dockerfiles/scratch.Dockerfile
+      dockerfile: tech-ops/reliability-engineering/dockerfiles/test.Dockerfile
       tag: version/version
       tag_prefix: ((deployment_name))-
   on_success:
-    in_parallel:
-    - put: tech-ops
-      params:
-        repository: tech-ops
-        tag: version/version
-        tag_prefix: ((deployment_name))-
-        tag_only: true
-        # force: true # do we need this?
-    - put: tech-ops-private
-      params:
-        repository: tech-ops-private
-        tag: version/version
-        tag_prefix: ((deployment_name))-
-        tag_only: true
-        # force: true # do we need this?
-    on_success:
-      put: version
+    do:
+    - in_parallel:
+      - put: tech-ops
+        params:
+          repository: tech-ops
+          tag: version/version
+          tag_prefix: ((deployment_name))-
+          tag_only: true
+          # force: true # do we need this?
+      - put: tech-ops-private
+        params:
+          repository: tech-ops-private
+          tag: version/version
+          tag_prefix: ((deployment_name))-
+          tag_only: true
+          # force: true # do we need this?
+    - put: version
       params:
         file: version/version
