@@ -97,3 +97,29 @@ resource "aws_ecs_service" "concourse_grafana" {
     subnets         = var.private_subnet_ids
   }
 }
+
+provider "grafana" {
+  url  = "https://grafana.${local.monitoring_domain}"
+  auth = "owner:${random_string.concourse_grafana_admin_password.result}"
+}
+
+resource "grafana_data_source" "prom_data_source" {
+  count      = 2
+  is_default = element([true, false], count.index)
+  type       = "prometheus"
+  name       = "Prometheus ${count.index + 1}"
+  url        = "http://prom-${count.index + 1}.${data.aws_route53_zone.private_root.name}:9090"
+}
+
+locals {
+  grafana_dashboards = [
+    'alerts',
+    'concourse',
+    'metrics-by-team'
+  ]
+}
+resource "grafana_dashboard" "metrics" {
+  for_each    = toset(local.grafana_dashboards)
+  config_json = file("${path.module}/files/dashboards/${each.key}.json")
+  depends_on  = grafana_data_source.prom_data_source.*
+}
