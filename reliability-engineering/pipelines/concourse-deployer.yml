@@ -202,7 +202,8 @@ jobs:
         repository: tech-ops
         version: version
       params:
-        PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
+        SSH_PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
+        GPG_PRIVATE_KEY: ((re-autom8-ci-github-gpg-private-key))
         TAG_PREFIX: ((deployment_name))-
     - task: tag-tech-ops-private
       file: tech-ops/reliability-engineering/pipelines/tasks/git-tag.yml
@@ -210,7 +211,8 @@ jobs:
         repository: tech-ops-private
         version: version
       params:
-        PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
+        SSH_PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
+        GPG_PRIVATE_KEY: ((re-autom8-ci-github-gpg-private-key))
         TAG_PREFIX: ((deployment_name))-
   - put: version
     params:
