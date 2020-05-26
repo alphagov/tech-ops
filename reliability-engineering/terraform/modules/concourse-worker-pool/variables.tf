@@ -59,4 +59,12 @@ variable "additional_concourse_worker_iam_policies" {
   default = []
 }
 
+variable "concourse_version" {
+  type = string
+}
+
+variable "concourse_sha1" {
+  type = string
+}
+
 data "aws_caller_identity" "account" {}

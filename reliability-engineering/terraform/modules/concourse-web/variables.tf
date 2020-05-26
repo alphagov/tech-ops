@@ -94,6 +94,14 @@ variable "db_storage_gb" {
   default = 100
 }
 
+variable "concourse_version" {
+  type = string
+}
+
+variable "concourse_sha1" {
+  type = string
+}
+
 data "aws_caller_identity" "account" {}
 
 locals {
