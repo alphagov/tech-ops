@@ -6,6 +6,11 @@ resource_types:
   source:
     repository: ljfranklin/terraform-resource
     tag: 0.12.25
+- name: paas-semver
+  type: docker-image
+  source:
+    repository: governmentpaas/semver-resource
+    tag: latest
 
 resources:
 
@@ -14,6 +19,7 @@ resources:
   type: git
   source:
     branch: ((deployment_branch))
+    tag_filter: ((deployment_tag))
     uri: git@github.com:alphagov/tech-ops-private.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -23,6 +29,7 @@ resources:
   type: git
   source:
     branch: ((deployment_branch))
+    tag_filter: ((deployment_tag))
     uri: git@github.com:alphagov/tech-ops.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -30,7 +37,10 @@ resources:
       - reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
       - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+      - reliability-engineering/pipelines/tasks/sign-tag.yml
+      - reliability-engineering/pipelines/tasks/verify-tag.yml
       - reliability-engineering/pipelines/concourse-deployer.yml
+      - reliability-engineering/dockerfiles/test.Dockerfile
 - name: infra
   icon: terraform
   type: terraform
@@ -42,6 +52,19 @@ resources:
       bucket: gds-tech-ops-tfstate
       region: eu-west-2
       key: ((deployment_name)).tfstate
+- name: version
+  type: paas-semver
+  source:
+    driver: s3
+    key: ((deployment_name))-version
+    bucket: ((readonly_private_bucket_name))
+    region_name: eu-west-2
+    initial_version: '1.0.0'
+- name: ecr
+  type: docker-image
+  icon: layers
+  source:
+    repository: ((readonly_private_ecr_repo_url))
 
 jobs:
 
@@ -55,11 +78,27 @@ jobs:
     - get: tech-ops
       trigger: true
     - get: infra
+  - in_parallel:
+    - task: verify-tech-ops-private-tag
+      file: tech-ops/reliability-engineering/pipelines/tasks/verify-tag.yml
+      input_mapping:
+        repository: tech-ops-private
+      params:
+        GPG_VERIFICATION_KEY: ((re-autom8-ci-github-gpg-private-key))
+        GPG_VERIFICATION_TAG: ((deployment_tag))
+    - task: verify-tech-ops-tag
+      file: tech-ops/reliability-engineering/pipelines/tasks/verify-tag.yml
+      input_mapping:
+        repository: tech-ops
+      params:
+        GPG_VERIFICATION_KEY: ((re-autom8-ci-github-gpg-private-key))
+        GPG_VERIFICATION_TAG: ((deployment_tag))
   - set_pipeline: deploy
     file: tech-ops/reliability-engineering/pipelines/concourse-deployer.yml
     vars:
       deployment_name: ((deployment_name))
       deployment_branch: ((deployment_branch))
+      deployment_tag: ((deployment_tag))
 
 - name: deploy
   serial: true
@@ -149,3 +188,48 @@ jobs:
       terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
       override_files:
       - concourse-provider-config/provider_concourse_override.tf.json
+
+- name: test
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: tech-ops-private
+      attempts: 50
+      passed: [scale-in]
+      trigger: true
+    - get: tech-ops
+      attempts: 50
+      passed: [scale-in]
+      trigger: true
+    - get: version
+      attempts: 50
+      params: {bump: minor}
+  - put: ecr # this is a simple check to ensure push to ecr works
+    params:
+      build: version
+      dockerfile: tech-ops/reliability-engineering/dockerfiles/test.Dockerfile
+      tag: version/version
+      tag_prefix: ((deployment_name))-
+  - in_parallel:
+    - task: tag-tech-ops
+      file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
+      input_mapping:
+        repository: tech-ops
+        version: version
+      params:
+        SSH_PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
+        GPG_PRIVATE_KEY: ((re-autom8-ci-github-gpg-private-key))
+        TAG_PREFIX: ((deployment_name))-
+    - task: tag-tech-ops-private
+      file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
+      input_mapping:
+        repository: tech-ops-private
+        version: version
+      params:
+        SSH_PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
+        GPG_PRIVATE_KEY: ((re-autom8-ci-github-gpg-private-key))
+        TAG_PREFIX: ((deployment_name))-
+  - put: version
+    params:
+      file: version/version

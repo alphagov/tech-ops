@@ -1,0 +1,51 @@
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: govsvc/task-toolbox
+    tag: latest
+inputs:
+- name: repository
+- name: version
+params:
+  SSH_PRIVATE_KEY:
+  GPG_PRIVATE_KEY:
+  TAG_FILE: version/version
+  TAG_PREFIX: v
+  TAG_MESSAGE: passed
+run:
+  path: sh
+  args:
+    - -euo
+    - pipefail
+    - -c
+    - |
+      echo "generating tag..."
+      TAG_VERSION="$(cat ${TAG_FILE})"
+      TAG_NAME="${TAG_PREFIX}${TAG_VERSION}"
+      echo "configuring git ssh access..."
+      mkdir -p ~/.ssh
+      echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
+      echo "Host *" > ~/.ssh/config
+      echo "  AddKeysToAgent yes" >> ~/.ssh/config
+      echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+      chmod -R 700 ~/.ssh
+      echo "configuring git user..."
+      cd repository
+      git config --global user.email "automate-team@digital.cabinet-office.gov.uk"
+      git config --global user.name "re-autom8-ci"
+      echo "configuring git commit signing..."
+      echo "${GPG_PRIVATE_KEY}" > key
+      gpg --import key
+      gpg --export-secret-keys > ~/.gnupg/pubring.gpg
+      KEY_ID="0x$(gpg --list-secret-keys --with-colons \
+        | grep '^sec:' \
+        | cut -d ':' -f 5 \
+      )"
+      echo "key id $KEY_ID"
+      git config --global user.signingkey "${KEY_ID}"
+      export GPG_TTY=$(tty)
+      echo "created signed tag ${TAG_NAME}..."
+      git tag -s "${TAG_NAME}" -m "${TAG_MESSAGE}"
+      echo "pushing ${TAG_NAME}..."
+      git push origin "refs/tags/${TAG_NAME}"
