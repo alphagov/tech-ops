@@ -19,7 +19,6 @@ resources:
   type: git
   source:
     branch: ((deployment_branch))
-    tag_filter: ((deployment_tag))
     uri: git@github.com:alphagov/tech-ops-private.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -78,21 +77,13 @@ jobs:
     - get: tech-ops
       trigger: true
     - get: infra
-  - in_parallel:
-    - task: verify-tech-ops-private-tag
-      file: tech-ops/reliability-engineering/pipelines/tasks/verify-tag.yml
-      input_mapping:
-        repository: tech-ops-private
-      params:
-        GPG_VERIFICATION_KEY: ((re-autom8-ci-github-gpg-private-key))
-        GPG_VERIFICATION_TAG: ((deployment_tag))
-    - task: verify-tech-ops-tag
-      file: tech-ops/reliability-engineering/pipelines/tasks/verify-tag.yml
-      input_mapping:
-        repository: tech-ops
-      params:
-        GPG_VERIFICATION_KEY: ((re-autom8-ci-github-gpg-private-key))
-        GPG_VERIFICATION_TAG: ((deployment_tag))
+  - task: verify-tech-ops-tag
+    file: tech-ops/reliability-engineering/pipelines/tasks/verify-tag.yml
+    input_mapping:
+      repository: tech-ops
+    params:
+      GPG_VERIFICATION_KEY: ((re-autom8-ci-github-gpg-private-key))
+      GPG_VERIFICATION_TAG: ((deployment_tag))
   - set_pipeline: deploy
     file: tech-ops/reliability-engineering/pipelines/concourse-deployer.yml
     vars:
@@ -211,25 +202,15 @@ jobs:
       dockerfile: tech-ops/reliability-engineering/dockerfiles/test.Dockerfile
       tag: version/version
       tag_prefix: ((deployment_name))-
-  - in_parallel:
-    - task: tag-tech-ops
-      file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
-      input_mapping:
-        repository: tech-ops
-        version: version
-      params:
-        SSH_PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
-        GPG_PRIVATE_KEY: ((re-autom8-ci-github-gpg-private-key))
-        TAG_PREFIX: ((deployment_name))-
-    - task: tag-tech-ops-private
-      file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
-      input_mapping:
-        repository: tech-ops-private
-        version: version
-      params:
-        SSH_PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
-        GPG_PRIVATE_KEY: ((re-autom8-ci-github-gpg-private-key))
-        TAG_PREFIX: ((deployment_name))-
+  - task: tag-tech-ops
+    file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
+    input_mapping:
+      repository: tech-ops
+      version: version
+    params:
+      SSH_PRIVATE_KEY: ((re-autom8-ci-github-ssh-private-key))
+      GPG_PRIVATE_KEY: ((re-autom8-ci-github-gpg-private-key))
+      TAG_PREFIX: ((deployment_name))-
   - put: version
     params:
       file: version/version
