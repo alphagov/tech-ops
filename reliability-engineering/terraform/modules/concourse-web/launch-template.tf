@@ -18,8 +18,8 @@ data "template_file" "concourse_web_cloud_init" {
     main_team_github_team               = var.main_team_github_team
     concourse_external_url              = aws_route53_record.concourse_public_deployment.fqdn
     concourse_db_url                    = aws_route53_record.concourse_private_db.fqdn
-    concourse_version                   = "6.0.0"
-    concourse_sha1                      = "b8696c55bea47363580e81e3710814a9cdea26ef  concourse-6.0.0-linux-amd64.tgz"
+    concourse_version                   = "6.1.0"
+    concourse_sha1                      = "e1f5923c9ed563ea8866b603a03e98b214a2fd09  concourse-6.1.0-linux-amd64.tgz"
     concourse_web_bucket                = aws_s3_bucket.concourse_web.bucket
     worker_keys_s3_object_key           = aws_s3_bucket_object.concourse_web_team_authorized_worker_keys.id
     concourse_web_syslog_log_group_name = local.concourse_web_syslog_log_group_name
