@@ -27,9 +27,11 @@ run:
       echo "${GPG_VERIFICATION_KEY}" > key
       gpg --import key
       export GPG_TTY=$(tty)
+      export TERM=xterm
       echo "trusted keys..."
       gpg --list-keys
-      echo "verifying commit signed by a trusted key..."
+      echo "finding tag..."
       cd repository
-      git tag --points-at HEAD
-      git verify-commit HEAD
+      TAG=$(cat .git/ref)
+      echo "verifying $TAG signed by a trusted key..."
+      git tag -v "${TAG}"
