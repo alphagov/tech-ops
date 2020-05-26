@@ -37,7 +37,8 @@ resources:
       - reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
       - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
-      - reliability-engineering/pipelines/tasks/git-tag.yml
+      - reliability-engineering/pipelines/tasks/sign-tag.yml
+      - reliability-engineering/pipelines/tasks/verify-tag.yml
       - reliability-engineering/pipelines/concourse-deployer.yml
       - reliability-engineering/dockerfiles/test.Dockerfile
 - name: infra
@@ -77,6 +78,21 @@ jobs:
     - get: tech-ops
       trigger: true
     - get: infra
+  - in_parallel:
+    - task: verify-tech-ops-private-tag
+      file: tech-ops/reliability-engineering/pipelines/tasks/verify-tag.yml
+      input_mapping:
+        repository: tech-ops-private
+      params:
+        GPG_VERIFICATION_KEY: ((re-autom8-ci-github-gpg-private-key))
+        GPG_VERIFICATION_TAG: ((deployment_tag))
+    - task: verify-tech-ops-tag
+      file: tech-ops/reliability-engineering/pipelines/tasks/verify-tag.yml
+      input_mapping:
+        repository: tech-ops
+      params:
+        GPG_VERIFICATION_KEY: ((re-autom8-ci-github-gpg-private-key))
+        GPG_VERIFICATION_TAG: ((deployment_tag))
   - set_pipeline: deploy
     file: tech-ops/reliability-engineering/pipelines/concourse-deployer.yml
     vars:
@@ -197,7 +213,7 @@ jobs:
       tag_prefix: ((deployment_name))-
   - in_parallel:
     - task: tag-tech-ops
-      file: tech-ops/reliability-engineering/pipelines/tasks/git-tag.yml
+      file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
       input_mapping:
         repository: tech-ops
         version: version
@@ -206,7 +222,7 @@ jobs:
         GPG_PRIVATE_KEY: ((re-autom8-ci-github-gpg-private-key))
         TAG_PREFIX: ((deployment_name))-
     - task: tag-tech-ops-private
-      file: tech-ops/reliability-engineering/pipelines/tasks/git-tag.yml
+      file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
       input_mapping:
         repository: tech-ops-private
         version: version
