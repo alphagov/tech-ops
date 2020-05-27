@@ -175,6 +175,7 @@ jobs:
     params:
       DEPLOYMENT_NAME: ((deployment_name))
   - put: infra
+    attempts: 10
     params:
       terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
       override_files:
