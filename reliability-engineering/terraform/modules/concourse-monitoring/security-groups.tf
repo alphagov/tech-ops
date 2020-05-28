@@ -123,3 +123,12 @@ module "concourse_prometheus_can_talk_to_concourse_prometheus_node_exporter_over
   from_port         = 9100
   to_port           = 9100
 }
+
+module "concourse_main_workers_can_talk_to_concourse_grafana_over_9100" {
+  source = "../sg-access-pair"
+
+  source_sg_id      = var.main_worker_security_group_id
+  destination_sg_id = aws_security_group.concourse_grafana.id
+  from_port         = 9100
+  to_port           = 9100
+}

@@ -14,6 +14,10 @@ variable "public_subnet_ids" {
   type = list(string)
 }
 
+variable "main_worker_security_group_id" {
+  type = string
+}
+
 variable "prometheus_security_group_id" {
   type = string
 }
