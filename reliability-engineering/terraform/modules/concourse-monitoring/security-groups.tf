@@ -41,6 +41,16 @@ resource "aws_security_group_rule" "concourse_monitoring_lb_ingress_from_outside
   cidr_blocks       = var.whitelisted_cidr_blocks
 }
 
+resource "aws_security_group_rule" "concourse_monitoring_lb_ingress_from_concourse_main_443" {
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+
+  security_group_id        = aws_security_group.concourse_monitoring_lb.id
+  source_security_group_id = var.main_worker_security_group_id
+}
+
 resource "aws_security_group_rule" "concourse_monitoring_lb_ingress_from_outside_80" {
   type      = "ingress"
   protocol  = "tcp"
@@ -120,15 +130,6 @@ module "concourse_prometheus_can_talk_to_concourse_prometheus_node_exporter_over
 
   source_sg_id      = var.prometheus_security_group_id
   destination_sg_id = var.prometheus_security_group_id
-  from_port         = 9100
-  to_port           = 9100
-}
-
-module "concourse_main_workers_can_talk_to_concourse_grafana_over_9100" {
-  source = "../sg-access-pair"
-
-  source_sg_id      = var.main_worker_security_group_id
-  destination_sg_id = aws_security_group.concourse_grafana.id
   from_port         = 9100
   to_port           = 9100
 }
