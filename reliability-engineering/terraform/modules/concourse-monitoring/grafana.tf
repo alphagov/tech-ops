@@ -113,13 +113,13 @@ resource "grafana_data_source" "prom_data_source" {
 
 locals {
   grafana_dashboards = [
-    'alerts',
-    'concourse',
-    'metrics-by-team'
+    "alerts",
+    "concourse",
+    "metrics-by-team"
   ]
 }
 resource "grafana_dashboard" "metrics" {
   for_each    = toset(local.grafana_dashboards)
   config_json = file("${path.module}/files/dashboards/${each.key}.json")
-  depends_on  = grafana_data_source.prom_data_source.*
+  depends_on  = [grafana_data_source.prom_data_source[0]]
 }
