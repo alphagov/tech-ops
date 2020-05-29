@@ -15,7 +15,7 @@ variable "public_subnet_ids" {
 }
 
 variable "main_nat_gateway_egress_ips" {
-  type = string
+  type = list(string)
 }
 
 variable "prometheus_security_group_id" {
