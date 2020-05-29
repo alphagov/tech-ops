@@ -14,7 +14,7 @@ variable "public_subnet_ids" {
   type = list(string)
 }
 
-variable "main_worker_security_group_id" {
+variable "main_nat_gateway_egress_ips" {
   type = string
 }
 
