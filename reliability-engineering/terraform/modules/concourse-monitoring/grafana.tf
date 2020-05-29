@@ -100,7 +100,7 @@ resource "aws_ecs_service" "concourse_grafana" {
 
 provider "grafana" {
   url  = "https://grafana.${local.monitoring_domain}"
-  auth = "owner:${random_string.concourse_grafana_admin_password.result}"
+  auth = "admin:${random_string.concourse_grafana_admin_password.result}"
 }
 
 resource "grafana_data_source" "prom_data_source" {
