@@ -22,6 +22,7 @@
   "panels": [
     {
       "collapsed": false,
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -38,14 +39,17 @@
       "bars": true,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Shows the number of finished build over time with their statuses (succeeded, failed, aborted & errored).",
       "fill": 10,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 6,
         "x": 0,
         "y": 1
       },
+      "hiddenSeries": false,
       "id": 34,
       "interval": "1m",
       "legend": {
@@ -61,6 +65,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -315,14 +322,17 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Shows the number of builds started and finished over time.",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 6,
         "x": 6,
         "y": 1
       },
+      "hiddenSeries": false,
       "id": 33,
       "interval": "1m",
       "legend": {
@@ -339,6 +349,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -367,7 +380,6 @@
         "sort": 0,
         "value_type": "individual"
       },
-      "transparent": false,
       "type": "graph",
       "xaxis": {
         "buckets": null,
@@ -405,15 +417,18 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "decimals": 0,
       "description": "The status of Concourse Workers",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 6,
         "x": 12,
         "y": 1
       },
+      "hiddenSeries": false,
       "id": 44,
       "interval": "",
       "legend": {
@@ -431,6 +446,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -529,14 +547,17 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Shows the number of resource checks done per team.",
       "fill": 0,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 6,
         "x": 18,
         "y": 1
       },
+      "hiddenSeries": false,
       "id": 61,
       "interval": "",
       "legend": {
@@ -552,6 +573,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -585,7 +609,8 @@
               "type": "fill"
             }
           ],
-          "intervalFactor": 1,
+          "interval": "",
+          "intervalFactor": 2,
           "legendFormat": "Success",
           "measurement": "check finished",
           "orderByTime": "ASC",
@@ -611,7 +636,8 @@
         {
           "expr": "sum(rate(concourse_lidar_checks_finished_total{status=\"error\"}[$__interval]))",
           "format": "time_series",
-          "intervalFactor": 1,
+          "interval": "",
+          "intervalFactor": 2,
           "legendFormat": "Error",
           "refId": "B"
         }
@@ -659,6 +685,7 @@
     },
     {
       "collapsed": false,
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -675,10 +702,12 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Shows the average percentage of CPU usage in user space.",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -686,6 +715,7 @@
         "x": 0,
         "y": 9
       },
+      "hiddenSeries": false,
       "id": 1,
       "interval": ">1m",
       "legend": {
@@ -701,6 +731,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -769,15 +802,6 @@
               "value": "/concourse-$deployment$/"
             }
           ]
-        },
-        {
-          "expr": "node_cpu{job=\"concourse_node_exporter\", role=\"concourse-web\",mode=\"idle\"}",
-          "format": "time_series",
-          "hide": true,
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "{{instance}}",
-          "refId": "B"
         }
       ],
       "thresholds": [
@@ -833,10 +857,12 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Shows the percentage of memory used (without counting cache) by the web instance.",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -844,6 +870,7 @@
         "x": 6,
         "y": 9
       },
+      "hiddenSeries": false,
       "id": 12,
       "interval": ">1m",
       "legend": {
@@ -851,7 +878,7 @@
         "current": false,
         "max": false,
         "min": false,
-        "show": false,
+        "show": true,
         "total": false,
         "values": false
       },
@@ -859,6 +886,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -871,7 +901,7 @@
         {
           "alias": "",
           "dsType": "influxdb",
-          "expr": "avg(1 - (node_memory_MemAvailable {job=\"concourse_node_exporter\", role=\"concourse-web\"} / node_memory_MemTotal))",
+          "expr": "node_memory_MemAvailable{job=\"concourse_node_exporter\", role=\"concourse-web\"} / node_memory_MemTotal{job=\"concourse_node_exporter\", role=\"concourse-web\"}",
           "format": "time_series",
           "groupBy": [
             {
@@ -890,8 +920,9 @@
           "groupByTags": [
             "host"
           ],
-          "hide": true,
+          "hide": false,
           "intervalFactor": 1,
+          "legendFormat": "{{instance}}",
           "measurement": "mem",
           "orderByTime": "ASC",
           "policy": "default",
@@ -926,20 +957,13 @@
               "value": "/concourse-$deployment$/"
             }
           ]
-        },
-        {
-          "expr": "node_memory_MemFree{job=\"concourse_node_exporter\", role=\"concourse-web\"}",
-          "format": "time_series",
-          "hide": false,
-          "intervalFactor": 1,
-          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Web Memory",
+      "title": "Available Memory",
       "tooltip": {
         "msResolution": false,
         "shared": true,
@@ -956,7 +980,7 @@
       },
       "yaxes": [
         {
-          "format": "decbytes",
+          "format": "percentunit",
           "logBase": 1,
           "max": null,
           "min": null,
@@ -980,16 +1004,19 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Shows the transmission/receive rate of the web eth0 network interface.",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 6,
         "x": 12,
         "y": 9
       },
+      "hiddenSeries": false,
       "id": 47,
       "legend": {
         "avg": false,
@@ -1004,6 +1031,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 1,
       "points": false,
@@ -1039,7 +1069,8 @@
             }
           ],
           "hide": false,
-          "intervalFactor": 1,
+          "interval": "",
+          "intervalFactor": 2,
           "legendFormat": "Received",
           "measurement": "net",
           "orderByTime": "ASC",
@@ -1118,7 +1149,8 @@
             }
           ],
           "hide": false,
-          "intervalFactor": 1,
+          "interval": "",
+          "intervalFactor": 2,
           "legendFormat": "Sent",
           "measurement": "net",
           "orderByTime": "ASC",
@@ -1176,7 +1208,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Web Network (Prom-2!!)",
+      "title": "Network Rate",
       "tooltip": {
         "msResolution": false,
         "shared": true,
@@ -1193,7 +1225,7 @@
       },
       "yaxes": [
         {
-          "format": "none",
+          "format": "Bps",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -1219,10 +1251,12 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "The number of queries that got created since the last time the metric was emitted.",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1230,6 +1264,7 @@
         "x": 18,
         "y": 9
       },
+      "hiddenSeries": false,
       "id": 19,
       "interval": "1m",
       "legend": {
@@ -1245,6 +1280,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 1,
       "points": false,
@@ -1342,10 +1380,12 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Shows the average number of the current running go routines for the web instances.",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1353,6 +1393,7 @@
         "x": 0,
         "y": 16
       },
+      "hiddenSeries": false,
       "id": 24,
       "interval": ">1m",
       "legend": {
@@ -1368,6 +1409,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -1479,10 +1523,12 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Shows the number of open files that belong to ATC.",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1490,6 +1536,7 @@
         "x": 6,
         "y": 16
       },
+      "hiddenSeries": false,
       "id": 36,
       "interval": ">1m",
       "legend": {
@@ -1505,6 +1552,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -1628,11 +1678,12 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus 2",
+      "datasource": null,
       "description": "Shows the response time of every call per possible route.",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1640,6 +1691,7 @@
         "x": 12,
         "y": 16
       },
+      "hiddenSeries": false,
       "id": 21,
       "interval": "",
       "legend": {
@@ -1657,6 +1709,9 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 1,
       "points": false,
@@ -1695,7 +1750,8 @@
             "route"
           ],
           "hide": false,
-          "intervalFactor": 1,
+          "interval": "",
+          "intervalFactor": 2,
           "legendFormat": "{{route}}",
           "measurement": "http response time",
           "orderByTime": "ASC",
@@ -1742,7 +1798,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "HTTP Response Duration (Prom-2!!!)",
+      "title": "HTTP Response Duration",
       "tooltip": {
         "msResolution": true,
         "shared": true,
@@ -1783,10 +1839,12 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "The number of open database connections per ATC node for both api and backend connection pools.",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1794,6 +1852,7 @@
         "x": 18,
         "y": 16
       },
+      "hiddenSeries": false,
       "id": 6,
       "interval": ">30s",
       "legend": {
@@ -1809,6 +1868,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null as zero",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 1,
       "points": false,
@@ -1910,6 +1972,7 @@
     },
     {
       "collapsed": false,
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1926,10 +1989,12 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Average CPU per team using irate for better accuracy",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1937,6 +2002,7 @@
         "x": 0,
         "y": 24
       },
+      "hiddenSeries": false,
       "id": 4,
       "interval": ">10s",
       "legend": {
@@ -1953,6 +2019,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 1,
       "points": false,
@@ -1963,9 +2032,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "100 - (avg by (team) (irate(node_cpu{role=\"concourse-worker\", mode=\"idle\", team!=\"main\"}[$__interval])) * 100)",
+          "expr": "1 - (avg by (team) (rate(node_cpu{role=\"concourse-worker\", mode=\"idle\", team!=\"main\"}[$__interval])))",
           "format": "time_series",
-          "intervalFactor": 1,
+          "interval": "",
+          "intervalFactor": 3,
           "legendFormat": "{{team}}",
           "refId": "A"
         }
@@ -1977,161 +2047,8 @@
       "title": "Average CPU / Team",
       "tooltip": {
         "msResolution": false,
-        "shared": false,
-        "sort": 2,
-        "value_type": "cumulative"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "none",
-          "logBase": 1,
-          "max": null,
-          "min": 0,
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "decimals": null,
-      "description": "Displays the disk space available by Team",
-      "editable": true,
-      "error": false,
-      "fill": 0,
-      "grid": {},
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 6,
-        "y": 24
-      },
-      "id": 15,
-      "interval": ">30s",
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 1,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "",
-          "dsType": "influxdb",
-          "expr": "sum by (team)(node_filesystem_free{mountpoint=\"/\",role=\"concourse-worker\"} / node_filesystem_size)",
-          "format": "time_series",
-          "groupBy": [
-            {
-              "params": [
-                "auto"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "host"
-              ],
-              "type": "tag"
-            },
-            {
-              "params": [
-                "bosh-job"
-              ],
-              "type": "tag"
-            }
-          ],
-          "hide": false,
-          "interval": ">1m",
-          "intervalFactor": 1,
-          "legendFormat": "{{team}}",
-          "measurement": "disk",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT mean(\"value\") * 100 FROM \"disk /var/vcap/data/baggageclaim/volumes\" WHERE \"bosh-job\" = 'worker' AND $timeFilter GROUP BY time($dynamic), \"tag\", \"host\"",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "used_percent"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "bosh-job",
-              "operator": "=~",
-              "value": "/.*worker.*/"
-            },
-            {
-              "condition": "AND",
-              "key": "bosh-deployment",
-              "operator": "=~",
-              "value": "/concourse-$deployment.*/"
-            },
-            {
-              "condition": "AND",
-              "key": "path",
-              "operator": "=",
-              "value": "/var/vcap/data"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Worker Disk Available % by Team",
-      "tooltip": {
-        "msResolution": false,
         "shared": true,
-        "sort": 2,
+        "sort": 0,
         "value_type": "cumulative"
       },
       "type": "graph",
@@ -2146,451 +2063,6 @@
         {
           "format": "percentunit",
           "logBase": 1,
-          "max": "1",
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "description": "The number of open file descriptors per team",
-      "fill": 0,
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 24
-      },
-      "id": 45,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "sum by (team)(process_open_fds{role=\"concourse-worker\"})",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "{{team}}",
-          "refId": "B"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "No. of Open Files / Team",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "description": "Shows the transmission/receive rate of the workers eth0 network interface.",
-      "editable": true,
-      "error": false,
-      "fill": 0,
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 18,
-        "y": 24
-      },
-      "id": 22,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "connected",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "Bytes received {bosh-job: [[tag_bosh-job]], host: [[tag_host]]}",
-          "dsType": "influxdb",
-          "expr": "avg(rate(node_network_receive_bytes{role=\"concourse-worker\"}[$__interval]))",
-          "format": "time_series",
-          "groupBy": [
-            {
-              "params": [
-                "$interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "host"
-              ],
-              "type": "tag"
-            },
-            {
-              "params": [
-                "bosh-job"
-              ],
-              "type": "tag"
-            }
-          ],
-          "hide": false,
-          "intervalFactor": 1,
-          "legendFormat": "Rx",
-          "measurement": "net",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "bytes_recv"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              },
-              {
-                "params": [
-                  "1s"
-                ],
-                "type": "non_negative_derivative"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "bosh-deployment",
-              "operator": "=~",
-              "value": "/concourse-$deployment.*/"
-            },
-            {
-              "condition": "AND",
-              "key": "bosh-job",
-              "operator": "=~",
-              "value": "/.*worker.*/"
-            },
-            {
-              "condition": "AND",
-              "key": "interface",
-              "operator": "=",
-              "value": "eth0"
-            }
-          ]
-        },
-        {
-          "alias": "Bytes received {bosh-job: [[tag_bosh-job]], host: [[tag_host]]}",
-          "dsType": "influxdb",
-          "expr": "avg(rate(node_network_transmit_bytes{role=\"concourse-worker\"}[$__interval]))",
-          "format": "time_series",
-          "groupBy": [
-            {
-              "params": [
-                "$interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "host"
-              ],
-              "type": "tag"
-            },
-            {
-              "params": [
-                "bosh-job"
-              ],
-              "type": "tag"
-            }
-          ],
-          "hide": false,
-          "intervalFactor": 1,
-          "legendFormat": "Tx",
-          "measurement": "net",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "bytes_sent"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              },
-              {
-                "params": [
-                  "1s"
-                ],
-                "type": "non_negative_derivative"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "bosh-deployment",
-              "operator": "=~",
-              "value": "/concourse-$deployment.*/"
-            },
-            {
-              "condition": "AND",
-              "key": "bosh-job",
-              "operator": "=~",
-              "value": "/.*worker.*/"
-            },
-            {
-              "condition": "AND",
-              "key": "interface",
-              "operator": "=",
-              "value": "eth0"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Average Worker Network (Tx/Rx)",
-      "tooltip": {
-        "msResolution": false,
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "Bps",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "description": "Shows the number of active containers per team as reported by the garden server on the worker.",
-      "editable": true,
-      "error": false,
-      "fill": 0,
-      "grid": {},
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 0,
-        "y": 31
-      },
-      "id": 14,
-      "interval": ">30s",
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": true,
-        "sideWidth": null,
-        "sort": "current",
-        "sortDesc": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "connected",
-      "percentage": false,
-      "pointradius": 1,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "$tag_worker",
-          "dsType": "influxdb",
-          "expr": "sum by(team)(concourse_workers_containers)",
-          "format": "time_series",
-          "groupBy": [
-            {
-              "params": [
-                "auto"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "worker"
-              ],
-              "type": "tag"
-            }
-          ],
-          "hide": false,
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "{{team}}",
-          "measurement": "worker containers",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT mean(\"value\") FROM \"worker containers\" WHERE \"bosh-deployment\" = 'concourse-wings' AND $timeFilter GROUP BY time($__interval), \"worker\"",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Total No. of Worker Containers",
-      "tooltip": {
-        "msResolution": true,
-        "shared": true,
-        "sort": 2,
-        "value_type": "cumulative"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "decimals": null,
-          "format": "none",
-          "logBase": 1,
           "max": null,
           "min": 0,
           "show": true
@@ -2613,151 +2085,27 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "description": "Shows the number of active volumes per team as reported by the baggageclaim server on the worker.",
+      "datasource": null,
+      "description": "Shows the percentage of memory used (without counting cache) by team.",
       "editable": true,
       "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
         "w": 6,
         "x": 6,
-        "y": 31
+        "y": 24
       },
-      "id": 23,
-      "interval": ">30s",
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "connected",
-      "percentage": false,
-      "pointradius": 1,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "",
-          "dsType": "influxdb",
-          "expr": "sum by (team)(concourse_workers_volumes)",
-          "format": "time_series",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "worker"
-              ],
-              "type": "tag"
-            }
-          ],
-          "hide": false,
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "{{team}}",
-          "measurement": "worker volumes",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT mean(\"value\") FROM \"cpu\" WHERE \"bosh-job\" = 'worker' AND $timeFilter GROUP BY time($interval), \"host\"",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "No. of Worker Volumes / Team",
-      "tooltip": {
-        "msResolution": true,
-        "shared": true,
-        "sort": 2,
-        "value_type": "cumulative"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "none",
-          "logBase": 1,
-          "max": null,
-          "min": 0,
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "description": "Shows the percentage of memory used (without counting cache) by the worker instances (per worker).",
-      "editable": true,
-      "error": false,
-      "fill": 0,
-      "grid": {},
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 31
-      },
+      "hiddenSeries": false,
       "id": 13,
       "legend": {
         "avg": false,
         "current": false,
         "max": false,
         "min": false,
-        "show": false,
+        "show": true,
         "total": false,
         "values": false
       },
@@ -2765,6 +2113,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -2777,7 +2128,7 @@
         {
           "alias": "",
           "dsType": "influxdb",
-          "expr": "avg(1 - (node_memory_MemAvailable {job=\"concourse_node_exporter\", role=\"concourse-worker\"} / node_memory_MemTotal))",
+          "expr": "avg by (team) (node_memory_MemAvailable {job=\"concourse_node_exporter\", role=\"concourse-worker\"} / node_memory_MemTotal)",
           "format": "time_series",
           "groupBy": [
             {
@@ -2803,7 +2154,9 @@
             "host"
           ],
           "hide": false,
+          "interval": "",
           "intervalFactor": 1,
+          "legendFormat": "{{team}}",
           "measurement": "mem",
           "orderByTime": "ASC",
           "policy": "default",
@@ -2908,7 +2261,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Average Worker Memory",
+      "title": "Available Memory / Team",
       "tooltip": {
         "msResolution": false,
         "shared": false,
@@ -2945,33 +2298,24 @@
       }
     },
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 38
-      },
-      "id": 55,
-      "panels": [],
-      "title": "Volumes & Containers",
-      "type": "row"
-    },
-    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "description": "The number of worker volumes by team",
+      "datasource": null,
+      "description": "Shows the transmission/receive rate of the workers eth0 network interface.",
+      "editable": true,
+      "error": false,
       "fill": 0,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 6,
-        "x": 0,
-        "y": 39
+        "x": 12,
+        "y": 24
       },
-      "id": 32,
-      "interval": ">2m",
+      "hiddenSeries": false,
+      "id": 22,
       "legend": {
         "avg": false,
         "current": false,
@@ -2984,7 +2328,10 @@
       "lines": true,
       "linewidth": 1,
       "links": [],
-      "nullPointMode": "null",
+      "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -2995,29 +2342,269 @@
       "steppedLine": false,
       "targets": [
         {
+          "alias": "Bytes received {bosh-job: [[tag_bosh-job]], host: [[tag_host]]}",
           "dsType": "influxdb",
-          "expr": "sum by(team) (concourse_workers_volumes)",
+          "expr": "avg by (team) (rate(node_network_receive_bytes{role=\"concourse-worker\"}[$__interval]))",
           "format": "time_series",
           "groupBy": [
             {
               "params": [
-                "auto"
+                "$interval"
               ],
               "type": "time"
             },
             {
               "params": [
-                "null"
+                "host"
               ],
-              "type": "fill"
+              "type": "tag"
+            },
+            {
+              "params": [
+                "bosh-job"
+              ],
+              "type": "tag"
             }
           ],
-          "intervalFactor": 1,
-          "legendFormat": "{{team}}",
-          "measurement": "volumes created",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "Rx {{team}}",
+          "measurement": "net",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(\"value\") FROM \"containers created\" WHERE $timeFilter GROUP BY time($__interval), \"host\" fill(null)",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "bytes_recv"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "bosh-deployment",
+              "operator": "=~",
+              "value": "/concourse-$deployment.*/"
+            },
+            {
+              "condition": "AND",
+              "key": "bosh-job",
+              "operator": "=~",
+              "value": "/.*worker.*/"
+            },
+            {
+              "condition": "AND",
+              "key": "interface",
+              "operator": "=",
+              "value": "eth0"
+            }
+          ]
+        },
+        {
+          "alias": "Bytes received {bosh-job: [[tag_bosh-job]], host: [[tag_host]]}",
+          "dsType": "influxdb",
+          "expr": "avg by (team) (rate(node_network_transmit_bytes{role=\"concourse-worker\"}[$__interval]))",
+          "format": "time_series",
+          "groupBy": [
+            {
+              "params": [
+                "$interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "host"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "bosh-job"
+              ],
+              "type": "tag"
+            }
+          ],
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "Tx {{team}}",
+          "measurement": "net",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "bytes_sent"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "bosh-deployment",
+              "operator": "=~",
+              "value": "/concourse-$deployment.*/"
+            },
+            {
+              "condition": "AND",
+              "key": "bosh-job",
+              "operator": "=~",
+              "value": "/.*worker.*/"
+            },
+            {
+              "condition": "AND",
+              "key": "interface",
+              "operator": "=",
+              "value": "eth0"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Average Worker Network (Tx/Rx) / Team",
+      "tooltip": {
+        "msResolution": false,
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "Bps",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "description": "Shows the number of active volumes per team as reported by the baggageclaim server on the worker.",
+      "editable": true,
+      "error": false,
+      "fill": 0,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 18,
+        "y": 24
+      },
+      "hiddenSeries": false,
+      "id": 23,
+      "interval": ">30s",
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 1,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "dsType": "influxdb",
+          "expr": "sum by (team)(concourse_workers_volumes)",
+          "format": "time_series",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "worker"
+              ],
+              "type": "tag"
+            }
+          ],
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "{{team}}",
+          "measurement": "worker volumes",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT mean(\"value\") FROM \"cpu\" WHERE \"bosh-job\" = 'worker' AND $timeFilter GROUP BY time($interval), \"host\"",
           "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
@@ -3031,7 +2618,7 @@
               },
               {
                 "params": [],
-                "type": "sum"
+                "type": "mean"
               }
             ]
           ],
@@ -3044,9 +2631,10 @@
       "timeShift": null,
       "title": "No. of Worker Volumes / Team",
       "tooltip": {
+        "msResolution": true,
         "shared": true,
-        "sort": 0,
-        "value_type": "individual"
+        "sort": 2,
+        "value_type": "cumulative"
       },
       "type": "graph",
       "xaxis": {
@@ -3058,16 +2646,14 @@
       },
       "yaxes": [
         {
-          "format": "short",
-          "label": null,
+          "format": "none",
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": 0,
           "show": true
         },
         {
           "format": "short",
-          "label": null,
           "logBase": 1,
           "max": null,
           "min": null,
@@ -3084,31 +2670,45 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "description": "Shows: \n - `worker containers.sum`: The number of containers reported by the worker on registration and on heartbeating.\n - `containers created.sum`: The number of created containers since the last metric emit as \n - `failed containers.sum`: The number of containers that failed to be created since the last metric emit.\n - `containers deleted.sum`: The number of deleted containers after the last metric emit.",
+      "datasource": null,
+      "description": "Shows the number of active containers per team as reported by the garden server on the worker.",
+      "editable": true,
+      "error": false,
       "fill": 0,
+      "fillGradient": 0,
+      "grid": {},
       "gridPos": {
-        "h": 6,
+        "h": 7,
         "w": 6,
-        "x": 6,
-        "y": 39
+        "x": 0,
+        "y": 31
       },
-      "id": 31,
-      "interval": ">2m",
+      "hiddenSeries": false,
+      "id": 14,
+      "interval": ">30s",
       "legend": {
+        "alignAsTable": false,
         "avg": false,
         "current": false,
         "max": false,
         "min": false,
+        "rightSide": false,
         "show": true,
+        "sideWidth": null,
+        "sort": "current",
+        "sortDesc": true,
         "total": false,
         "values": false
       },
       "lines": true,
       "linewidth": 1,
       "links": [],
-      "nullPointMode": "null",
+      "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
-      "pointradius": 3,
+      "pointradius": 1,
       "points": false,
       "renderer": "flot",
       "seriesOverrides": [],
@@ -3117,8 +2717,9 @@
       "steppedLine": false,
       "targets": [
         {
+          "alias": "$tag_worker",
           "dsType": "influxdb",
-          "expr": "sum by (team)(concourse_workers_containers)",
+          "expr": "sum by(team)(concourse_workers_containers)",
           "format": "time_series",
           "groupBy": [
             {
@@ -3129,19 +2730,19 @@
             },
             {
               "params": [
-                "null"
+                "worker"
               ],
-              "type": "fill"
+              "type": "tag"
             }
           ],
           "hide": false,
-          "instant": false,
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{team}}",
-          "measurement": "containers created",
+          "measurement": "worker containers",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(\"value\") FROM \"containers created\" WHERE $timeFilter GROUP BY time($__interval), \"host\" fill(null)",
+          "query": "SELECT mean(\"value\") FROM \"worker containers\" WHERE \"bosh-deployment\" = 'concourse-wings' AND $timeFilter GROUP BY time($__interval), \"worker\"",
           "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
@@ -3155,7 +2756,7 @@
               },
               {
                 "params": [],
-                "type": "sum"
+                "type": "mean"
               }
             ]
           ],
@@ -3166,7 +2767,257 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "No. of Containers per Team",
+      "title": "Total No. of Worker Containers",
+      "tooltip": {
+        "msResolution": true,
+        "shared": true,
+        "sort": 2,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": null,
+          "format": "none",
+          "logBase": 1,
+          "max": null,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "decimals": null,
+      "description": "Displays the disk space available by Team",
+      "editable": true,
+      "error": false,
+      "fill": 0,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 6,
+        "y": 31
+      },
+      "hiddenSeries": false,
+      "id": 15,
+      "interval": ">30s",
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 1,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "",
+          "dsType": "influxdb",
+          "expr": "sum by (team)(node_filesystem_free{mountpoint=\"/\",role=\"concourse-worker\"} / node_filesystem_size)",
+          "format": "time_series",
+          "groupBy": [
+            {
+              "params": [
+                "auto"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "host"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "bosh-job"
+              ],
+              "type": "tag"
+            }
+          ],
+          "hide": false,
+          "interval": ">1m",
+          "intervalFactor": 1,
+          "legendFormat": "{{team}}",
+          "measurement": "disk",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT mean(\"value\") * 100 FROM \"disk /var/vcap/data/baggageclaim/volumes\" WHERE \"bosh-job\" = 'worker' AND $timeFilter GROUP BY time($dynamic), \"tag\", \"host\"",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "used_percent"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "bosh-job",
+              "operator": "=~",
+              "value": "/.*worker.*/"
+            },
+            {
+              "condition": "AND",
+              "key": "bosh-deployment",
+              "operator": "=~",
+              "value": "/concourse-$deployment.*/"
+            },
+            {
+              "condition": "AND",
+              "key": "path",
+              "operator": "=",
+              "value": "/var/vcap/data"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Available Disk / Team",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 2,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "percentunit",
+          "logBase": 1,
+          "max": "1",
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "description": "The number of open file descriptors per team",
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 12,
+        "y": 31
+      },
+      "hiddenSeries": false,
+      "id": 45,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum by (team)(process_open_fds{role=\"concourse-worker\"})",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "{{team}}",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "No. of Open Files / Team",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -3195,7 +3046,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -3205,7 +3056,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 16,
+  "schemaVersion": 22,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -3249,5 +3100,8 @@
   "timezone": "browser",
   "title": "Concourse",
   "uid": "000000007",
-  "version": 94
+  "variables": {
+    "list": []
+  },
+  "version": 122
 }
