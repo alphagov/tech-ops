@@ -10,6 +10,7 @@ locals {
 
 resource "aws_kms_key" "concourse_worker_shared" {
   description = "${var.deployment} concourse worker shared"
+  depends_on  = [aws_iam_role.concourse_workers]
 
   policy = <<-POLICY
   {
