@@ -327,8 +327,9 @@ jobs:
             - -c
             - |
               apt-get update
-              apt-get install -y nodejs
+              apt-get install -y nodejs yarnpkg
               bundle install --without development
+              yarnpkg install
               bundle exec rake
     on_success:
       put: re-request-an-aws-account-pr
@@ -368,7 +369,9 @@ jobs:
             - -c
             - |
               apt-get update
+              apt-get install -y nodejs yarnpkg
               bundle install --without development
+              yarnpkg install
               cp -r . ../bundled/
       - put: deploy-to-paas-aws-account-management-space
         params:
