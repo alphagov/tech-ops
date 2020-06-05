@@ -113,6 +113,8 @@ jobs:
       terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
       override_files:
       - concourse-provider-config/provider_concourse_override.tf.json
+  - set_pipeline: roll-instances
+    file: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))/roll-instances.yml
 
 - name: scale-out
   serial: true
