@@ -6,6 +6,7 @@ image_resource:
     tag: latest
 inputs:
 - name: infra # terraform metadata
+- name: concourse-release
 outputs:
 - name: concourse-provider-config
 params:
@@ -32,6 +33,12 @@ run:
       }
     }
     EOF
+    echo "generating version config..."
+    cat <<-EOF > concourse-provider-config/version.tfvars
+      concourse_version = "$(cat concourse-release/version)"
+      concourse_sha1 = "$(cat concourse-release/concourse-*-linux-amd64.tgz.sha1)"
+    EOF
+    cat concourse-provider-config/version.tfvars
     echo "writing main team password to file..."
     jq -r .main_team_password <infra/metadata > concourse-provider-config/main_team_password
     echo "OK!"

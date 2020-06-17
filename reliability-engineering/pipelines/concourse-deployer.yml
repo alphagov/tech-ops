@@ -64,6 +64,11 @@ resources:
   icon: layers
   source:
     repository: ((readonly_private_ecr_repo_url))
+- name: concourse-release
+  type: github-release
+  source:
+    owner: concourse
+    repository: concourse
 
 jobs:
 
@@ -104,6 +109,11 @@ jobs:
       trigger: true
     - get: infra
       passed: [update]
+    - get: concourse-release
+      trigger: true
+      params:
+        globs:
+        - concourse-*-linux-amd64.tgz.sha1
   - task: configure-providers
     file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
@@ -113,6 +123,8 @@ jobs:
       terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
       override_files:
       - concourse-provider-config/provider_concourse_override.tf.json
+      var_files:
+      - concourse-provider-config/version.tfvars
   - set_pipeline: roll-instances
     file: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))/roll-instances.yml
   - set_pipeline: deploy-info-pipelines
@@ -133,6 +145,11 @@ jobs:
       trigger: true
     - get: infra
       passed: [deploy]
+    - get: concourse-release
+      passed: [deploy]
+      params:
+        globs:
+        - concourse-*-linux-amd64.tgz.sha1
   - task: configure-providers
     file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
@@ -162,6 +179,8 @@ jobs:
         terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
         override_files:
         - concourse-provider-config/provider_concourse_override.tf.json
+        var_files:
+        - concourse-provider-config/version.tfvars
 
 - name: scale-in
   serial: true
@@ -176,6 +195,11 @@ jobs:
       trigger: true
     - get: infra
       passed: [scale-out]
+    - get: concourse-release
+      passed: [scale-out]
+      params:
+        globs:
+        - concourse-*-linux-amd64.tgz.sha1
   - task: configure-providers
     file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
@@ -186,6 +210,8 @@ jobs:
       terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
       override_files:
       - concourse-provider-config/provider_concourse_override.tf.json
+      var_files:
+      - concourse-provider-config/version.tfvars
 
 - name: test
   serial: true
