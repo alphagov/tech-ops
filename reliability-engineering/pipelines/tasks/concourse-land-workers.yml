@@ -3,7 +3,7 @@ image_resource:
   type: registry-image
   source:
     repository: concourse/concourse-pipeline-resource
-    tag: 2.2.0
+    tag: 6
 params:
   DEPLOYMENT_NAME:
   FLY_USERNAME: main

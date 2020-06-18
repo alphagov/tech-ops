@@ -69,6 +69,11 @@ resources:
   source:
     owner: concourse
     repository: concourse
+- name: fly
+  type: registry-image
+  source:
+    repository: concourse/concourse-pipeline-resource
+    tag: latest
 
 jobs:
 
@@ -150,15 +155,17 @@ jobs:
       params:
         globs:
         - concourse-*-linux-amd64.tgz.sha1
+    - get: fly
   - task: configure-providers
     file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
+  - task: get-current-workers
+    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml
+    image: fly
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
   - do:
-    - task: get-current-workers
-      file: tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml
-      params:
-        DEPLOYMENT_NAME: ((deployment_name))
     - in_parallel:
       - task: scale-out-web-node-asg
         file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
@@ -170,6 +177,7 @@ jobs:
           ASG_PREFIX: ((deployment_name))-main-concourse-worker
     - task: land-old-workers
       file: tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
+      image: fly
       params:
         DEPLOYMENT_NAME: ((deployment_name))
     on_failure:
