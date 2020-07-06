@@ -1,4 +1,4 @@
-data "aws_ami" "ubuntu_bionic" {
+data "aws_ami" "ubuntu_focal" {
   most_recent = true
 
   # canonical
@@ -6,7 +6,7 @@ data "aws_ami" "ubuntu_bionic" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
 }
 
@@ -28,7 +28,7 @@ data "aws_subnet" "concourse_prometheus" {
 resource "aws_instance" "concourse_prometheus" {
   count = 2
 
-  ami                    = data.aws_ami.ubuntu_bionic.id
+  ami                    = data.aws_ami.ubuntu_focal.id
   instance_type          = var.prometheus_instance_type
   subnet_id              = var.private_subnet_ids[count.index]
   vpc_security_group_ids = [var.prometheus_security_group_id]
