@@ -1,4 +1,4 @@
-data "aws_ami" "ubuntu_bionic" {
+data "aws_ami" "ubuntu_focal" {
   most_recent = true
 
   # canonical
@@ -6,7 +6,7 @@ data "aws_ami" "ubuntu_bionic" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
 }
 
@@ -33,7 +33,7 @@ output "concourse_web_syslog_log_group_name" {
 resource "aws_launch_template" "concourse_web" {
   name_prefix            = "${var.deployment}-concourse-web-"
   ebs_optimized          = true
-  image_id               = data.aws_ami.ubuntu_bionic.id
+  image_id               = data.aws_ami.ubuntu_focal.id
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.concourse_web.id]
 
