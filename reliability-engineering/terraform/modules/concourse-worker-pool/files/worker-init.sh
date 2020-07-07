@@ -71,6 +71,6 @@ systemctl start  concourse-worker
 # see concourse/concourse #1667 and #2482
 iptables -P FORWARD ACCEPT
 
-apt-get install prometheus-node-exporter
+apt-get install --yes prometheus-node-exporter
 systemctl enable prometheus-node-exporter
 systemctl start prometheus-node-exporter
