@@ -86,6 +86,13 @@ scrape_configs:
         target_label: instance
 EOF
 
+# ensure that prometheus owns it's files after a ubuntu upgrade the "pollinate"
+# user owned all the files (potentially some kind of issue with uid mismatch)
+promvar="/var/lib/prometheus"
+if [ -d "${promvar}" ]; then
+	chown -R prometheus:prometheus "${promvar}"
+fi
+
 systemctl daemon-reload
 systemctl enable  prometheus
 systemctl restart prometheus
