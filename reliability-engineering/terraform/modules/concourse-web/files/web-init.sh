@@ -145,7 +145,7 @@ systemctl daemon-reload
 systemctl enable concourse-web
 systemctl start  concourse-web
 
-apt-get install prometheus-node-exporter
+apt-get install --yes prometheus-node-exporter
 systemctl enable prometheus-node-exporter
 systemctl start prometheus-node-exporter
 
