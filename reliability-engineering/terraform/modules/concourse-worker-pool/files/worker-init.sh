@@ -73,7 +73,7 @@ TOKEN=`curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-me
 
 while sleep 5; do
 
-    HTTP_CODE=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -w %{http_code} -o /dev/null http://169.254.169.254/latest/meta-data/spot/instance-action)
+    HTTP_CODE=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -w %%{http_code} -o /dev/null http://169.254.169.254/latest/meta-data/spot/instance-action)
 
     if [[ "$HTTP_CODE" -eq 401 ]] ; then
         echo 'Refreshing Authentication Token'
