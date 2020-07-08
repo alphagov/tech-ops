@@ -63,14 +63,56 @@ LimitNOFILE=infinity
 WantedBy=multi-user.target
 EOF
 
+# adapted from
+# https://aws.amazon.com/blogs/compute/best-practices-for-handling-ec2-spot-instance-interruptions/
+# 'EOF' in single quotes prevents varible interpolation; this is important
+cat <<'EOF' > /usr/local/bin/check-spot-interruption
+#!/bin/bash
+set -ue
+TOKEN=`curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 1800"`
+
+while sleep 5; do
+
+    HTTP_CODE=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -w %{http_code} -o /dev/null http://169.254.169.254/latest/meta-data/spot/instance-action)
+
+    if [[ "$HTTP_CODE" -eq 401 ]] ; then
+        echo 'Refreshing Authentication Token'
+        TOKEN=`curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 1800"`
+    elif [[ "$HTTP_CODE" -eq 200 ]] ; then
+        echo 'Interrupted: retiring concourse-worker'
+        systemd kill -s SIGUSR2 concourse-worker
+        exit 0
+    elif [[ "$HTTP_CODE" -eq 404 ]] ; then
+        echo 'Not Interrupted'
+    else
+        echo "Unexpected http code $HTTP_CODE; exiting"
+        exit 1
+    fi
+done
+EOF
+chmod +x /usr/local/bin/check-spot-interruption
+
+cat <<EOF > /etc/systemd/system/check-spot-interruption.service
+[Unit]
+Description=Check EC2 metadata for spot interruption notices
+
+[Service]
+ExecStart=/usr/local/bin/check-spot-interruption
+Type=simple
+RestartSec=3s
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 systemctl daemon-reload
-systemctl enable concourse-worker
-systemctl start  concourse-worker
+systemctl enable --now concourse-worker
+systemctl enable --now check-spot-interruption
 
 # this enables the workers to talk to the internet
 # see concourse/concourse #1667 and #2482
 iptables -P FORWARD ACCEPT
 
 apt-get install --yes prometheus-node-exporter
-systemctl enable prometheus-node-exporter
-systemctl start prometheus-node-exporter
+systemctl enable --now prometheus-node-exporter
