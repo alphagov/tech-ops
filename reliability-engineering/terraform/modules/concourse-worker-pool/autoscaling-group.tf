@@ -17,8 +17,11 @@ resource "aws_autoscaling_group" "concourse_worker" {
         version            = "$Latest"
       }
 
-      override {
-        instance_type = var.instance_type
+      dynamic "override" {
+        for_each = var.spot_instance_types
+        content {
+          instance_type = override.value
+        }
       }
     }
 

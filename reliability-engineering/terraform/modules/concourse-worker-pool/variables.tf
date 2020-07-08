@@ -46,8 +46,19 @@ variable "desired_capacity" {
   default = 1
 }
 
+variable "on_demand_percentage" {
+  default     = 100
+  description = "Percentage of instances to be launched as on-demand (ie not spot)"
+}
+
 variable "instance_type" {
   default = "t3.small"
+}
+
+variable "spot_instance_types" {
+  type        = list(string)
+  default     = []
+  description = "Instance types available for use as spot instances"
 }
 
 variable "volume_size" {
