@@ -4,7 +4,7 @@ locals {
       "arn:aws:iam::${data.aws_caller_identity.account.account_id}:root",
       aws_iam_role.concourse_web.arn,
     ],
-    aws_iam_role.concourse_workers.*.arn,
+    list(aws_iam_role.concourse_workers.*.arn)
   )
 }
 
