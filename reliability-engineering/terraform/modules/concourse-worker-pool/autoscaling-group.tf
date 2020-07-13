@@ -26,7 +26,7 @@ resource "aws_autoscaling_group" "concourse_worker" {
     }
 
     instances_distribution {
-      on_demand_percentage_above_base_capacity = 100
+      on_demand_percentage_above_base_capacity = var.on_demand_percentage
     }
   }
 
