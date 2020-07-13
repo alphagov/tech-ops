@@ -100,7 +100,7 @@ Description=Check EC2 metadata for spot interruption notices
 ExecStart=/usr/local/bin/check-spot-interruption
 Type=simple
 RestartSec=3s
-Restart=always
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
