@@ -11,6 +11,13 @@ resource_types:
   source:
     repository: governmentpaas/semver-resource
     tag: latest
+- name: pool
+  type: registry-image
+  source:
+    # pool is included by default but the bundled resource is broke
+    # https://github.com/concourse/pool-resource/pull/56
+    repository: concourse/pool-resource
+    tag: 1.1.3
 
 resources:
 
@@ -64,6 +71,27 @@ resources:
   icon: layers
   source:
     repository: ((readonly_private_ecr_repo_url))
+- name: pool-repo
+  type: git
+  icon: github
+  source:
+    branch: pool
+    uri: ((readonly_codecommit_pool_uri))
+    private_key: ((readonly_codecommit_private_key))
+- name: pool
+  type: pool
+  icon: pool
+  source:
+    branch: pool
+    uri: ((readonly_codecommit_pool_uri))
+    private_key: ((readonly_codecommit_private_key))
+    pool: my-pool
+- name: a-test-lock-config
+  type: mock
+  source:
+    create_files:
+      name: a-test-lock
+      metadata: ''
 - name: concourse-release
   type: github-release
   source:
@@ -237,12 +265,39 @@ jobs:
     - get: version
       attempts: 50
       params: {bump: minor}
-  - put: ecr # this is a simple check to ensure push to ecr works
+
+  # this is a simple check to ensure push to ecr works
+  - put: ecr
     params:
       build: version
       dockerfile: tech-ops/reliability-engineering/dockerfiles/test.Dockerfile
       tag: version/version
       tag_prefix: ((deployment_name))-
+
+  # the following tasks exercise the codecommit repo provided for pool-resource
+  - task: init-pool
+    file: tech-ops/reliability-engineering/pipelines/tasks/test-init-pool.yml
+    output_mapping:
+      repo: pool
+  - put: pool-repo
+    params:
+      repository: pool
+      force: true
+  - get: a-test-lock-config  # defines a lock
+  - put: add-lock  # adds the lock to the pool
+    resource: pool
+    params:
+      add: a-test-lock-config
+  - put: acquire-lock  # get the lock
+    resource: pool
+    params:
+      acquire: true
+  - put: release-lock  # releases the lock
+    resource: pool
+    params:
+      release: a-test-lock-config
+
+  # this promotes the repo for use in other deployments (eg cd-staging -> cd)
   - task: tag-tech-ops
     file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
     input_mapping:
