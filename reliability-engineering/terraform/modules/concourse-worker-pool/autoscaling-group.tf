@@ -10,9 +10,24 @@ resource "aws_autoscaling_group" "concourse_worker" {
     "OldestInstance",
   ]
 
-  launch_template {
-    id      = aws_launch_template.concourse_worker.id
-    version = "$Latest"
+  mixed_instances_policy {
+    launch_template {
+      launch_template_specification {
+        launch_template_id = aws_launch_template.concourse_worker.id
+        version            = "$Latest"
+      }
+
+      dynamic "override" {
+        for_each = coalescelist(var.spot_instance_types, [var.instance_type])
+        content {
+          instance_type = override.value
+        }
+      }
+    }
+
+    instances_distribution {
+      on_demand_percentage_above_base_capacity = var.on_demand_percentage
+    }
   }
 
   tag {
