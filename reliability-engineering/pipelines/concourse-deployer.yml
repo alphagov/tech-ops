@@ -22,7 +22,7 @@ resource_types:
 resources:
 
 - name: tech-ops-private
-  icon: github-circle
+  icon: github
   type: git
   source:
     branch: ((deployment_branch))
@@ -31,7 +31,7 @@ resources:
     paths:
       - reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
 - name: tech-ops
-  icon: github-circle
+  icon: github
   type: git
   source:
     branch: ((deployment_branch))
