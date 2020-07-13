@@ -18,7 +18,7 @@ resource "aws_autoscaling_group" "concourse_worker" {
       }
 
       dynamic "override" {
-        for_each = var.spot_instance_types
+        for_each = coalescelist(var.spot_instance_types, [var.instance_type])
         content {
           instance_type = override.value
         }
