@@ -1,0 +1,26 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: governmentpaas/git-ssh
+    tag: latest
+outputs:
+- name: repo
+run:
+  dir: repo
+  path: sh
+  args:
+  - -euo
+  - pipefail
+  - -c
+  - |
+    git init .
+
+    for pool in my-pool; do
+      mkdir -p "$pool/claimed"
+      mkdir -p "$pool/unclaimed"
+      touch "$pool/claimed/.keep"
+      touch "$pool/unclaimed/.keep"
+      git add "$pool"
+      git commit -m "setup $pool"
+    done

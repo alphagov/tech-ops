@@ -165,3 +165,33 @@ resource "aws_ssm_parameter" "concourse_worker_egress_ips" {
     Deployment = var.deployment
   }
 }
+
+resource "aws_ssm_parameter" "concourse_worker_codecommit_pool_uri" {
+  name = "/${var.deployment}/concourse/pipelines/${var.name}/readonly_codecommit_pool_uri"
+
+  type        = "String"
+  description = "Clone URI for codecommit pool repo ${var.deployment}/${var.name}"
+  value       = "ssh://${
+    replace(
+      aws_codecommit_repository.pool_resource.clone_url_ssh,
+      "ssh://",
+      "${aws_iam_user_ssh_key.codecommit.ssh_public_key_id}@",
+    )
+  }"
+
+  tags = {
+    Deployment = var.deployment
+  }
+}
+
+resource "aws_ssm_parameter" "concourse_worker_codecommit_private_key" {
+  name = "/${var.deployment}/concourse/pipelines/${var.name}/readonly_codecommit_private_key"
+
+  type        = "String"
+  description = "Clone URI for codecommit pool repo ${var.deployment}/${var.name}"
+  value       = tls_private_key.codecommit.private_key_pem
+
+  tags = {
+    Deployment = var.deployment
+  }
+}
