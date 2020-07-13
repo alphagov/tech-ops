@@ -297,6 +297,19 @@ jobs:
     params:
       release: a-test-lock-config
 
+- name: tag-release
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: tech-ops
+      attempts: 50
+      passed: [test]
+      trigger: true
+    - get: version
+      attempts: 50
+      params: {bump: minor}
+
   # this promotes the repo for use in other deployments (eg cd-staging -> cd)
   - task: tag-tech-ops
     file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
