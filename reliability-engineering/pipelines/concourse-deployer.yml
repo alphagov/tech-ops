@@ -64,6 +64,18 @@ resources:
   icon: layers
   source:
     repository: ((readonly_private_ecr_repo_url))
+- name: pool
+  type: pool
+  source:
+    branch: pool
+    uri: ((readonly_codecommit_pool_uri))
+    private_key: ((readonly_codecommit_private_key))
+- name: a-test-lock-config
+  type: mock
+  source:
+    create_files:
+      name: a-test-lock
+      metadata: ''
 - name: concourse-release
   type: github-release
   source:
@@ -237,12 +249,36 @@ jobs:
     - get: version
       attempts: 50
       params: {bump: minor}
-  - put: ecr # this is a simple check to ensure push to ecr works
+
+  # this is a simple check to ensure push to ecr works
+  - put: ecr
     params:
       build: version
       dockerfile: tech-ops/reliability-engineering/dockerfiles/test.Dockerfile
       tag: version/version
       tag_prefix: ((deployment_name))-
+
+  # the following tasks exercise the codecommit repo provided for pool-resource
+  - task: init-pool
+    file: tech-ops/reliability-engineering/pipelines/tasks/test-init-pool.yml
+    output_mapping:
+      repo: pool
+  - put: pool
+    params:
+      repository: pool
+      force: true
+  - get: a-test-lock-config  # defines a lock
+  - put: pool  # adds the lock to the pool
+    params:
+      add: a-test-lock-config
+  - put: pool  # claims the lock
+    params:
+      claim: pool
+  - put: pool  # releases the lock
+    params:
+      release: pool
+
+  # this promotes the repo for use in other deployments (eg cd-staging -> cd)
   - task: tag-tech-ops
     file: tech-ops/reliability-engineering/pipelines/tasks/sign-tag.yml
     input_mapping:
