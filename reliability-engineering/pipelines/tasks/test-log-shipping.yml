@@ -1,0 +1,54 @@
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: govsvc/task-toolbox
+    tag: latest
+params:
+  AWS_REGION: eu-west-2
+  AWS_DEFAULT_REGION: eu-west-2
+  TEST_FARBACK: 0
+  LOG_GROUP:
+run:
+  path: /bin/bash
+  args:
+  - -eu
+  - -c
+  - |
+    CURRENT_TIME=$(date '+%s')
+    FARBACK="${TEST_FARBACK:-180}"
+    LOGS_SINCE=$(($CURRENT_TIME - $FARBACK))
+
+    if [[ -z "${LOG_GROUP}" ]]; then
+      echo "LOG_GROUP env var not set"
+      exit 1
+    fi
+
+    # convert from seconds based epoch to AWS supported milliseconds epoch
+    CURRENT_TIME="${CURRENT_TIME}000"
+    LOGS_SINCE="${LOGS_SINCE}000"
+
+    echo "         Time: $CURRENT_TIME"
+    echo "   Logs Since: $LOGS_SINCE"
+    echo "    Log Group: $LOG_GROUP"
+
+    LOG_EVENTS=$(aws logs filter-log-events --log-group-name $LOG_GROUP --start-time $LOGS_SINCE --max-items 10)
+    LOG_EVENTS_COUNT=$(echo $LOG_EVENTS | jq ".events | length")
+    if (( ${LOG_EVENTS_COUNT} == 0 )); then
+      echo ""
+      echo "FAIL: No log events collected yet"
+      exit 1
+    fi
+
+    LASTSEENLOG=$(echo $LOG_EVENTS | jq ".events[].timestamp" | grep -v "null" | sort -urn | head -n1)
+    echo "   Logs Since: $LOGS_SINCE"
+    echo "    Logs Seen: $LASTSEENLOG"
+    if (( ${LASTSEENLOG} >= ${LOGS_SINCE} )); then
+      echo "PASS: Logs have arrived in CloudWatch"
+      echo "Logs received at: $LASTSEENLOG in $LOG_GROUP"
+      exit 0
+    fi
+
+    echo ""
+    echo "FAIL: No logs have arrived in CloudWatch since $LOGS_SINCE"
+    exit 1
