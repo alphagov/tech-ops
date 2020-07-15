@@ -180,6 +180,7 @@ jobs:
       passed: [deploy]
     - get: concourse-release
       passed: [deploy]
+      trigger: true
       params:
         globs:
         - concourse-*-linux-amd64.tgz.sha1
@@ -233,6 +234,7 @@ jobs:
       passed: [scale-out]
     - get: concourse-release
       passed: [scale-out]
+      trigger: true
       params:
         globs:
         - concourse-*-linux-amd64.tgz.sha1
