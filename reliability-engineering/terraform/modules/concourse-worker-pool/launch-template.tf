@@ -14,11 +14,12 @@ data "template_file" "concourse_worker_cloud_init" {
   template = file("${path.module}/files/worker-init.sh")
 
   vars = {
-    deployment        = var.deployment
-    worker_team_name  = var.name
-    concourse_host    = local.concourse_url
-    concourse_version = var.concourse_version
-    concourse_sha1    = var.concourse_sha1
+    deployment            = var.deployment
+    worker_team_name      = var.name
+    concourse_host        = local.concourse_url
+    concourse_version     = var.concourse_version
+    concourse_sha1        = var.concourse_sha1
+    syslog_log_group_name = "/${var.deployment}/concourse/worker"
   }
 }
 

@@ -300,12 +300,19 @@ jobs:
       release: a-test-lock-config
 
   # check that logs are arriving in CloudWatch
-  - task: check-concourse-logs
-    file: tech-ops/reliability-engineering/pipelines/tasks/test-log-shipping.yml
-    attempts: 3
-    timeout: 10m
-    params:
-      LOG_GROUP: /((deployment_name))/concourse/web
+  - in_parallel:
+    - task: check-web-logs
+      file: tech-ops/reliability-engineering/pipelines/tasks/test-log-shipping.yml
+      attempts: 3
+      timeout: 10m
+      params:
+        LOG_GROUP: /((deployment_name))/concourse/web
+    - task: check-worker-logs
+      file: tech-ops/reliability-engineering/pipelines/tasks/test-log-shipping.yml
+      attempts: 3
+      timeout: 10m
+      params:
+        LOG_GROUP: /((deployment_name))/concourse/worker
 
 - name: tag-release
   serial: true
