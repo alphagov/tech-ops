@@ -116,3 +116,36 @@ iptables -P FORWARD ACCEPT
 
 apt-get install --yes prometheus-node-exporter
 systemctl enable --now prometheus-node-exporter
+
+## install cloudwatch log agent
+curl -o /root/amazon-cloudwatch-agent.deb https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
+dpkg -i -E /root/amazon-cloudwatch-agent.deb
+usermod -aG adm cwagent
+
+# configure which log files are shipped to cloudwatch
+mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/
+cat <<EOF > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+{
+	"agent": {
+		"metrics_collection_interval": 60,
+		"run_as_user": "cwagent"
+	},
+	"logs": {
+		"logs_collected": {
+			"files": {
+				"collect_list": [
+					{
+						"file_path": "/var/log/syslog",
+						"log_group_name": "${syslog_log_group_name}",
+						"log_stream_name": "{hostname}/syslog"
+					}
+				]
+			}
+		}
+	}
+}
+EOF
+
+# start cloudwatch log agent
+systemctl enable amazon-cloudwatch-agent.service
+service amazon-cloudwatch-agent start
