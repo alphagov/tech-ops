@@ -22,7 +22,7 @@ manual steps that need to be processed:
 2. Request access to the Splunk service from the GOV.UK PaaS team.
 
    You can contact the GOV.UK PaaS team either via `#paas` on slack or via the offical
-   [support system](https://www.cloud.service.gov.uk/support)
+   [support system](https://admin.london.cloud.service.gov.uk/support)
 
    A GOV.UK PaaS administrator will need to perform `cf enable-service-access splunk -b
    splunk -o $YOUR_ORG` on your behalf which will make the `splunk` service
