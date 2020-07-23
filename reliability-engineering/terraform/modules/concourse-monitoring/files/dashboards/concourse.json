@@ -17,7 +17,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "id": 5,
+  "id": 8,
   "links": [],
   "panels": [
     {
@@ -41,6 +41,12 @@
       "dashes": false,
       "datasource": null,
       "description": "Shows the number of finished build over time with their statuses (succeeded, failed, aborted & errored).",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 10,
       "fillGradient": 0,
       "gridPos": {
@@ -324,6 +330,12 @@
       "dashes": false,
       "datasource": null,
       "description": "Shows the number of builds started and finished over time.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -365,6 +377,7 @@
           "expr": "sum(rate(concourse_builds_finished_total[30m]))-sum(rate(concourse_builds_started_total[30m]))",
           "format": "time_series",
           "hide": false,
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "",
           "refId": "C"
@@ -420,6 +433,12 @@
       "datasource": null,
       "decimals": 0,
       "description": "The status of Concourse Workers",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -549,6 +568,12 @@
       "dashes": false,
       "datasource": null,
       "description": "Shows the number of resource checks done per team.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -706,6 +731,12 @@
       "description": "Shows the average percentage of CPU usage in user space.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -745,7 +776,7 @@
       "targets": [
         {
           "dsType": "influxdb",
-          "expr": "1 - (avg(rate(node_cpu{job=\"concourse_node_exporter\", role=\"concourse-web\",mode=\"idle\"}[$__interval])))",
+          "expr": "1 - (avg(rate(node_cpu_seconds_total{job=\"concourse_node_exporter\", role=\"concourse-web\",mode=\"idle\"}[$__interval])))",
           "format": "time_series",
           "groupBy": [
             {
@@ -861,6 +892,12 @@
       "description": "Shows the percentage of memory used (without counting cache) by the web instance.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -901,7 +938,7 @@
         {
           "alias": "",
           "dsType": "influxdb",
-          "expr": "node_memory_MemAvailable{job=\"concourse_node_exporter\", role=\"concourse-web\"} / node_memory_MemTotal{job=\"concourse_node_exporter\", role=\"concourse-web\"}",
+          "expr": "node_memory_MemAvailable_bytes{job=\"concourse_node_exporter\", role=\"concourse-web\"} / node_memory_MemTotal_bytes{job=\"concourse_node_exporter\", role=\"concourse-web\"}",
           "format": "time_series",
           "groupBy": [
             {
@@ -921,6 +958,7 @@
             "host"
           ],
           "hide": false,
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{instance}}",
           "measurement": "mem",
@@ -1008,6 +1046,12 @@
       "description": "Shows the transmission/receive rate of the web eth0 network interface.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -1046,7 +1090,7 @@
         {
           "alias": "received {bosh-job: [[tag_bosh-job]], host: [[tag_host]]}",
           "dsType": "influxdb",
-          "expr": "avg(rate(node_network_receive_bytes{role=\"concourse-web\"}[$__interval]))",
+          "expr": "avg(rate(node_network_receive_bytes_total{role=\"concourse-web\"}[$__interval]))",
           "format": "time_series",
           "groupBy": [
             {
@@ -1126,7 +1170,7 @@
         {
           "alias": "sent {bosh-job: [[tag_bosh-job]], host: [[tag_host]]}",
           "dsType": "influxdb",
-          "expr": "avg(rate(node_network_transmit_bytes{role=\"concourse-web\"}[$__interval]))",
+          "expr": "avg(rate(node_network_transmit_bytes_total{role=\"concourse-web\"}[$__interval]))",
           "format": "time_series",
           "groupBy": [
             {
@@ -1255,6 +1299,12 @@
       "description": "The number of queries that got created since the last time the metric was emitted.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -1384,6 +1434,12 @@
       "description": "Shows the average number of the current running go routines for the web instances.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -1527,6 +1583,12 @@
       "description": "Shows the number of open files that belong to ATC.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -1682,6 +1744,12 @@
       "description": "Shows the response time of every call per possible route.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -1843,6 +1911,12 @@
       "description": "The number of open database connections per ATC node for both api and backend connection pools.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -1993,6 +2067,12 @@
       "description": "Average CPU per team using irate for better accuracy",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -2032,7 +2112,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (avg by (team) (rate(node_cpu{role=\"concourse-worker\", mode=\"idle\", team!=\"main\"}[$__interval])))",
+          "expr": "1 - (avg by (team) (rate(node_cpu_seconds_total{role=\"concourse-worker\", mode=\"idle\", team!=\"main\"}[$__interval])))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 3,
@@ -2089,6 +2169,12 @@
       "description": "Shows the percentage of memory used (without counting cache) by team.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -2128,7 +2214,7 @@
         {
           "alias": "",
           "dsType": "influxdb",
-          "expr": "avg by (team) (node_memory_MemAvailable {job=\"concourse_node_exporter\", role=\"concourse-worker\"} / node_memory_MemTotal)",
+          "expr": "avg by (team) (node_memory_MemAvailable_bytes {job=\"concourse_node_exporter\", role=\"concourse-worker\"} / node_memory_MemTotal_bytes)",
           "format": "time_series",
           "groupBy": [
             {
@@ -2191,70 +2277,6 @@
               "value": "/concourse-$deployment.*/"
             }
           ]
-        },
-        {
-          "dsType": "influxdb",
-          "expr": "",
-          "format": "time_series",
-          "groupBy": [
-            {
-              "params": [
-                "auto"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "host"
-              ],
-              "type": "tag"
-            },
-            {
-              "params": [
-                "bosh-job"
-              ],
-              "type": "tag"
-            }
-          ],
-          "groupByTags": [
-            "host"
-          ],
-          "hide": false,
-          "intervalFactor": 1,
-          "measurement": "mem",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT mean(value) * 100 FROM \"memory\" WHERE \"bosh-job\" = 'worker' AND $timeFilter GROUP BY time($dynamic), \"host\"",
-          "rawQuery": false,
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "used_percent"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "bosh-job",
-              "operator": "=",
-              "value": "concourse"
-            },
-            {
-              "condition": "AND",
-              "key": "bosh-deployment",
-              "operator": "=~",
-              "value": "/concourse-$deployment$/"
-            }
-          ]
         }
       ],
       "thresholds": [],
@@ -2306,6 +2328,12 @@
       "description": "Shows the transmission/receive rate of the workers eth0 network interface.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -2344,7 +2372,7 @@
         {
           "alias": "Bytes received {bosh-job: [[tag_bosh-job]], host: [[tag_host]]}",
           "dsType": "influxdb",
-          "expr": "avg by (team) (rate(node_network_receive_bytes{role=\"concourse-worker\"}[$__interval]))",
+          "expr": "avg by (team) (rate(node_network_receive_bytes_total{role=\"concourse-worker\"}[$__interval]))",
           "format": "time_series",
           "groupBy": [
             {
@@ -2418,7 +2446,7 @@
         {
           "alias": "Bytes received {bosh-job: [[tag_bosh-job]], host: [[tag_host]]}",
           "dsType": "influxdb",
-          "expr": "avg by (team) (rate(node_network_transmit_bytes{role=\"concourse-worker\"}[$__interval]))",
+          "expr": "avg by (team) (rate(node_network_transmit_bytes_total{role=\"concourse-worker\"}[$__interval]))",
           "format": "time_series",
           "groupBy": [
             {
@@ -2541,6 +2569,12 @@
       "description": "Shows the number of active volumes per team as reported by the baggageclaim server on the worker.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -2674,6 +2708,12 @@
       "description": "Shows the number of active containers per team as reported by the garden server on the worker.",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -2814,6 +2854,12 @@
       "description": "Displays the disk space available by Team",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "grid": {},
@@ -2855,7 +2901,7 @@
         {
           "alias": "",
           "dsType": "influxdb",
-          "expr": "sum by (team)(node_filesystem_free{mountpoint=\"/\",role=\"concourse-worker\"} / node_filesystem_size)",
+          "expr": "sum by (team)(node_filesystem_free_bytes{mountpoint=\"/\",role=\"concourse-worker\"} / node_filesystem_size_bytes)",
           "format": "time_series",
           "groupBy": [
             {
@@ -2970,6 +3016,12 @@
       "dashes": false,
       "datasource": null,
       "description": "The number of open file descriptors per team",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -3056,7 +3108,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 22,
+  "schemaVersion": 25,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -3072,7 +3124,6 @@
     "notice": false,
     "now": true,
     "refresh_intervals": [
-      "5s",
       "10s",
       "30s",
       "1m",
@@ -3099,9 +3150,6 @@
   },
   "timezone": "browser",
   "title": "Concourse",
-  "uid": "000000007",
-  "variables": {
-    "list": []
-  },
-  "version": 122
+  "uid": "bpMdZazMk",
+  "version": 3
 }

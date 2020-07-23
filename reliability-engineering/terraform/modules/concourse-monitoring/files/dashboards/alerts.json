@@ -15,13 +15,20 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "id": 1,
+  "id": 7,
   "links": [],
   "panels": [
     {
       "content": "---\n\n✈️ [Concourse](https://cd.gds-reliability.engineering)\n\n🔥 [Prometheus 1](https://prom-1.monitoring.cd.gds-reliability.engineering/graph)\n\n🔥 [Prometheus 2](https://prom-2.monitoring.cd.gds-reliability.engineering/graph)\n\n---",
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "gridPos": {
-        "h": 4,
+        "h": 5,
         "w": 6,
         "x": 0,
         "y": 0
@@ -71,14 +78,23 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "label_replace(node_uname_info, \"worker\", \"$1\", \"nodename\", \"(.*)\") * on (worker) group_left concourse_workers_containers",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 6,
         "y": 0
       },
+      "hiddenSeries": false,
       "id": 4,
       "legend": {
         "avg": false,
@@ -93,6 +109,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -198,13 +217,22 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 12,
         "y": 0
       },
+      "hiddenSeries": false,
       "id": 12,
       "legend": {
         "avg": false,
@@ -219,6 +247,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -229,8 +260,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (avg by (instance) (rate(node_cpu{job=\"concourse_node_exporter\", role=\"concourse-web\",mode=\"idle\"}[5m])))",
+          "expr": "1 - (avg by (instance) (rate(node_cpu_seconds_total{job=\"concourse_node_exporter\", role=\"concourse-web\",mode=\"idle\"}[5m])))",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "CPU usage - {{instance}}",
           "refId": "A"
@@ -324,13 +356,22 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 18,
         "y": 0
       },
+      "hiddenSeries": false,
       "id": 15,
       "legend": {
         "avg": false,
@@ -345,6 +386,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -355,8 +399,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (node_memory_MemAvailable {job=\"concourse_node_exporter\", role=\"concourse-web\"} / node_memory_MemTotal)",
+          "expr": "1 - (node_memory_MemAvailable_bytes {job=\"concourse_node_exporter\", role=\"concourse-web\"} / node_memory_MemTotal_bytes)",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Memory usage - {{instance}}",
           "refId": "A"
@@ -414,12 +459,19 @@
     {
       "dashboardFilter": "",
       "dashboardTags": [],
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "folderId": null,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 0,
-        "y": 4
+        "y": 5
       },
       "id": 31,
       "limit": 10,
@@ -435,7 +487,6 @@
         "paused"
       ],
       "title": "Firing alerts",
-      "transparent": false,
       "type": "alertlist"
     },
     {
@@ -477,13 +528,22 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 6,
         "y": 5
       },
+      "hiddenSeries": false,
       "id": 2,
       "legend": {
         "avg": false,
@@ -498,6 +558,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -508,7 +571,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (node_filesystem_avail {job=\"concourse_node_exporter\", role=\"concourse-worker\", mountpoint=\"/\"} / node_filesystem_size {job=\"concourse_node_exporter\", role=\"concourse-worker\", mountpoint=\"/\"})",
+          "expr": "1 - (node_filesystem_avail_bytes {job=\"concourse_node_exporter\", role=\"concourse-worker\", mountpoint=\"/\"} / node_filesystem_size_bytes {job=\"concourse_node_exporter\", role=\"concourse-worker\", mountpoint=\"/\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -605,13 +668,22 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 12,
         "y": 5
       },
+      "hiddenSeries": false,
       "id": 18,
       "legend": {
         "avg": false,
@@ -626,6 +698,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -636,8 +711,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (avg without (cpu) (rate(node_cpu{job=\"concourse_node_exporter\", role=\"concourse-worker\",mode=\"idle\"}[5m])))",
+          "expr": "1 - (avg without (cpu) (rate(node_cpu_seconds_total{job=\"concourse_node_exporter\", role=\"concourse-worker\",mode=\"idle\"}[5m])))",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "CPU usage - {{instance}} - {{team}}",
           "refId": "A"
@@ -731,13 +807,22 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 18,
         "y": 5
       },
+      "hiddenSeries": false,
       "id": 20,
       "legend": {
         "avg": false,
@@ -752,6 +837,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -762,8 +850,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (node_memory_MemAvailable {job=\"concourse_node_exporter\", role=\"concourse-worker\"} / node_memory_MemTotal)",
+          "expr": "1 - (node_memory_MemAvailable_bytes {job=\"concourse_node_exporter\", role=\"concourse-worker\"} / node_memory_MemTotal_bytes)",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Memory usage - {{instance}} - {{team}}",
           "refId": "A"
@@ -827,6 +916,13 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -839,7 +935,7 @@
         "h": 2,
         "w": 6,
         "x": 0,
-        "y": 9
+        "y": 10
       },
       "id": 24,
       "interval": null,
@@ -901,6 +997,13 @@
     {
       "dashboardFilter": "",
       "dashboardTags": [],
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "folderId": null,
       "gridPos": {
         "h": 5,
@@ -917,18 +1020,18 @@
       "sortOrder": 3,
       "stateFilter": [],
       "title": "Alerts",
-      "transparent": false,
       "type": "alertlist"
     },
     {
       "alert": {
+        "alertRuleTags": {},
         "conditions": [
           {
             "evaluator": {
               "params": [
-                1
+                0
               ],
-              "type": "lt"
+              "type": "gt"
             },
             "operator": {
               "type": "and"
@@ -959,13 +1062,22 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 12,
         "y": 10
       },
+      "hiddenSeries": false,
       "id": 30,
       "legend": {
         "avg": false,
@@ -980,6 +1092,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null as zero",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -996,10 +1111,11 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "absent(count(up{job=\"concourse_node_exporter\"} == 0))",
+          "expr": "absent(up{job=\"concourse_node_exporter\"})",
           "format": "time_series",
           "hide": false,
           "instant": false,
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "All hosts reachable",
           "refId": "C"
@@ -1010,8 +1126,8 @@
           "colorMode": "critical",
           "fill": true,
           "line": true,
-          "op": "lt",
-          "value": 1
+          "op": "gt",
+          "value": 0
         }
       ],
       "timeFrom": null,
@@ -1094,13 +1210,22 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 18,
         "y": 10
       },
+      "hiddenSeries": false,
       "id": 6,
       "legend": {
         "avg": false,
@@ -1115,6 +1240,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -1125,8 +1253,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (node_filesystem_avail {job=\"concourse_node_exporter\", role=\"prometheus\", mountpoint=\"/var/lib/prometheus\"} / node_filesystem_size {job=\"concourse_node_exporter\", role=\"prometheus\", mountpoint=\"/var/lib/prometheus\"})",
+          "expr": "1 - (node_filesystem_avail_bytes {job=\"concourse_node_exporter\", role=\"prometheus\", mountpoint=\"/var/lib/prometheus\"} / node_filesystem_size_bytes {job=\"concourse_node_exporter\", role=\"prometheus\", mountpoint=\"/var/lib/prometheus\"})",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Used disk space - {{instance}}",
           "refId": "A"
@@ -1190,6 +1319,13 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -1202,7 +1338,7 @@
         "h": 2,
         "w": 6,
         "x": 0,
-        "y": 11
+        "y": 12
       },
       "id": 25,
       "interval": null,
@@ -1241,9 +1377,10 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "count(node_time{job=\"concourse_node_exporter\", role=\"concourse-worker\"})",
+          "expr": "count(node_time_seconds{job=\"concourse_node_exporter\", role=\"concourse-worker\"})",
           "format": "time_series",
           "instant": false,
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A"
@@ -1271,6 +1408,13 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -1283,7 +1427,7 @@
         "h": 2,
         "w": 6,
         "x": 0,
-        "y": 13
+        "y": 14
       },
       "id": 26,
       "interval": null,
@@ -1322,9 +1466,10 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "count(node_time{job=\"concourse_node_exporter\", role=\"concourse-web\"})",
+          "expr": "count(node_time_seconds{job=\"concourse_node_exporter\", role=\"concourse-web\"})",
           "format": "time_series",
           "instant": false,
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A"
@@ -1383,13 +1528,21 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus 1",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 6,
         "y": 15
       },
+      "hiddenSeries": false,
       "id": 33,
       "legend": {
         "avg": false,
@@ -1404,6 +1557,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -1511,13 +1667,21 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus 2",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
         "w": 6,
         "x": 12,
         "y": 15
       },
+      "hiddenSeries": false,
       "id": 34,
       "legend": {
         "avg": false,
@@ -1532,6 +1696,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -1601,7 +1768,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 16,
+  "schemaVersion": 25,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -1613,7 +1780,6 @@
   },
   "timepicker": {
     "refresh_intervals": [
-      "5s",
       "10s",
       "30s",
       "1m",
@@ -1638,6 +1804,6 @@
   },
   "timezone": "",
   "title": "Alerts",
-  "uid": "xgwl_AUiz",
-  "version": 51
+  "uid": "JMN7mazMk",
+  "version": 9
 }

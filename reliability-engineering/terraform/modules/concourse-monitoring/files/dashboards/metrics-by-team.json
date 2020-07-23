@@ -15,12 +15,19 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "id": 4,
-  "iteration": 1590154848648,
+  "id": 6,
+  "iteration": 1595501373310,
   "links": [],
   "panels": [
     {
       "content": "---\n\n✈️ [Concourse](https://cd.gds-reliability.engineering)\n\n🔥 [Prometheus 1](https://prom-1.monitoring.cd.gds-reliability.engineering/graph)\n\n🔥 [Prometheus 2](https://prom-2.monitoring.cd.gds-reliability.engineering/graph)\n\n---",
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 5,
         "w": 6,
@@ -40,13 +47,21 @@
       "dashes": false,
       "datasource": "Prometheus 1",
       "description": "label_replace(node_uname_info, \"worker\", \"$1\", \"nodename\", \"(.*)\") * on (worker) group_left concourse_workers_containers",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 6,
         "x": 6,
         "y": 0
       },
+      "hiddenSeries": false,
       "id": 4,
       "legend": {
         "avg": false,
@@ -61,6 +76,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -73,6 +91,7 @@
         {
           "expr": "concourse_workers_containers * on(worker) group_left(team) label_replace(node_uname_info{team=\"$Team\"},\"worker\", \"$0\", \"nodename\",\".*\")",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Number of containers - {{instance}}",
           "refId": "A"
@@ -125,13 +144,21 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus 1",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 12,
         "x": 12,
         "y": 0
       },
+      "hiddenSeries": false,
       "id": 18,
       "legend": {
         "avg": false,
@@ -146,6 +173,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -156,8 +186,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (avg without (cpu) (rate(node_cpu{team=\"$Team\",job=\"concourse_node_exporter\", role=\"concourse-worker\",mode=\"idle\"}[5m])))",
+          "expr": "1 - (avg without (cpu) (rate(node_cpu_seconds_total{team=\"$Team\",job=\"concourse_node_exporter\", role=\"concourse-worker\",mode=\"idle\"}[5m])))",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "CPU usage - {{instance}}",
           "refId": "A"
@@ -214,6 +245,12 @@
         "#d44a3a"
       ],
       "datasource": "Prometheus 1",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -291,13 +328,21 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus 1",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 6,
         "x": 6,
         "y": 7
       },
+      "hiddenSeries": false,
       "id": 2,
       "legend": {
         "avg": false,
@@ -312,6 +357,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -322,7 +370,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (node_filesystem_avail {job=\"concourse_node_exporter\", role=\"concourse-worker\", mountpoint=\"/\",team=\"$Team\"} / node_filesystem_size {job=\"concourse_node_exporter\", role=\"concourse-worker\", mountpoint=\"/\"})",
+          "expr": "1 - (node_filesystem_avail_bytes {job=\"concourse_node_exporter\", role=\"concourse-worker\", mountpoint=\"/\",team=\"$Team\"} / node_filesystem_size_bytes {job=\"concourse_node_exporter\", role=\"concourse-worker\", mountpoint=\"/\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -378,13 +426,21 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus 1",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 12,
         "x": 12,
         "y": 7
       },
+      "hiddenSeries": false,
       "id": 20,
       "legend": {
         "avg": false,
@@ -399,6 +455,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -409,8 +468,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "1 - (node_memory_MemAvailable {team=\"$Team\",job=\"concourse_node_exporter\", role=\"concourse-worker\"} / node_memory_MemTotal)",
+          "expr": "1 - (node_memory_MemAvailable_bytes {team=\"$Team\",job=\"concourse_node_exporter\", role=\"concourse-worker\"} / node_memory_MemTotal_bytes)",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Memory usage - {{instance}} - {{team}}",
           "refId": "A"
@@ -467,6 +527,12 @@
         "#d44a3a"
       ],
       "datasource": "Prometheus 1",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -518,9 +584,10 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "count(node_time{job=\"concourse_node_exporter\", role=\"concourse-worker\",team=\"$Team\"})",
+          "expr": "count(node_time_seconds{job=\"concourse_node_exporter\", role=\"concourse-worker\",team=\"$Team\"})",
           "format": "time_series",
           "instant": false,
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A"
@@ -549,6 +616,12 @@
         "#d44a3a"
       ],
       "datasource": "Prometheus 1",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -600,9 +673,10 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "count(node_time{job=\"concourse_node_exporter\", role=\"concourse-web\"})",
+          "expr": "count(node_time_seconds{job=\"concourse_node_exporter\", role=\"concourse-web\"})",
           "format": "time_series",
           "instant": false,
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A"
@@ -623,7 +697,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 16,
+  "schemaVersion": 25,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -631,19 +705,19 @@
       {
         "allValue": null,
         "current": {
-          "tags": [],
+          "selected": false,
           "text": "gsp",
           "value": "gsp"
         },
         "datasource": "Prometheus 1",
-        "definition": "label_values(node_cpu, team)",
+        "definition": "label_values(node_cpu_seconds_total, team)",
         "hide": 0,
         "includeAll": false,
         "label": null,
         "multi": false,
         "name": "Team",
         "options": [],
-        "query": "label_values(node_cpu, team)",
+        "query": "label_values(node_cpu_seconds_total, team)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -662,7 +736,6 @@
   },
   "timepicker": {
     "refresh_intervals": [
-      "5s",
       "10s",
       "30s",
       "1m",
@@ -687,6 +760,6 @@
   },
   "timezone": "",
   "title": "Metrics by team",
-  "uid": "WLzpINdWk",
-  "version": 3
+  "uid": "Mvhqk-kMz",
+  "version": 2
 }
