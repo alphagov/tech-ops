@@ -34,6 +34,7 @@ resource "aws_iam_policy" "concourse_worker_base" {
       }, {
         "Action": [
           "ssm:GetParameter",
+          "ssm:GetParameterHistory",
           "ssm:GetParameters",
           "ssm:GetParametersByPath",
           "ssm:DeleteParameter",
