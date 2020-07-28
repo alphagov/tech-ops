@@ -80,7 +80,7 @@ while sleep 5; do
         TOKEN=`curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 1800"`
     elif [[ "$HTTP_CODE" -eq 200 ]] ; then
         echo 'Interrupted: retiring concourse-worker'
-        systemd kill -s SIGUSR2 concourse-worker
+        systemctl kill -s SIGUSR2 concourse-worker
         exit 0
     elif [[ "$HTTP_CODE" -eq 404 ]] ; then
         echo 'Not Interrupted'
