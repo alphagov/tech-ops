@@ -257,19 +257,20 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops-private
-      attempts: 50
+      attempts: 10
       passed: [scale-in]
       trigger: true
     - get: tech-ops
-      attempts: 50
+      attempts: 10
       passed: [scale-in]
       trigger: true
     - get: version
-      attempts: 50
+      attempts: 10
       params: {bump: minor}
 
   # this is a simple check to ensure push to ecr works
   - put: ecr
+    attempts: 10
     params:
       build: version
       dockerfile: tech-ops/reliability-engineering/dockerfiles/test.Dockerfile
@@ -278,23 +279,29 @@ jobs:
 
   # the following tasks exercise the codecommit repo provided for pool-resource
   - task: init-pool
+    attempts: 10
     file: tech-ops/reliability-engineering/pipelines/tasks/test-init-pool.yml
     output_mapping:
       repo: pool
   - put: pool-repo
+    attempts: 10
     params:
       repository: pool
       force: true
   - get: a-test-lock-config  # defines a lock
+    attempts: 10
   - put: add-lock  # adds the lock to the pool
+    attempts: 10
     resource: pool
     params:
       add: a-test-lock-config
   - put: acquire-lock  # get the lock
+    attempts: 10
     resource: pool
     params:
       acquire: true
   - put: release-lock  # releases the lock
+    attempts: 10
     resource: pool
     params:
       release: a-test-lock-config
@@ -302,14 +309,14 @@ jobs:
   # check that logs are arriving in CloudWatch
   - in_parallel:
     - task: check-web-logs
+      attempts: 10
       file: tech-ops/reliability-engineering/pipelines/tasks/test-log-shipping.yml
-      attempts: 3
       timeout: 10m
       params:
         LOG_GROUP: /((deployment_name))/concourse/web
     - task: check-worker-logs
+      attempts: 10
       file: tech-ops/reliability-engineering/pipelines/tasks/test-log-shipping.yml
-      attempts: 3
       timeout: 10m
       params:
         LOG_GROUP: /((deployment_name))/concourse/worker
@@ -320,11 +327,9 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops
-      attempts: 50
       passed: [test]
       trigger: true
     - get: version
-      attempts: 50
       params: {bump: minor}
 
   # this promotes the repo for use in other deployments (eg cd-staging -> cd)

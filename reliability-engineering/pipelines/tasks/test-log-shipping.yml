@@ -7,7 +7,7 @@ image_resource:
 params:
   AWS_REGION: eu-west-2
   AWS_DEFAULT_REGION: eu-west-2
-  TEST_FARBACK: 0
+  TEST_FARBACK: 180
   LOG_GROUP:
 run:
   path: /bin/bash
