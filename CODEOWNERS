@@ -11,4 +11,4 @@ reliability-engineering/pipelines/tasks/* @alphagov/re-common-cloud
 reliability-engineering/terraform/modules/concourse-* @alphagov/re-common-cloud
 
 # cyber security owners
-cyber-security/* @alphagov/reliability-engineering @alphagov/team-cybersecurity
+/cyber-security/ @alphagov/reliability-engineering @alphagov/team-cybersecurity
