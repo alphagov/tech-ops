@@ -25,5 +25,5 @@ resource "aws_route53_record" "concourse_public_deployment_cert_validation" {
 
 resource "aws_acm_certificate_validation" "concourse_public_deployment" {
   certificate_arn         = aws_acm_certificate.concourse_public_deployment.arn
-  validation_record_fqdns = [aws_route53_record.concourse_public_deployment_cert_validation.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.concourse_public_deployment_cert_validation : record.fqdn]
 }
