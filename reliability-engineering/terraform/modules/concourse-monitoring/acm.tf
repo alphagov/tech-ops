@@ -13,15 +13,19 @@ resource "aws_acm_certificate" "concourse_monitoring" {
 }
 
 resource "aws_route53_record" "concourse_monitoring_cert_validation" {
-  name    = aws_acm_certificate.concourse_monitoring.domain_validation_options[0].resource_record_name
-  type    = aws_acm_certificate.concourse_monitoring.domain_validation_options[0].resource_record_type
+  for_each = {
+    for dvo in aws_acm_certificate.concourse_monitoring.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  name    = each.value.name
+  records = [each.value.record]
+  type    = each.value.type
   zone_id = data.aws_route53_zone.public_root.zone_id
-
-  records = [
-    aws_acm_certificate.concourse_monitoring.domain_validation_options[0].resource_record_value,
-  ]
-
-  ttl = 60
+  ttl     = 60
 }
 
 resource "aws_acm_certificate_validation" "concourse_web" {
