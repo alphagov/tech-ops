@@ -21,6 +21,8 @@ resource "aws_route53_record" "concourse_public_deployment_cert_validation" {
   type    = each.value.type
   zone_id = data.aws_route53_zone.public_root.zone_id
   ttl     = 60
+
+  allow_overwrite = true
 }
 
 resource "aws_acm_certificate_validation" "concourse_public_deployment" {
