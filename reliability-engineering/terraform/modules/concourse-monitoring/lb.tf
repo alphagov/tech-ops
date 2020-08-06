@@ -71,8 +71,9 @@ resource "aws_lb_listener_rule" "concourse_prometheus" {
   }
 
   condition {
-    field  = "host-header"
-    values = ["prom-${count.index + 1}.*"]
+    host_header {
+      values = ["prom-${count.index + 1}.*"]
+    }
   }
 }
 
