@@ -11,10 +11,17 @@
 locals {
   # eu-west-1 AMI ID for Web Page Test (linux)
   ami_id = "ami-9978f6ee"
+
+  # cannot actually reference this except for count because element does not
+  # work for nested lists
+  ingress_cidr_chunksize = 45
+  ingress_cidr_chunks = "${chunklist(var.ingress_cidrs, local.ingress_cidr_chunksize)}"
 }
 
 resource "aws_security_group" "web_page_test_controller" {
-  name        = "${var.env}-controller"
+  count = "${length(local.ingress_cidr_chunks)}"
+
+  name        = "${var.env}-controller-${count.index}"
   description = "ingress/egress/all"
   vpc_id      = "${aws_vpc.main.id}"
 
@@ -22,7 +29,14 @@ resource "aws_security_group" "web_page_test_controller" {
     from_port   = 0
     to_port     = 0
     protocol    = -1
-    cidr_blocks = ["${var.ingress_cidrs}"]
+
+    cidr_blocks = ["${
+      slice(
+        var.ingress_cidrs,
+        count.index * local.ingress_cidr_chunksize,
+        min((count.index + 1) * local.ingress_cidr_chunksize, length(var.ingress_cidrs)),
+      )
+    }"]
   }
 
   ingress {
@@ -36,7 +50,7 @@ resource "aws_security_group" "web_page_test_controller" {
     from_port       = 0
     to_port         = 0
     protocol        = -1
-    security_groups = ["${aws_security_group.web_page_test_controller_lb.id}"]
+    security_groups = ["${aws_security_group.web_page_test_controller_lb.*.id}"]
   }
 
   egress {
@@ -68,7 +82,9 @@ resource "aws_security_group" "web_page_test_agent" {
 }
 
 resource "aws_security_group" "web_page_test_controller_lb" {
-  name        = "${var.env}-controller-lb"
+  count = "${length(local.ingress_cidr_chunks)}"
+
+  name        = "${var.env}-controller-lb-${count.index}"
   description = "ingress/egress/all"
   vpc_id      = "${aws_vpc.main.id}"
 
@@ -76,7 +92,14 @@ resource "aws_security_group" "web_page_test_controller_lb" {
     from_port   = 0
     to_port     = 0
     protocol    = -1
-    cidr_blocks = ["${var.ingress_cidrs}"]
+
+    cidr_blocks = ["${
+      slice(
+        var.ingress_cidrs,
+        count.index * local.ingress_cidr_chunksize,
+        min((count.index + 1) * local.ingress_cidr_chunksize, length(var.ingress_cidrs)),
+      )
+    }"]
   }
 
   egress {
@@ -108,7 +131,7 @@ resource "aws_instance" "web_page_test_controller" {
   associate_public_ip_address = true
 
   vpc_security_group_ids = [
-    "${aws_security_group.web_page_test_controller.id}",
+    "${aws_security_group.web_page_test_controller.*.id}",
   ]
 
   user_data = <<-EOF
@@ -147,7 +170,7 @@ resource "aws_lb" "web_page_test_controller" {
   name               = "web-page-test-controller"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = ["${aws_security_group.web_page_test_controller_lb.id}"]
+  security_groups    = ["${aws_security_group.web_page_test_controller_lb.*.id}"]
   subnets            = ["${aws_subnet.public.*.id}"]
 }
 
