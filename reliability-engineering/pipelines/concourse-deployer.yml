@@ -158,6 +158,7 @@ jobs:
       - concourse-provider-config/provider_concourse_override.tf.json
       var_files:
       - concourse-provider-config/version.tfvars
+  - get: fly
   - task: generate-roll-instances-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
     image: fly
