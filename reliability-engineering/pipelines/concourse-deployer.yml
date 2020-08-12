@@ -41,8 +41,10 @@ resources:
     paths:
       - reliability-engineering/terraform/modules
       - reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+      - reliability-engineering/pipelines/tasks/concourse-get-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+      - reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
       - reliability-engineering/pipelines/tasks/sign-tag.yml
       - reliability-engineering/pipelines/tasks/verify-tag.yml
       - reliability-engineering/pipelines/concourse-deployer.yml
