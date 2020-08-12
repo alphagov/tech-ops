@@ -20,6 +20,7 @@ run:
   - -c
   - |
     mkdir -p roll-instances-pipeline
+    export PATH="$PATH:/opt/resource"
     fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD -n $CONCOURSE_USERNAME
     fly -t concourse sync
     fly -t concourse workers --json | jq 'group_by (.team)[] | {"team": (.[0].team), "workers": (. | length)}' | jq --slurp '{
