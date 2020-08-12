@@ -1,0 +1,71 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: concourse/concourse-pipeline-resource
+    tag: "6.0.0"
+inputs:
+- name: tech-ops-private
+outputs:
+- name: roll-instances-pipeline
+params:
+  DEPLOYMENT_NAME:
+  CONCOURSE_USERNAME:
+  CONCOURSE_PASSWORD:
+run:
+  path: /bin/bash
+  args:
+  - -euo
+  - pipefail
+  - -c
+  - |
+    mkdir -p roll-instances-pipeline
+    fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD -n $CONCOURSE_USERNAME
+    fly -t concourse sync
+    fly -t concourse workers --json | jq 'group_by (.team)[] | {"team": (.[0].team), "workers": (. | length)}' | jq --slurp '{
+      "resources": [
+        {
+          "name": "every-weekday-morning",
+          "type": "time",
+          "source": {
+            "location": "Europe/London",
+            "start": "05:00 AM",
+            "stop": "06:00 AM"
+          }
+        }
+      ],
+      "jobs": [.[] | select (.team != "main") | {
+        "name": ("roll-" + .team + "-concourse-workers"),
+        "serial": true,
+        "plan": [
+          {
+            "get": "every-weekday-morning",
+            "trigger": true
+          },
+          {
+            "task": "roll-instances",
+            "config": {
+              "platform": "linux",
+              "image_resource": {
+                "type": "docker-image",
+                "source": {
+                  "repository": "gdsre/awsc",
+                  "tag": "c0e3d9fa6213"
+                }
+              },
+              "params": {
+                "TEAM": .team,
+                "MINIMUM_HEALTHY": (if (100 / .workers) == 100 then 0 else (100 / .workers) end)
+              },
+              "run": {
+                "path": "sh",
+                "args": [
+                  "-c",
+                  "set -ue; AWS_REGION=eu-west-2 awsc autoscaling migrate cd-$TEAM-concourse-worker -m $MINIMUM_HEALTHY"
+                ]
+              }
+            }
+          }
+        ]
+      }]
+    }' | yq --yaml-output . > roll-instances-pipeline/roll-instances.yml

@@ -158,8 +158,14 @@ jobs:
       - concourse-provider-config/provider_concourse_override.tf.json
       var_files:
       - concourse-provider-config/version.tfvars
+  - task: generate-roll-instances-pipeline
+    file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
+    image: fly
+    params:
+      CONCOURSE_USERNAME: main
+      CONCOURSE_PASSWORD: ((readonly_local_user_password))
   - set_pipeline: roll-instances
-    file: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))/roll-instances.yml
+    file: roll-instances-pipeline/roll-instances.yml
   - set_pipeline: deploy-info-pipelines
     file: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))/deploy-info-pipelines.yml
     vars:
