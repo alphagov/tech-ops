@@ -165,6 +165,7 @@ jobs:
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
     image: fly
     params:
+      DEPLOYMENT_NAME: ((deployment_name))
       CONCOURSE_USERNAME: main
       CONCOURSE_PASSWORD: ((readonly_local_user_password))
   - set_pipeline: roll-instances
