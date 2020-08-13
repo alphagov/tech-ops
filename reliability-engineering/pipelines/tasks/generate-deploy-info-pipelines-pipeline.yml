@@ -1,0 +1,59 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: concourse/concourse-pipeline-resource
+    tag: "6.0.0"
+inputs:
+- name: tech-ops-private
+outputs:
+- name: deploy-info-pipelines-pipeline
+params:
+  DEPLOYMENT_NAME:
+  CONCOURSE_USERNAME:
+  CONCOURSE_PASSWORD:
+run:
+  path: /bin/bash
+  args:
+  - -euo
+  - pipefail
+  - -c
+  - |
+    mkdir -p deploy-info-pipelines-pipeline
+    export PATH="$PATH:/opt/resource"
+    fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD -n $CONCOURSE_USERNAME
+    fly -t concourse sync
+    fly -t concourse teams --json | jq '{
+      "resources": [
+        {
+          "name": "tech-ops-private",
+          "type": "git",
+          "icon": "github-circle",
+          "source": {
+            "branch": "((deployment_branch))",
+            "uri": "git@github.com:alphagov/tech-ops-private.git",
+            "private_key": "((re-autom8-ci-github-ssh-private-key))",
+            "paths": [
+              "reliability-engineering/terraform/deployments/gds-tech-ops/cd/pipelines/info.yml"
+            ]
+          }
+        }
+      ],
+      "jobs": [{
+        "name": "deploy-info-pipelines",
+        "serial": true,
+        "plan": [
+          {
+            "get": "tech-ops-private",
+            "trigger": true
+          },
+          {
+            "in_parallel": [.[] | {
+              "set_pipeline": "info",
+              "team": .name,
+              "file": "tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/cd/pipelines/info.yml"
+            }]
+          }
+        ]
+      }]
+    }' | yq --yaml-output . > deploy-info-pipelines-pipeline/deploy-info-pipelines.yml

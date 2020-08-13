@@ -175,8 +175,15 @@ jobs:
       CONCOURSE_PASSWORD: ((readonly_local_user_password))
   - set_pipeline: roll-instances
     file: roll-instances-pipeline/roll-instances.yml
+  - task: generate-deploy-info-pipelines-pipeline
+    file: tech-ops/reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
+    image: fly-yq
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
+      CONCOURSE_USERNAME: main
+      CONCOURSE_PASSWORD: ((readonly_local_user_password))
   - set_pipeline: deploy-info-pipelines
-    file: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))/deploy-info-pipelines.yml
+    file: deploy-info-pipelines-pipeline/deploy-info-pipelines.yml
     vars:
       deployment_branch: ((deployment_branch))
 
