@@ -104,6 +104,11 @@ resources:
   source:
     repository: concourse/concourse-pipeline-resource
     tag: latest
+- name: fly-yq
+  type: registry-image
+  source:
+    repository: gdsre/fly-yq
+    tag: latest
 
 jobs:
 
@@ -160,10 +165,10 @@ jobs:
       - concourse-provider-config/provider_concourse_override.tf.json
       var_files:
       - concourse-provider-config/version.tfvars
-  - get: fly
+  - get: fly-yq
   - task: generate-roll-instances-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
-    image: fly
+    image: fly-yq
     params:
       DEPLOYMENT_NAME: ((deployment_name))
       CONCOURSE_USERNAME: main
