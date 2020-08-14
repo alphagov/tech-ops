@@ -15,10 +15,10 @@ resources:
 - name: gdsre-aws-ruby-git
   type: git
   source:
-    uri: https://github.com/alphagov/verify-infrastructure.git
+    uri: https://github.com/alphagov/tech-ops.git
     branch: master
     paths:
-    - dockerfiles/aws-ruby
+    - reliability-engineering/dockerfiles/gdsre/aws-ruby
 
 jobs:
 - name: build-gdsre-aws-ruby
@@ -32,6 +32,6 @@ jobs:
       params: {save: true}
   - put: gdsre-aws-ruby
     params:
-      build: gdsre-aws-ruby-git/dockerfiles/aws-ruby
+      build: gdsre-aws-ruby-git/reliability-engineering/dockerfiles/gdsre/aws-ruby
       load_bases: [ ruby-2.6.1 ]
     get_params: {skip_download: true}
