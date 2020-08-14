@@ -44,6 +44,7 @@ resources:
       - reliability-engineering/pipelines/tasks/concourse-get-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+      - reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
       - reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
       - reliability-engineering/pipelines/tasks/sign-tag.yml
       - reliability-engineering/pipelines/tasks/verify-tag.yml
