@@ -1,0 +1,37 @@
+resources:
+- name: gdsre-aws-ruby
+  type: docker-image
+  source:
+    # FIXME: move to docker hub
+    repository: ((readonly_private_ecr_repo_url))
+    tag: gdsre-aws-ruby-latest
+
+- name: ruby-2.6.1
+  type: docker-image
+  source:
+    repository: ruby
+    tag: "2.6.1"
+
+- name: gdsre-aws-ruby-git
+  type: git
+  source:
+    uri: https://github.com/alphagov/verify-infrastructure.git
+    branch: master
+    paths:
+    - dockerfiles/aws-ruby
+
+jobs:
+- name: build-gdsre-aws-ruby
+  serial: true
+  plan:
+  - in_parallel:
+    - get: gdsre-aws-ruby-git
+      trigger: true
+    - get: ruby-2.6.1
+      trigger: true
+      params: {save: true}
+  - put: gdsre-aws-ruby
+    params:
+      build: gdsre-aws-ruby-git/dockerfiles/aws-ruby
+      load_bases: [ ruby-2.6.1 ]
+    get_params: {skip_download: true}
