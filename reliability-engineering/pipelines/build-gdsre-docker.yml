@@ -20,7 +20,22 @@ resources:
     paths:
     - reliability-engineering/dockerfiles/gdsre/aws-ruby
 
+- name: build-gdsre-docker-pipeline
+  type: git
+  source:
+    uri: https://github.com/alphagov/tech-ops.git
+    branch: master
+    paths:
+    - reliability-engineering/pipelines/build-gdsre-docker.yml
+
 jobs:
+- name: selfupdate
+  serial: true
+  plan:
+  - get: build-gdsre-docker-pipeline
+    trigger: true
+  - set_pipeline: build-gdsre-docker
+    file: build-gdsre-docker-pipeline/reliability-engineering/pipelines/build-gdsre-docker.yml
 - name: build-gdsre-aws-ruby
   serial: true
   plan:
