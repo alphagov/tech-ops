@@ -166,27 +166,6 @@ jobs:
       - concourse-provider-config/provider_concourse_override.tf.json
       var_files:
       - concourse-provider-config/version.tfvars
-  - get: fly-yq
-  - task: generate-roll-instances-pipeline
-    file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
-    image: fly-yq
-    params:
-      DEPLOYMENT_NAME: ((deployment_name))
-      CONCOURSE_USERNAME: main
-      CONCOURSE_PASSWORD: ((readonly_local_user_password))
-  - set_pipeline: roll-instances
-    file: roll-instances-pipeline/roll-instances.yml
-  - task: generate-deploy-info-pipelines-pipeline
-    file: tech-ops/reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
-    image: fly-yq
-    params:
-      DEPLOYMENT_NAME: ((deployment_name))
-      CONCOURSE_USERNAME: main
-      CONCOURSE_PASSWORD: ((readonly_local_user_password))
-  - set_pipeline: deploy-info-pipelines
-    file: deploy-info-pipelines-pipeline/deploy-info-pipelines.yml
-    vars:
-      deployment_branch: ((deployment_branch))
 
 - name: scale-out
   serial: true
@@ -273,6 +252,36 @@ jobs:
       - concourse-provider-config/provider_concourse_override.tf.json
       var_files:
       - concourse-provider-config/version.tfvars
+
+- name: configure-teams
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: tech-ops-private
+      passed: [scale-in]
+      trigger: true
+    - get: fly-yq
+  - task: generate-roll-instances-pipeline
+    file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
+    image: fly-yq
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
+      CONCOURSE_USERNAME: main
+      CONCOURSE_PASSWORD: ((readonly_local_user_password))
+  - set_pipeline: roll-instances
+    file: roll-instances-pipeline/roll-instances.yml
+  - task: generate-deploy-info-pipelines-pipeline
+    file: tech-ops/reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
+    image: fly-yq
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
+      CONCOURSE_USERNAME: main
+      CONCOURSE_PASSWORD: ((readonly_local_user_password))
+  - set_pipeline: deploy-info-pipelines
+    file: deploy-info-pipelines-pipeline/deploy-info-pipelines.yml
+    vars:
+      deployment_branch: ((deployment_branch))
 
 - name: test
   serial: true
