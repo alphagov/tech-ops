@@ -1,0 +1,52 @@
+resources:
+- name: govsvc-aws-ruby
+  type: docker-image
+  source:
+    username: ((dockerhub-username))
+    password: ((dockerhub-password))
+    repository: govsvc/aws-ruby
+
+- name: ruby-2.6.1
+  type: docker-image
+  source:
+    repository: ruby
+    tag: "2.6.1"
+
+- name: govsvc-aws-ruby-git
+  type: git
+  source:
+    uri: https://github.com/alphagov/tech-ops.git
+    branch: master
+    paths:
+    - reliability-engineering/dockerfiles/govsvc/aws-ruby
+
+- name: build-govsvc-docker-pipeline
+  type: git
+  source:
+    uri: https://github.com/alphagov/tech-ops.git
+    branch: master
+    paths:
+    - reliability-engineering/pipelines/build-govsvc-docker.yml
+
+jobs:
+- name: selfupdate
+  serial: true
+  plan:
+  - get: build-govsvc-docker-pipeline
+    trigger: true
+  - set_pipeline: build-govsvc-docker
+    file: build-govsvc-docker-pipeline/reliability-engineering/pipelines/build-govsvc-docker.yml
+- name: build-govsvc-aws-ruby
+  serial: true
+  plan:
+  - in_parallel:
+    - get: govsvc-aws-ruby-git
+      trigger: true
+    - get: ruby-2.6.1
+      trigger: true
+      params: {save: true}
+  - put: govsvc-aws-ruby
+    params:
+      build: govsvc-aws-ruby-git/reliability-engineering/dockerfiles/govsvc/aws-ruby
+      load_bases: [ ruby-2.6.1 ]
+    get_params: {skip_download: true}
