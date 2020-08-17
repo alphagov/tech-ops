@@ -255,10 +255,13 @@ jobs:
 
 - name: configure-teams
   serial: true
-  serial_groups: [deploy]
   plan:
   - in_parallel:
     - get: tech-ops-private
+      passed: [scale-in]
+      trigger: true
+    - get: tech-ops
+      attempts: 10
       passed: [scale-in]
       trigger: true
     - get: fly-yq
