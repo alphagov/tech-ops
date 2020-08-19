@@ -65,11 +65,11 @@ scrape_configs:
     scheme: 'http'
     dns_sd_configs:
       - names:
-          - "${deployment}-concourse-grafana.monitoring.local"
+          - "${deployment}-concourse-grafana.local.cd.gds-reliability.engineering"
     relabel_configs:
       - source_labels: [__meta_dns_name]
         target_label: job
-        regex: "^${deployment}-concourse-(.*).monitoring.local$"
+        regex: "^${deployment}-concourse-(.*).local.cd.gds-reliability.engineering$"
 
   - job_name: concourse_node_exporter
     ec2_sd_configs:
