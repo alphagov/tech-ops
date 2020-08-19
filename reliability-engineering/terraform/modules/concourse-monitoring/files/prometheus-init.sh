@@ -60,6 +60,17 @@ scrape_configs:
       - source_labels: [__meta_ec2_instance_id]
         target_label: instance
 
+  - job_name: concourse_grafana
+    metrics_path: '/metrics'
+    scheme: 'http'
+    dns_sd_configs:
+      - names:
+          - "${deployment}-concourse-grafana.monitoring.local"
+    relabel_configs:
+      - source_labels: [__meta_dns_name]
+        target_label: job
+        regex: "^${deployment}-concourse-(.*).monitoring.local$"
+
   - job_name: concourse_node_exporter
     ec2_sd_configs:
       - region: eu-west-2

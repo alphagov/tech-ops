@@ -96,6 +96,38 @@ resource "aws_ecs_service" "concourse_grafana" {
     security_groups = [aws_security_group.concourse_grafana.id]
     subnets         = var.private_subnet_ids
   }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.grafana_service_discovery.arn
+    port         = 3000
+  }
+}
+
+resource "aws_service_discovery_private_dns_namespace" "monitoring_apps" {
+  name        = "monitoring.local"
+  description = "Monitoring app instances"
+  vpc         = var.vpc_id
+}
+
+resource "aws_service_discovery_service" "grafana_service_discovery" {
+  name = "${var.deployment}-concourse-grafana"
+
+  description = "Service discovery for ${var.deployment}-concourse-grafana instances"
+
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.monitoring_apps.id
+
+    dns_records {
+      ttl  = 60
+      type = "SRV"
+    }
+
+    routing_policy = "MULTIVALUE"
+  }
+
+  health_check_custom_config {
+    failure_threshold = 2
+  }
 }
 
 provider "grafana" {
