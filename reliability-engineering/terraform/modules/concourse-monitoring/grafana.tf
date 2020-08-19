@@ -104,7 +104,7 @@ resource "aws_ecs_service" "concourse_grafana" {
 }
 
 resource "aws_service_discovery_private_dns_namespace" "monitoring_apps" {
-  name        = "monitoring.local"
+  name        = "local.cd.gds-reliability.engineering"
   description = "Monitoring app instances"
   vpc         = var.vpc_id
 }
