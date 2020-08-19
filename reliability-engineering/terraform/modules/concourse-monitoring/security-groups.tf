@@ -38,7 +38,7 @@ resource "aws_security_group_rule" "concourse_monitoring_lb_ingress_from_outside
   to_port   = 443
 
   security_group_id = aws_security_group.concourse_monitoring_lb.id
-  cidr_blocks       = concat(
+  cidr_blocks = concat(
     var.whitelisted_cidr_blocks,
     formatlist("%s/32", var.main_nat_gateway_egress_ips)
   )
@@ -98,6 +98,15 @@ resource "aws_security_group_rule" "concourse_grafana_egress_to_internet" {
 
   security_group_id = aws_security_group.concourse_grafana.id
   cidr_blocks       = ["0.0.0.0/0"]
+}
+
+module "concourse_prometheus_can_scrape_metrics_from_concourse_grafana" {
+  source = "../sg-access-pair"
+
+  source_sg_id      = var.prometheus_security_group_id
+  destination_sg_id = aws_security_group.concourse_grafana.id
+  from_port         = 3000
+  to_port           = 3000
 }
 
 module "concourse_prometheus_can_talk_to_concourse_grafana_over_9100" {
