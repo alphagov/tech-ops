@@ -28,6 +28,21 @@ resources:
     paths:
     - reliability-engineering/pipelines/build-govsvc-docker.yml
 
+- name: govsvc-octodns
+  type: docker-image
+  source:
+    username: ((dockerhub-username))
+    password: ((dockerhub-password))
+    repository: govsvc/octodns
+
+- name: govsvc-octodns-git
+  type: git
+  source:
+    uri: https://github.com/alphagov/tech-ops.git
+    branch: master
+    paths:
+    - reliability-engineering/dockerfiles/govsvc/octodns
+
 jobs:
 - name: selfupdate
   serial: true
@@ -49,4 +64,13 @@ jobs:
     params:
       build: govsvc-aws-ruby-git/reliability-engineering/dockerfiles/govsvc/aws-ruby
       load_bases: [ ruby-2.6.1 ]
+    get_params: {skip_download: true}
+- name: build-govsvc-octodns
+  serial: true
+  plan:
+  - get: govsvc-octodns-git
+    trigger: true
+  - put: govsvc-octodns
+    params:
+      build: govsvc-octodns-git/reliability-engineering/dockerfiles/govsvc/octodns
     get_params: {skip_download: true}
