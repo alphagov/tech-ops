@@ -28,6 +28,13 @@ resources:
     paths:
     - reliability-engineering/pipelines/build-govsvc-docker.yml
 
+- name: awscli
+  type: docker-image
+  source:
+    username: ((dockerhub-username))
+    password: ((dockerhub-password))
+    repository: governmentpaas/awscli
+
 - name: govsvc-octodns
   type: docker-image
   source:
@@ -68,8 +75,11 @@ jobs:
 - name: build-govsvc-octodns
   serial: true
   plan:
-  - get: govsvc-octodns-git
-    trigger: true
+  in_parallel:
+    - get: govsvc-octodns-git
+      trigger: true
+    - get: awscli
+      trigger: true
   - put: govsvc-octodns
     params:
       build: govsvc-octodns-git/reliability-engineering/dockerfiles/govsvc/octodns
