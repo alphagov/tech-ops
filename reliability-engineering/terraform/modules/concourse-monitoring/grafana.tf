@@ -76,8 +76,8 @@ resource "aws_ecs_task_definition" "concourse_grafana_task_def" {
   requires_compatibilities = ["FARGATE"]
 }
 
-resource "aws_ecs_service" "concourse_grafana" {
-  name            = "${var.deployment}-concourse-grafana"
+resource "aws_ecs_service" "concourse_grafana_v2" {
+  name            = "${var.deployment}-concourse-grafana-v2"
   cluster         = aws_ecs_cluster.concourse_grafana.name
   task_definition = aws_ecs_task_definition.concourse_grafana_task_def.arn
   launch_type     = "FARGATE"
