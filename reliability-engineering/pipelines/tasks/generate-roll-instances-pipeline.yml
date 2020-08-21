@@ -41,6 +41,13 @@ run:
             "start": "05:00 AM",
             "stop": "06:00 AM"
           }
+        },
+        {
+          "name": "awsc-image",
+          "type": "docker-image",
+          "source": {
+            "repository": "govsvc/awsc"
+          }
         }
       ],
       "jobs": [.[] | select (.team != "main") | {
@@ -48,20 +55,21 @@ run:
         "serial": true,
         "plan": [
           {
-            "get": "every-weekday-morning",
-            "trigger": true
+            "in_parallel": [
+              {
+                "get": "every-weekday-morning",
+                "trigger": true
+              },
+              {
+                "get": "awsc-image"
+              }
+            ]
           },
           {
             "task": "roll-instances",
+            "image": "awsc-image",
             "config": {
               "platform": "linux",
-              "image_resource": {
-                "type": "docker-image",
-                "source": {
-                  "repository": "gdsre/awsc",
-                  "tag": "c0e3d9fa6213"
-                }
-              },
               "params": {
                 "TEAM": .team,
                 "MINIMUM_HEALTHY": (if (100 / .workers) == 100 then 0 else (100 / .workers) end)
