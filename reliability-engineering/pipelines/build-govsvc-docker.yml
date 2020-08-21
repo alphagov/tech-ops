@@ -77,7 +77,7 @@ jobs:
 - name: build-govsvc-octodns
   serial: true
   plan:
-  in_parallel:
+  - in_parallel:
     - get: govsvc-octodns-git
       trigger: true
     - get: awscli
