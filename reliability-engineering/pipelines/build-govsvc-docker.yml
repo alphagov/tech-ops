@@ -71,6 +71,8 @@ jobs:
     params:
       build: govsvc-aws-ruby-git/reliability-engineering/dockerfiles/govsvc/aws-ruby
       load_bases: [ ruby-2.6.1 ]
+      tag_file: ruby-2.6.1/tag
+      tag_as_latest: true
     get_params: {skip_download: true}
 - name: build-govsvc-octodns
   serial: true
