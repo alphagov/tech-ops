@@ -82,7 +82,9 @@ jobs:
       trigger: true
     - get: awscli
       trigger: true
+      params: {save: true}
   - put: govsvc-octodns
     params:
       build: govsvc-octodns-git/reliability-engineering/dockerfiles/govsvc/octodns
+      load_bases: [ awscli ]
     get_params: {skip_download: true}
