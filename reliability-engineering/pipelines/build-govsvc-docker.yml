@@ -50,6 +50,27 @@ resources:
     paths:
     - reliability-engineering/dockerfiles/govsvc/octodns
 
+- name: golang-1.12-image
+  type: docker-image
+  source:
+    repository: golang
+    tag: "1.12"
+
+- name: govsvc-awsc-image
+  type: docker-image
+  source:
+    username: ((dockerhub-username))
+    password: ((dockerhub-password))
+    repository: govsvc/awsc
+
+- name: govsvc-awsc-git
+  type: git
+  source:
+    uri: https://github.com/alphagov/tech-ops.git
+    branch: master
+    paths:
+    - reliability-engineering/dockerfiles/govsvc/awsc
+
 jobs:
 - name: selfupdate
   serial: true
@@ -87,4 +108,18 @@ jobs:
     params:
       build: govsvc-octodns-git/reliability-engineering/dockerfiles/govsvc/octodns
       load_bases: [ awscli ]
+    get_params: {skip_download: true}
+- name: build-govsvc-awsc
+  serial: true
+  plan:
+  - in_parallel:
+    - get: govsvc-awsc-git
+      trigger: true
+    - get: golang-1.12-image
+      trigger: true
+      params: {save: true}
+  - put: govsvc-awsc-image
+    params:
+      build: govsvc-awsc-git/reliability-engineering/dockerfiles/govsvc/awsc
+      load_bases: [ golang-1.12-image ]
     get_params: {skip_download: true}
