@@ -36,3 +36,22 @@ resource "aws_autoscaling_group" "concourse_worker" {
     propagate_at_launch = true
   }
 }
+
+resource "aws_autoscaling_schedule" "reduce_for_the_weekend" {
+  scheduled_action_name = "reduce-for-the-weekend"
+  min_size = -1
+  max_size = -1
+  # don't add an instance if desired_capacity == 0
+  desired_capacity = min(1, var.desired_capacity)
+  recurrence = "0 20 * * 5" # 20:00 every Friday
+  autoscaling_group_name = aws_autoscaling_group.concourse_worker.name
+}
+
+resource "aws_autoscaling_schedule" "increase_for_the_work_week" {
+  scheduled_action_name = "increase-for-the-work-week"
+  min_size = -1
+  max_size = -1
+  desired_capacity = var.desired_capacity
+  recurrence = "0 7 * * 1" # 07:00 every Monday
+  autoscaling_group_name = aws_autoscaling_group.concourse_worker.name
+}
