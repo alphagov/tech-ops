@@ -36,3 +36,7 @@ resource "aws_autoscaling_group" "concourse_worker" {
     propagate_at_launch = true
   }
 }
+
+output "asg_name" {
+  value = aws_autoscaling_group.concourse_worker.name
+}
