@@ -1,7 +1,11 @@
 package csls_test
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"time"
 
 	"github.com/alphagov/tech-ops/cyber-security/components/csls-splunk-broker/pkg/aws/awsfakes"
@@ -11,6 +15,17 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
+
+func gzip_decompress(b []byte) ([]byte, error) {
+	gz, _ := gzip.NewReader(bytes.NewReader(b))
+	result, err := ioutil.ReadAll(gz)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to decompress data")
+	}
+
+	return result, nil
+}
 
 var _ = Describe("Stream", func() {
 
@@ -37,7 +52,9 @@ var _ = Describe("Stream", func() {
 		}
 		Expect(stream.PutCloudfoundryLog(input, logGroupName)).To(Succeed())
 		Expect(client.PutRecordCallCount()).To(Equal(1))
-		Expect(json.Unmarshal(client.PutRecordArgsForCall(0).Data, &output)).To(Succeed())
+		decompressed, err := gzip_decompress(client.PutRecordArgsForCall(0).Data)
+		Expect(err).To(BeNil())
+		Expect(json.Unmarshal(decompressed, &output)).To(Succeed())
 	})
 
 	It("should set the correct stream name", func() {

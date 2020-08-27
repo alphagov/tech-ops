@@ -1,6 +1,8 @@
 package csls
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 
@@ -67,10 +69,16 @@ func (w *Stream) PutCloudfoundryLog(log cloudfoundry.Log, groupName string) erro
 			},
 		},
 	}
-	b, err := json.Marshal(data)
+	json, err := json.Marshal(data)
 	if err != nil {
 		return fmt.Errorf("failed-to-marshal-batch: %s", err)
 	}
+
+	// Cloudwatch gzip compresses data before sending to Kinesis
+	// https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html
+	b := gzip_compress(json)
+
+	// Kinesis client transparently base64 encodes `Data`
 	_, err = w.AWS.PutRecord(&kinesis.PutRecordInput{
 		StreamName:   aws.String(w.Name),
 		Data:         b,
@@ -80,4 +88,12 @@ func (w *Stream) PutCloudfoundryLog(log cloudfoundry.Log, groupName string) erro
 		return err
 	}
 	return nil
+}
+
+func gzip_compress(in []byte) []byte {
+	var out bytes.Buffer
+	gz := gzip.NewWriter(&out)
+	gz.Write(in)
+	gz.Close()
+	return out.Bytes()
 }
