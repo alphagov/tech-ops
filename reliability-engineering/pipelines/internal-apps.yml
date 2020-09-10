@@ -47,6 +47,20 @@ resources:
       access_token: ((pr-builds-status-github-token))
       disable_forks: true
 
+  - name: gds-tech-learning-pathway-git
+    type: git
+    source:
+      uri: https://github.com/alphagov/gds-tech-learning-pathway.git
+      branch: master
+
+  - name: gds-tech-learning-pathway-pr
+    type: pull-request
+    check_every: 1m
+    source:
+      repository: alphagov/gds-tech-learning-pathway
+      access_token: ((pr-builds-status-github-token))
+      disable_forks: true
+
   - name: re-request-an-aws-account-git
     type: git
     source:
@@ -293,6 +307,69 @@ jobs:
       - put: deploy-to-paas-docs-space
         params:
           current_app_name: gds-way
+          manifest: bundled/manifest.yml
+          show_app_log: true
+          path: bundled
+
+  - name: build-gds-tech-learning-pathway-pr
+    public: true
+    serial: true
+    plan:
+      - get: gds-tech-learning-pathway-pr
+        trigger: true
+        version: every
+      - put: gds-tech-learning-pathway-pr
+        params:
+          status: pending
+          path: gds-tech-learning-pathway-pr
+      - task: bundle-gds-tech-learning-pathway
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: govsvc/aws-ruby
+              tag: 2.6.1
+          inputs:
+            - name: gds-tech-learning-pathway-pr
+              path: repo
+          run: *bundle-pr
+    on_success:
+      put: gds-tech-learning-pathway-pr
+      params:
+        path: gds-tech-learning-pathway-pr
+        status: success
+    on_failure:
+      put: gds-tech-learning-pathway-pr
+      params:
+        path: gds-tech-learning-pathway-pr
+        status: failure
+
+  - name: build-gds-tech-learning-pathway
+    public: true
+    serial: true
+    plan:
+      - get: gds-tech-learning-pathway-git
+        trigger: true
+      - task: bundle-gds-tech-learning-pathway
+        timeout: 15m
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: govsvc/aws-ruby
+              tag: 2.6.1
+          inputs:
+            - name: gds-tech-learning-pathway-git
+              path: repo
+          outputs:
+            - name: bundled
+          run: *bundle
+      - put: deploy-to-paas-docs-space
+        params:
+          current_app_name: gds-tech-learning-pathway
           manifest: bundled/manifest.yml
           show_app_log: true
           path: bundled
