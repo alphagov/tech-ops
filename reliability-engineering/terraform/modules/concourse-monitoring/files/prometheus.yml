@@ -1,0 +1,52 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: concourse_prometheus
+    ec2_sd_configs:
+      - region: eu-west-2
+        refresh_interval: 30s
+        port: 9090
+    relabel_configs:
+      - source_labels: [__meta_ec2_tag_Name]
+        regex: '^${deployment}-concourse-prometheus$'
+        action: keep
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+
+  - job_name: concourse_grafana
+    metrics_path: '/metrics'
+    scheme: 'http'
+    dns_sd_configs:
+      - names:
+          - "${deployment}-concourse-grafana.local.cd.gds-reliability.engineering"
+    relabel_configs:
+      - source_labels: [__meta_dns_name]
+        target_label: job
+        regex: "^${deployment}-concourse-(.*).local.cd.gds-reliability.engineering$"
+
+  - job_name: concourse_node_exporter
+    ec2_sd_configs:
+      - region: eu-west-2
+        refresh_interval: 30s
+        port: 9100
+    relabel_configs:
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_tag_Team]
+        target_label: team
+
+  - job_name: concourse_web
+    ec2_sd_configs:
+      - region: eu-west-2
+        refresh_interval: 30s
+        port: 9391
+    relabel_configs:
+      - source_labels: [__meta_ec2_tag_Name]
+        regex: '^${deployment}-concourse-web$'
+        action: keep
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance

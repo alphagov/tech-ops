@@ -8,7 +8,10 @@ resource "aws_iam_role" "concourse_prometheus" {
       {
         "Action": "sts:AssumeRole",
         "Principal": {
-          "Service": "ec2.amazonaws.com"
+          "Service": [
+            "ec2.amazonaws.com",
+            "ecs-tasks.amazonaws.com"
+          ]
         },
         "Effect": "Allow"
       }
@@ -45,6 +48,14 @@ resource "aws_iam_policy" "concourse_prometheus" {
         "Effect" : "Allow",
         "Action" : "ec2:DescribeInstances",
         "Resource" : "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "${aws_cloudwatch_log_group.prometheus.arn}"
       }
     ]
   }

@@ -1,0 +1,49 @@
+[
+    {
+        "name": "prometheus",
+        "image": "prom/prometheus:v2.19.2",
+        "command": [],
+        "portMappings": [
+            {
+                "containerPort": 9090,
+                "hostPort": 9090,
+                "protocol": "tcp"
+            }
+        ],
+        "mountPoints": [
+            {
+                "sourceVolume": "${data_volume_name}",
+                "containerPath": "/opt/data",
+                "readOnly": false
+            },
+            {
+                "sourceVolume": "task",
+                "containerPath": "/task"
+            }
+        ],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "${log_group_name}",
+                "awslogs-region": "${log_group_region}",
+                "awslogs-stream-prefix": "prometheus"
+            }
+        },
+        "environment": [
+            {
+                "Name": "CONFIG_BASE64",
+                "Value": "${config_base64}"
+            },
+            {
+                "Name": "ENTRYPOINT_BASE64",
+                "Value": "${prometheus_entrypoint_base64}"
+            }
+        ],
+        "user": "root",
+        "entryPoint": [
+            "sh",
+            "-c",
+            "set -ueo pipefail; echo $ENTRYPOINT_BASE64 | base64 -d > /tmp/entrypoint.sh; chmod +x /tmp/entrypoint.sh; exec /tmp/entrypoint.sh"
+        ]
+    }
+]

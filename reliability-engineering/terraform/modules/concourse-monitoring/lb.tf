@@ -45,6 +45,35 @@ resource "aws_lb_listener" "concourse_monitoring_http" {
   }
 }
 
+resource "aws_lb_target_group" "concourse_prometheus_ecs" {
+  name        = "${var.deployment}-prometheus-ecs"
+  port        = 9090
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path = "/api/v1/status/config"
+  }
+}
+
+resource "aws_lb_listener_rule" "concourse_prometheus_ecs" {
+  listener_arn = aws_lb_listener.concourse_monitoring_https.arn
+  priority     = 99
+
+  action {
+    type = "forward"
+
+    target_group_arn = aws_lb_target_group.concourse_prometheus_ecs.arn
+  }
+
+  condition {
+    host_header {
+      values = ["prom.*"]
+    }
+  }
+}
+
 resource "aws_lb_target_group" "concourse_prometheus" {
   count = 2
 
