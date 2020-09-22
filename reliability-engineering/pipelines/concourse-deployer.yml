@@ -264,6 +264,9 @@ jobs:
       attempts: 10
       passed: [scale-in]
       trigger: true
+    - get: concourse-release
+      passed: [scale-in]
+      trigger: true
     - get: fly-yq
   - task: generate-roll-instances-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
@@ -302,6 +305,9 @@ jobs:
     - get: version
       attempts: 10
       params: {bump: minor}
+    - get: concourse-release
+      passed: [scale-in]
+      trigger: true
 
   # this is a simple check to ensure push to ecr works
   - put: ecr
@@ -362,6 +368,9 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops
+      passed: [test]
+      trigger: true
+    - get: concourse-release
       passed: [test]
       trigger: true
     - get: version
