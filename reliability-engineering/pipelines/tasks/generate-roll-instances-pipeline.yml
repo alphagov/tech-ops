@@ -21,6 +21,7 @@ run:
   - pipefail
   - -c
   - |
+    apk update && apk add jq
     mkdir -p roll-instances-pipeline
     export PATH="$PATH:/opt/resource"
     fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD -n $CONCOURSE_USERNAME
@@ -94,4 +95,4 @@ run:
           }
         ]
       }]
-    }' | yq --yaml-output . > roll-instances-pipeline/roll-instances.yml
+    }' > roll-instances-pipeline/roll-instances.json

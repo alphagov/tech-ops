@@ -21,6 +21,7 @@ run:
   - pipefail
   - -c
   - |
+    apk update && apk add jq
     mkdir -p deploy-info-pipelines-pipeline
     export PATH="$PATH:/opt/resource"
     fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD -n $CONCOURSE_USERNAME
@@ -58,4 +59,4 @@ run:
           }
         ]
       }]
-    }' | yq --yaml-output . > deploy-info-pipelines-pipeline/deploy-info-pipelines.yml
+    }' > deploy-info-pipelines-pipeline/deploy-info-pipelines.json
