@@ -3,7 +3,9 @@ image_resource:
   type: registry-image
   source:
     repository: concourse/concourse-pipeline-resource
-    tag: "6.0.0"
+    tag: dev
+  version:
+    digest: sha256:cd899511e06c3027dc8429f4b38ba8ea32a4c0bea044f4711899d5987abf8fdf
 inputs:
 - name: tech-ops-private
 outputs:
@@ -19,6 +21,7 @@ run:
   - pipefail
   - -c
   - |
+    apk update && apk add jq
     mkdir -p deploy-info-pipelines-pipeline
     export PATH="$PATH:/opt/resource"
     fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD -n $CONCOURSE_USERNAME
@@ -56,4 +59,4 @@ run:
           }
         ]
       }]
-    }' | yq --yaml-output . > deploy-info-pipelines-pipeline/deploy-info-pipelines.yml
+    }' > deploy-info-pipelines-pipeline/deploy-info-pipelines.json
