@@ -3,7 +3,9 @@ image_resource:
   type: registry-image
   source:
     repository: concourse/concourse-pipeline-resource
-    tag: "6.0.0"
+    tag: dev
+  version:
+    digest: sha256:cd899511e06c3027dc8429f4b38ba8ea32a4c0bea044f4711899d5987abf8fdf
 inputs:
 - name: tech-ops-private
 outputs:
