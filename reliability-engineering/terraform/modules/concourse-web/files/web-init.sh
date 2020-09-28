@@ -91,10 +91,10 @@ ExecStart=/usr/local/concourse/bin/concourse web \
   --external-url https://${concourse_external_url} \
   --peer-address $${local_ip}                      \
   \
-  --aws-ssm-region eu-west-2 \
-  --aws-ssm-pipeline-secret-template \
+  --aws-secretsmanager-region eu-west-2 \
+  --aws-secretsmanager-pipeline-secret-template \
     /${deployment}/concourse/pipelines/{{.Team}}/{{.Pipeline}}/{{.Secret}} \
-  --aws-ssm-team-secret-template \
+  --aws-secretsmanager-team-secret-template \
     /${deployment}/concourse/pipelines/{{.Team}}/{{.Secret}} \
   \
   --postgres-database concourse             \

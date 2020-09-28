@@ -33,6 +33,22 @@ resource "aws_iam_policy" "concourse_web" {
           "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.account.account_id}:parameter/${var.deployment}/concourse/pipelines/*"
         ]
       }, {
+        "Action": [
+          "secretsmanager:ListSecrets"
+        ],
+        "Effect": "Allow",
+        "Resource": "*"
+      }, {
+        "Action": [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ],
+        "Effect": "Allow",
+        "Resource": [
+          "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.account.account_id}:secret:/${var.deployment}/concourse/pipelines/*",
+          "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.account.account_id}:secret:__concourse-health-check-??????"
+        ]
+      }, {
         "Effect": "Allow",
         "Action": [
           "kms:ListKeys",
