@@ -1,9 +1,13 @@
+data "aws_iam_role" "lambda_execution" {
+  name = var.lambda_execution_role_name
+}
+
 resource "aws_lambda_function" "sts_creds_to_ssm" {
   filename         = "${path.module}/files/function.zip"
   source_code_hash = filebase64sha256("${path.module}/files/function.zip")
   function_name    = "${var.deployment}_sts_creds_to_ssm"
 
-  role        = aws_iam_role.concourse_sts_rotation_lambda_execution.arn
+  role        = data.aws_iam_role.lambda_execution.arn
   handler     = "lambda_function.lambda_handler"
   runtime     = "python3.7"
   timeout     = "240"
@@ -29,12 +33,12 @@ resource "aws_cloudwatch_event_target" "update_sts" {
   rule = aws_cloudwatch_event_rule.every_ten_minutes.name
   arn  = aws_lambda_function.sts_creds_to_ssm.arn
 
-  for_each = toset(var.team_names)
+  for_each = var.team_role_arns
 
   target_id = each.key
   input = jsonencode({
-    role_arn  = aws_iam_role.concourse_team[each.key].arn
     team_name = each.key
+    role_arn  = each.value
   })
 }
 
