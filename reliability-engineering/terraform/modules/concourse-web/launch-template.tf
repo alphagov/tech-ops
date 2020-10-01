@@ -21,7 +21,8 @@ data "template_file" "concourse_web_cloud_init" {
     concourse_version                   = var.concourse_version
     concourse_sha1                      = var.concourse_sha1
     concourse_web_bucket                = aws_s3_bucket.concourse_web.bucket
-    worker_keys_s3_object_key           = aws_s3_bucket_object.concourse_web_team_authorized_worker_keys.id
+    global_worker_keys_s3_object_key    = aws_s3_bucket_object.concourse_web_global_authorized_worker_keys.id
+    team_worker_keys_s3_object_key      = aws_s3_bucket_object.concourse_web_team_authorized_worker_keys.id
     concourse_web_syslog_log_group_name = local.concourse_web_syslog_log_group_name
   }
 }

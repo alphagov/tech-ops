@@ -49,3 +49,39 @@ ARP
 output "concourse_worker_iam_role_names" {
   value = zipmap(var.worker_team_names, aws_iam_role.concourse_workers.*.name)
 }
+
+resource "tls_private_key" "concourse_global_worker_ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+output "concourse_global_worker_ssh_public_key_openssh" {
+  value = tls_private_key.concourse_global_worker_ssh_key.public_key_openssh
+}
+
+output "concourse_global_worker_ssh_private_key_pem" {
+  value = tls_private_key.concourse_global_worker_ssh_key.private_key_pem
+}
+
+resource "aws_iam_role" "concourse_global_worker" {
+  name = "${var.deployment}-global-concourse-worker"
+
+  assume_role_policy = <<-ARP
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "ec2.amazonaws.com"
+        },
+        "Effect": "Allow"
+      }
+    ]
+  }
+ARP
+}
+
+output "concourse_global_worker_iam_role_name" {
+  value = aws_iam_role.concourse_global_worker.name
+}

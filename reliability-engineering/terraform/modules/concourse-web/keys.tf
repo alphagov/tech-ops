@@ -52,3 +52,10 @@ resource "aws_s3_bucket_object" "concourse_web_team_authorized_worker_keys" {
   content = jsonencode(var.worker_ssh_public_keys_openssh)
   etag    = md5(jsonencode(var.worker_ssh_public_keys_openssh))
 }
+
+resource "aws_s3_bucket_object" "concourse_web_global_authorized_worker_keys" {
+  bucket  = aws_s3_bucket.concourse_web.bucket
+  key     = "global_authorized_worker_keys"
+  content = var.global_worker_ssh_public_keys_openssh
+  etag    = md5(var.global_worker_ssh_public_keys_openssh)
+}

@@ -47,7 +47,13 @@ variable "worker_pool_egress_eips" {
 }
 
 variable "worker_ssh_public_keys_openssh" {
-  type = map(string)
+  type        = map(string)
+  description = "A map from team names to authorized_keys content for workers pinned to a specific team."
+}
+
+variable "global_worker_ssh_public_keys_openssh" {
+  type        = string
+  description = "The authorized_keys file for global workers (ie workers not pinned to a team)."
 }
 
 variable "web_ssh_private_key_pem" {

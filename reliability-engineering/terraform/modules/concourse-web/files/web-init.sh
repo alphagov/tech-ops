@@ -63,8 +63,10 @@ aws ssm get-parameter \
 
 local_ip="$(curl -sf http://169.254.169.254/latest/meta-data/local-ipv4)"
 
+aws s3 cp s3://${concourse_web_bucket}/${global_worker_keys_s3_object_key} /opt/concourse/keys/worker_authorized_keys
+
 team_keys="$(aws s3 cp \
-             s3://${concourse_web_bucket}/${worker_keys_s3_object_key} -)"
+             s3://${concourse_web_bucket}/${team_worker_keys_s3_object_key} -)"
 concourse_tsa_team_key_args=""
 for team_name in $(jq -r 'keys | join("\n")' <<< "$team_keys"); do
   team_key_file_path="/opt/concourse/keys/worker_$team_name"
@@ -83,7 +85,7 @@ After=network.target
 [Service]
 ExecStart=/usr/local/concourse/bin/concourse web \
   \
-  --tsa-authorized-keys /dev/null                       \
+  --tsa-authorized-keys /opt/concourse/keys/worker_authorized_keys  \
   $concourse_tsa_team_key_args                          \
   --tsa-host-key        /opt/concourse/keys/web_ssh     \
   --session-signing-key /opt/concourse/keys/web_session \
