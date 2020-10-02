@@ -27,12 +27,12 @@ mkdir -p /opt/concourse/keys
 mkdir -p /opt/concourse/worker
 
 aws ssm get-parameter \
-  --name /${deployment}/concourse/worker/${worker_team_name}/web_ssh_public_key \
+  --name /${deployment}/concourse/worker/global/web_ssh_public_key \
   --with-decryption \
 | jq -r .Parameter.Value > /opt/concourse/keys/web_pub_key
 
 aws ssm get-parameter \
-  --name /${deployment}/concourse/worker/${worker_team_name}/ssh_key \
+  --name /${deployment}/concourse/worker/global/ssh_key \
   --with-decryption \
 | jq -r .Parameter.Value > /opt/concourse/keys/ssh_key
 
@@ -47,8 +47,7 @@ ExecStart=/usr/local/concourse/bin/concourse worker \
   --tsa-host ${concourse_host}:2222 \
   --tsa-public-key /opt/concourse/keys/web_pub_key \
   --tsa-worker-private-key /opt/concourse/keys/ssh_key \
-  --ephemeral --baggageclaim-driver=overlay \
-  --team ${worker_team_name}
+  --ephemeral --baggageclaim-driver=overlay
 Environment=CONCOURSE_GARDEN_DNS_SERVER=169.254.169.253
 Type=simple
 RestartSec=3s
