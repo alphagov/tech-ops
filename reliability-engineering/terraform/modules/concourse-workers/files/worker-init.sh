@@ -49,6 +49,7 @@ ExecStart=/usr/local/concourse/bin/concourse worker \
   --tsa-worker-private-key /opt/concourse/keys/ssh_key \
   --ephemeral --baggageclaim-driver=overlay
 Environment=CONCOURSE_GARDEN_DNS_SERVER=169.254.169.253
+Environment=CONCOURSE_GARDEN_DENY_NETWORK=169.254.169.254/32
 Type=simple
 RestartSec=3s
 Restart=always
