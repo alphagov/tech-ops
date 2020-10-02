@@ -2,9 +2,19 @@ data "aws_iam_role" "lambda_execution" {
   name = var.lambda_execution_role_name
 }
 
+data "archive_file" "sts_lambda_function_py" {
+  type        = "zip"
+  output_path = "${path.module}/files/lambda_rotate_sts.zip"
+
+  source {
+    content  = file("${path.module}/files/lambda_rotate_sts.py")
+    filename = "lambda_function.py"
+  }
+}
+
 resource "aws_lambda_function" "sts_creds_to_ssm" {
-  filename         = "${path.module}/files/function.zip"
-  source_code_hash = filebase64sha256("${path.module}/files/function.zip")
+  filename         = data.archive_file.sts_lambda_function_py.output_path
+  source_code_hash = data.archive_file.sts_lambda_function_py.output_base64sha256
   function_name    = "${var.deployment}_sts_creds_to_ssm"
 
   role        = data.aws_iam_role.lambda_execution.arn
