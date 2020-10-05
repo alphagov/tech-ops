@@ -2,6 +2,11 @@ variable "deployment" {
   type = string
 }
 
+variable "lambda_execution_role_arn" {
+  type        = string
+  description = "The ARN of an IAM Role to act as execution role for the Lambda that rotates team credentials.  It needs to be trusted to assume the various team roles."
+}
+
 variable "lambda_execution_role_name" {
   type        = string
   description = "The name of an IAM Role to act as execution role for the Lambda that rotates team credentials.  It needs to be trusted to assume the various team roles."

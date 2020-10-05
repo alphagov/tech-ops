@@ -16,6 +16,10 @@ resource "aws_iam_role" "concourse_sts_rotation_lambda_execution" {
 ARP
 }
 
+output "concourse_sts_rotation_lambda_role_arn" {
+  value = aws_iam_role.concourse_sts_rotation_lambda_execution.arn
+}
+
 output "concourse_sts_rotation_lambda_role_name" {
   value = aws_iam_role.concourse_sts_rotation_lambda_execution.name
 }

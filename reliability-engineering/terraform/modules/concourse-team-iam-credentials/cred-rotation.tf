@@ -1,7 +1,3 @@
-data "aws_iam_role" "lambda_execution" {
-  name = var.lambda_execution_role_name
-}
-
 data "archive_file" "sts_lambda_function_py" {
   type        = "zip"
   output_path = "${path.module}/files/lambda_rotate_sts.zip"
@@ -17,7 +13,7 @@ resource "aws_lambda_function" "sts_creds_to_ssm" {
   source_code_hash = data.archive_file.sts_lambda_function_py.output_base64sha256
   function_name    = "${var.deployment}_sts_creds_to_ssm"
 
-  role        = data.aws_iam_role.lambda_execution.arn
+  role        = var.lambda_execution_role_arn
   handler     = "lambda_function.lambda_handler"
   runtime     = "python3.7"
   timeout     = "240"
