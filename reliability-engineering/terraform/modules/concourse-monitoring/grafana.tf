@@ -147,6 +147,7 @@ locals {
   grafana_dashboards = [
     "alerts",
     "concourse",
+    "concourse-internal",
     "grafana-metrics",
     "metrics-by-team"
   ]
