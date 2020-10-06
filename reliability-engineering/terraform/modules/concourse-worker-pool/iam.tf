@@ -156,9 +156,36 @@ resource "aws_iam_policy" "concourse_worker_base" {
 POLICY
 }
 
+resource "aws_iam_policy" "restrict_ips" {
+  name = "${var.deployment}-${var.name}-restrict-ips"
+
+  policy = <<-POLICY
+  {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Deny",
+         "Resource": "*",
+         "Action": "*",
+         "Condition": {
+           "NotIpAddress": {
+             "aws:SourceIp": ${jsonencode(var.egress_ips)}
+           }
+         }
+       }
+     ]
+  }
+POLICY
+}
+
 resource "aws_iam_role_policy_attachment" "concourse_worker_concourse_worker_base" {
   role       = var.worker_iam_role_name
   policy_arn = aws_iam_policy.concourse_worker_base.arn
+}
+
+resource "aws_iam_role_policy_attachment" "concourse_worker_ip_restriction" {
+  role       = var.worker_iam_role_name
+  policy_arn = aws_iam_policy.restrict_ips.arn
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_worker_additional" {
