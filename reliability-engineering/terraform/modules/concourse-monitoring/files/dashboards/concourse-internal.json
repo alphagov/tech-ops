@@ -479,10 +479,10 @@
         "allValue": "",
         "current": {
           "selected": true,
-          "text": "cd-smoke-test",
-          "value": "cd-smoke-test"
+          "text": "All",
+          "value": "$__all"
         },
-        "datasource": "Prometheus",
+        "datasource": "Prometheus 1",
         "definition": "concourse_builds_duration_seconds_bucket",
         "hide": 0,
         "includeAll": true,
@@ -505,10 +505,10 @@
         "allValue": "",
         "current": {
           "selected": true,
-          "text": "build",
-          "value": "build"
+          "text": "All",
+          "value": "$__all"
         },
-        "datasource": "Prometheus",
+        "datasource": "Prometheus 1",
         "definition": "concourse_builds_duration_seconds_bucket { pipeline=~\"$pipeline\" }",
         "hide": 0,
         "includeAll": true,
@@ -530,8 +530,8 @@
     ]
   },
   "time": {
-    "from": "2020-09-27T03:00:00.000Z",
-    "to": "2020-09-27T05:00:00.000Z"
+    "from": "now-1h",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
