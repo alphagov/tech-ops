@@ -4,6 +4,7 @@ resource "aws_lb" "concourse_web" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.concourse_lb.id]
   subnets            = var.public_subnet_ids
+  idle_timeout       = 150
 
   tags = {
     Name       = "${var.deployment}-concourse-web"
