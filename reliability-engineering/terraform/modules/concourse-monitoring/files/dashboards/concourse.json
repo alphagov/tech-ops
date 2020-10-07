@@ -480,7 +480,7 @@
         {
           "alias": "$tag_state",
           "dsType": "influxdb",
-          "expr": "sum(concourse_workers_registered) by(state)",
+          "expr": "max(concourse_workers_registered) by(state)",
           "format": "time_series",
           "groupBy": [
             {
