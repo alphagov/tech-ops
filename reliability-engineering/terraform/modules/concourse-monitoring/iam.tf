@@ -116,3 +116,79 @@ resource "aws_iam_role_policy_attachment" "concourse_grafana_execution_concourse
   role       = aws_iam_role.concourse_grafana_execution.name
   policy_arn = aws_iam_policy.concourse_grafana_execution.arn
 }
+
+resource "aws_iam_role" "concourse_grafana_task" {
+  name = "${var.deployment}-concourse-grafana-task"
+
+  assume_role_policy = <<-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "ecs-tasks.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  }
+EOF
+}
+
+resource "aws_iam_policy" "concourse_grafana_task" {
+  name = "${var.deployment}-concourse-grafana-task"
+
+  # policy pulled verbatim from
+  # https://grafana.com/docs/grafana/latest/features/datasources/cloudwatch/
+  policy = <<-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AllowReadingMetricsFromCloudWatch",
+        "Effect": "Allow",
+        "Action": [
+          "cloudwatch:DescribeAlarmsForMetric",
+          "cloudwatch:DescribeAlarmHistory",
+          "cloudwatch:DescribeAlarms",
+          "cloudwatch:ListMetrics",
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:GetMetricData"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "AllowReadingLogsFromCloudWatch",
+        "Effect": "Allow",
+        "Action": [
+          "logs:DescribeLogGroups",
+          "logs:GetLogGroupFields",
+          "logs:StartQuery",
+          "logs:StopQuery",
+          "logs:GetQueryResults",
+          "logs:GetLogEvents"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "AllowReadingTagsInstancesRegionsFromEC2",
+        "Effect": "Allow",
+        "Action": ["ec2:DescribeTags", "ec2:DescribeInstances", "ec2:DescribeRegions"],
+        "Resource": "*"
+      },
+      {
+        "Sid": "AllowReadingResourcesForTags",
+        "Effect": "Allow",
+        "Action": "tag:GetResources",
+        "Resource": "*"
+      }
+    ]
+  }
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "concourse_grafana_task_concourse_grafana_task" {
+  role       = aws_iam_role.concourse_grafana_task.name
+  policy_arn = aws_iam_policy.concourse_grafana_task.arn
+}

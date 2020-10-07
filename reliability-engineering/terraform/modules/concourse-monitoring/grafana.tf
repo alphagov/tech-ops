@@ -70,6 +70,7 @@ resource "aws_ecs_task_definition" "concourse_grafana_task_def" {
   family                   = "${var.deployment}-concourse-grafana"
   container_definitions    = data.template_file.concourse_grafana_container_def.rendered
   execution_role_arn       = aws_iam_role.concourse_grafana_execution.arn
+  task_role_arn            = aws_iam_role.concourse_grafana_task.arn
   network_mode             = "awsvpc"
   cpu                      = 2048
   memory                   = 4096
@@ -141,6 +142,17 @@ resource "grafana_data_source" "prom_data_source" {
   type       = "prometheus"
   name       = "Prometheus ${count.index + 1}"
   url        = "http://prom-${count.index + 1}.${data.aws_route53_zone.private_root.name}:9090"
+}
+
+resource "grafana_data_source" "cloudwatch" {
+  type = "cloudwatch"
+  name = "CloudWatch"
+
+  json_data {
+    auth_type      = "credentials"
+    default_region = "eu-west-2"
+  }
+
 }
 
 locals {
