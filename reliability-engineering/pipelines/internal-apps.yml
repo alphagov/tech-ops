@@ -41,7 +41,19 @@ resources:
       organization: gds-tech-ops
       space: docs
 
+  - name: tech-ops
+    type: git
+    source:
+      uri: https://github.com/alphagov/tech-ops.git
 jobs:
+  - name: self-update
+    serial: true
+    plan:
+    - get: tech-ops
+      trigger: true
+    - set_pipeline: internal-apps
+      file: tech-ops/reliability-engineering/pipelines/internal-apps.yml
+
   - name: build-re-team-manual
     public: true
     serial: true
