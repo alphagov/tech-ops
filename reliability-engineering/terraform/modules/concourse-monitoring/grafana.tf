@@ -41,7 +41,7 @@ resource "aws_db_instance" "concourse_grafana_db" {
   allocated_storage         = 25
   storage_type              = "gp2"
   engine                    = "postgres"
-  engine_version            = "10.10"
+  engine_version            = "10.13"
   instance_class            = "db.t2.small"
   name                      = "grafana"
   username                  = "grafana"
