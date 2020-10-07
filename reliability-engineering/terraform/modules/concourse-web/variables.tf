@@ -94,6 +94,10 @@ variable "db_storage_gb" {
   default = 100
 }
 
+variable "db_performance_insights_enabled" {
+  default = false
+}
+
 variable "concourse_version" {
   type = string
 }

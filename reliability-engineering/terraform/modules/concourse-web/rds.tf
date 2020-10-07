@@ -14,20 +14,21 @@ resource "aws_db_subnet_group" "concourse" {
 }
 
 resource "aws_db_instance" "concourse" {
-  identifier                = "${var.deployment}-concourse"
-  name                      = "concourse"
-  username                  = "concourse"
-  password                  = random_string.concourse_db_password.result
-  db_subnet_group_name      = aws_db_subnet_group.concourse.name
-  allocated_storage         = var.db_storage_gb
-  storage_type              = "gp2"
-  engine                    = "postgres"
-  engine_version            = "10.10"
-  instance_class            = var.db_instance_type
-  final_snapshot_identifier = "${var.deployment}-concourse-final"
-  storage_encrypted         = true
-  vpc_security_group_ids    = [aws_security_group.concourse_db.id]
-  ca_cert_identifier        = "rds-ca-2019"
+  identifier                   = "${var.deployment}-concourse"
+  name                         = "concourse"
+  username                     = "concourse"
+  password                     = random_string.concourse_db_password.result
+  db_subnet_group_name         = aws_db_subnet_group.concourse.name
+  allocated_storage            = var.db_storage_gb
+  storage_type                 = "gp2"
+  engine                       = "postgres"
+  engine_version               = "10.10"
+  instance_class               = var.db_instance_type
+  final_snapshot_identifier    = "${var.deployment}-concourse-final"
+  storage_encrypted            = true
+  vpc_security_group_ids       = [aws_security_group.concourse_db.id]
+  ca_cert_identifier           = "rds-ca-2019"
+  performance_insights_enabled = var.db_performance_insights_enabled
 
   tags = {
     Name       = "${var.deployment}-concourse"
