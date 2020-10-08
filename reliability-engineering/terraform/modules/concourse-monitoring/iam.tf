@@ -110,15 +110,10 @@ resource "aws_iam_policy" "concourse_grafana_execution" {
         "Effect": "Allow",
         "Action": [
           "logs:CreateLogStream",
-          "logs:CreateLogGroup"
-        ],
-        "Resource": "arn:aws:logs:eu-west-2:${data.aws_caller_identity.account.account_id}:log-group:/${var.deployment}/grafana"
-      }, {
-        "Effect": "Allow",
-        "Action": [
+          "logs:CreateLogGroup",
           "logs:PutLogEvents"
         ],
-        "Resource": "arn:aws:logs:eu-west-2:${data.aws_caller_identity.account.account_id}:log-group:/${var.deployment}/grafana:log-stream:*"
+        "Resource": "*"
       }
     ]
   }
