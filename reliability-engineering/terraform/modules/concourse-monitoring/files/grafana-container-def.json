@@ -65,6 +65,15 @@
         "name": "GF_SECURITY_ADMIN_PASSWORD",
         "valueFrom": "arn:aws:ssm:eu-west-2:${aws_account_id}:parameter/${deployment}/grafana/grafana-admin-password"
       }
-    ]
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/${deployment}/grafana",
+        "awslogs-region": "eu-west-2",
+        "awslogs-stream-prefix": "grafana",
+        "awslogs-create-group": "true"
+      }
+    }
   }
 ]
