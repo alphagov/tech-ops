@@ -97,6 +97,7 @@ resources:
       metadata: ''
 - name: concourse-release
   type: github-release
+  check_every: 30m
   source:
     owner: concourse
     repository: concourse
