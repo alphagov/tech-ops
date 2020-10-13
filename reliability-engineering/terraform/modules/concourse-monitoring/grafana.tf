@@ -160,6 +160,7 @@ locals {
     "alerts",
     "concourse",
     "concourse-internal",
+    "concourse-slo",
     "grafana-metrics",
     "metrics-by-team"
   ]
