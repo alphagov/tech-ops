@@ -16,6 +16,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
+  "id": 21,
   "links": [],
   "panels": [
     {
@@ -73,21 +74,19 @@
           "calcs": [
             "mean"
           ],
-          "fields": "/^errorRatio$/",
+          "fields": "",
           "values": false
         }
       },
       "pluginVersion": "7.0.5",
       "targets": [
         {
-          "alias": "",
+          "alias": "ok",
           "apiMode": "Metrics",
-          "dimensions": {
-            "LoadBalancer": "app/cd-concourse-web/ba5029fcd9b9cde2"
-          },
-          "expression": "",
+          "dimensions": {},
+          "expression": "SUM(SEARCH(' {AWS/ApplicationELB,LoadBalancer} ${deployment}-concourse-web  2XX', 'Sum', 300))",
           "hide": true,
-          "id": "status5xx",
+          "id": "status2xx",
           "matchExact": true,
           "metricName": "HTTPCode_ELB_5XX_Count",
           "namespace": "AWS/ApplicationELB",
@@ -99,68 +98,32 @@
           ]
         },
         {
-          "alias": "",
-          "dimensions": {
-            "LoadBalancer": "app/cd-concourse-web/ba5029fcd9b9cde2"
-          },
-          "expression": "",
+          "alias": "err",
+          "apiMode": "Metrics",
+          "dimensions": {},
+          "expression": "SUM(SEARCH(' {AWS/ApplicationELB,LoadBalancer} ${deployment}-concourse-web  5XX', 'Sum', 300))",
           "hide": true,
-          "id": "status4xx",
+          "id": "status5xx",
           "matchExact": true,
-          "metricName": "HTTPCode_ELB_4XX_Count",
+          "metricName": "HTTPCode_ELB_5XX_Count",
           "namespace": "AWS/ApplicationELB",
           "period": "300",
           "refId": "B",
-          "region": "default",
+          "region": "eu-west-2",
           "statistics": [
             "Sum"
           ]
         },
         {
-          "alias": "",
-          "dimensions": {
-            "LoadBalancer": "app/cd-concourse-web/ba5029fcd9b9cde2"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "status2xx",
-          "matchExact": true,
-          "metricName": "HTTPCode_Target_2XX_Count",
-          "namespace": "AWS/ApplicationELB",
-          "period": "300",
-          "refId": "F",
-          "region": "default",
-          "statistics": [
-            "Sum"
-          ]
-        },
-        {
-          "alias": "",
-          "dimensions": {
-            "LoadBalancer": "app/cd-concourse-web/ba5029fcd9b9cde2"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "status3xx",
-          "matchExact": true,
-          "metricName": "HTTPCode_ELB_3XX_Count",
-          "namespace": "AWS/ApplicationELB",
-          "period": "300",
-          "refId": "G",
-          "region": "default",
-          "statistics": [
-            "Sum"
-          ]
-        },
-        {
-          "alias": "",
+          "alias": "availability",
           "dimensions": {},
-          "expression": "1 - status5xx / (status2xx+status3xx+status4xx+status5xx)",
+          "expression": "1 - status5xx / (status5xx + status2xx)",
+          "hide": false,
           "id": "errorRatio",
           "matchExact": true,
           "metricName": "",
           "namespace": "",
-          "period": "300",
+          "period": "",
           "refId": "C",
           "region": "default",
           "statistics": [
@@ -193,6 +156,7 @@
       "timeFrom": null,
       "timeShift": null,
       "title": "",
+      "transparent": true,
       "type": "text"
     },
     {
@@ -258,7 +222,7 @@
       "pluginVersion": "7.0.5",
       "targets": [
         {
-          "expr": "sum(rate(concourse_http_responses_duration_seconds_bucket{le=\"0.25\"}[5m]))\n/\nsum(rate(concourse_http_responses_duration_seconds_count[5m]))\n\n",
+          "expr": "sum(rate(concourse_http_responses_duration_seconds_bucket{le=\"0.25\",status!=\"500\"}[5m]))\n/\nsum(rate(concourse_http_responses_duration_seconds_count[5m]))\n\n",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -289,6 +253,7 @@
       "timeFrom": null,
       "timeShift": null,
       "title": "",
+      "transparent": true,
       "type": "text"
     },
     {
@@ -383,6 +348,7 @@
       "timeFrom": null,
       "timeShift": null,
       "title": "",
+      "transparent": true,
       "type": "text"
     }
   ],
@@ -412,6 +378,6 @@
   },
   "timezone": "",
   "title": "Service Level Objectives",
-  "uid": "conc-slo",
-  "version": 1
+  "uid": "G15tIa5Gk",
+  "version": 4
 }
