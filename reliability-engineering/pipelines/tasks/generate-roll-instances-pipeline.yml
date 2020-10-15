@@ -28,7 +28,7 @@ run:
     fly -t concourse sync
     jq -s '.[0] * .[1]' \
       <(fly -t concourse teams --json \
-        | jq '[.[] | {team: .name, workers: 1}]' \
+        | jq "[.[] | {team: .name, workers: 1, deployment: \"${DEPLOYMENT_NAME}\"}]" \
         | jq 'map( {(.team): .} ) | add' \
       ) \
       <(fly -t concourse workers --json \
@@ -82,13 +82,14 @@ run:
               "platform": "linux",
               "params": {
                 "TEAM": .team,
+                "DEPLOYMENT_NAME": .deployment,
                 "MINIMUM_HEALTHY": (if (100 / .workers) == 100 then 0 else (100 / .workers) end)
               },
               "run": {
                 "path": "sh",
                 "args": [
                   "-c",
-                  "set -ue; AWS_REGION=eu-west-2 awsc autoscaling migrate cd-$TEAM-concourse-worker -m $MINIMUM_HEALTHY"
+                  "set -ue; AWS_REGION=eu-west-2 awsc autoscaling migrate $DEPLOYMENT_NAME-$TEAM-concourse-worker -m $MINIMUM_HEALTHY"
                 ]
               }
             }
