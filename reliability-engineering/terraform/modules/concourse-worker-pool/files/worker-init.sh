@@ -4,6 +4,7 @@ set -ueo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update --yes
+apt-get upgrade --yes
 
 export AWS_REGION=eu-west-2
 export AWS_DEFAULT_REGION=eu-west-2
