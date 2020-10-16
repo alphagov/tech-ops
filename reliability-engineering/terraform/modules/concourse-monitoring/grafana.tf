@@ -156,16 +156,30 @@ resource "grafana_data_source" "cloudwatch" {
 }
 
 locals {
-  grafana_dashboards = [
+  grafana_dashboards = toset([
     "alerts",
     "concourse",
     "concourse-internal",
+    "concourse-slo",
     "grafana-metrics",
     "metrics-by-team"
-  ]
+  ])
 }
+
+data "template_file" "grafana_dashboards" {
+  for_each = local.grafana_dashboards
+  template = file("${path.module}/files/dashboards/${each.key}.json")
+
+  vars = {
+    deployment = var.deployment
+  }
+}
+
 resource "grafana_dashboard" "metrics" {
-  for_each    = toset(local.grafana_dashboards)
-  config_json = file("${path.module}/files/dashboards/${each.key}.json")
-  depends_on  = [grafana_data_source.prom_data_source[0]]
+  for_each    = local.grafana_dashboards
+  config_json = template_file.grafana_dashboards[each.key].rendered
+  depends_on = [
+    grafana_data_source.prom_data_source[0],
+    grafana_data_source.cloudwatch,
+  ]
 }
