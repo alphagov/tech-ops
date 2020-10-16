@@ -166,18 +166,11 @@ locals {
   ])
 }
 
-data "template_file" "grafana_dashboards" {
-  for_each = local.grafana_dashboards
-  template = file("${path.module}/files/dashboards/${each.key}.json")
-
-  vars = {
-    deployment = var.deployment
-  }
-}
-
 resource "grafana_dashboard" "metrics" {
-  for_each    = local.grafana_dashboards
-  config_json = template_file.grafana_dashboards[each.key].rendered
+  for_each = local.grafana_dashboards
+  config_json = templatefile("${path.module}/files/dashboards/${each.key}.json", {
+    deployment = var.deployment
+  })
   depends_on = [
     grafana_data_source.prom_data_source[0],
     grafana_data_source.cloudwatch,
