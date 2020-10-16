@@ -223,7 +223,7 @@
       "targets": [
         {
           "expr": "sum(rate(concourse_http_responses_duration_seconds_bucket{le=\"0.25\",status!=\"500\"}[5m]))\n/\nsum(rate(concourse_http_responses_duration_seconds_count[5m]))\n\n",
-          "interval": "",
+          "interval": "5m",
           "legendFormat": "",
           "refId": "A"
         }
