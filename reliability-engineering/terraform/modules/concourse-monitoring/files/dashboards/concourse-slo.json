@@ -318,7 +318,7 @@
       "targets": [
         {
           "expr": " 1 - sum(increase(concourse_builds_finished{status=\"errored\"}[5m])) / sum(increase(concourse_builds_finished[5m]))",
-          "interval": "",
+          "interval": "5m",
           "legendFormat": "",
           "refId": "A"
         }
