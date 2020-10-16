@@ -16,7 +16,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 21,
   "links": [],
   "panels": [
     {
@@ -378,6 +377,6 @@
   },
   "timezone": "",
   "title": "Service Level Objectives",
-  "uid": "G15tIa5Gk",
+  "uid": "concourse-slos",
   "version": 4
 }
