@@ -15,7 +15,7 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/gds-way.git
-      branch: master
+      branch: main
 
   - name: re-request-an-aws-account-git
     type: git
