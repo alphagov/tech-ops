@@ -147,11 +147,9 @@ EOF
 
 systemctl daemon-reload
 systemctl enable concourse-web
-systemctl start  concourse-web
 
 apt-get install --yes prometheus-node-exporter
 systemctl enable prometheus-node-exporter
-systemctl start prometheus-node-exporter
 
 ## install cloudwatch log agent
 curl -o /root/amazon-cloudwatch-agent.deb https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
@@ -184,4 +182,5 @@ EOF
 
 # start cloudwatch log agent
 systemctl enable amazon-cloudwatch-agent.service
-service amazon-cloudwatch-agent start
+
+reboot

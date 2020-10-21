@@ -109,15 +109,15 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable --now concourse-worker
-systemctl enable --now check-spot-interruption
+systemctl enable concourse-worker
+systemctl enable check-spot-interruption
 
 # this enables the workers to talk to the internet
 # see concourse/concourse #1667 and #2482
 iptables -P FORWARD ACCEPT
 
 apt-get install --yes prometheus-node-exporter
-systemctl enable --now prometheus-node-exporter
+systemctl enable prometheus-node-exporter
 
 ## install cloudwatch log agent
 curl -o /root/amazon-cloudwatch-agent.deb https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
@@ -150,4 +150,5 @@ EOF
 
 # start cloudwatch log agent
 systemctl enable amazon-cloudwatch-agent.service
-service amazon-cloudwatch-agent start
+
+reboot

@@ -105,5 +105,6 @@ if [ -d $promvar ]; then
 fi
 
 systemctl daemon-reload
-systemctl enable  prometheus
-systemctl restart prometheus
+systemctl enable prometheus
+
+reboot
