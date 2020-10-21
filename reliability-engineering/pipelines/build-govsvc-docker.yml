@@ -71,6 +71,31 @@ resources:
     paths:
     - reliability-engineering/dockerfiles/govsvc/awsc
 
+- name: ubuntu
+  type: docker-image
+  source:
+    repository: ubuntu
+
+- name: terraform
+  type: docker-image
+  source:
+    repository: hashicorp/terraform
+
+- name: govsvc-aws-terraform
+  type: docker-image
+  source:
+    username: ((dockerhub-username))
+    password: ((dockerhub-password))
+    repository: govsvc/aws-terraform
+
+- name: govsvc-aws-terraform-git
+  type: git
+  source:
+    uri: https://github.com/alphagov/tech-ops.git
+    branch: master
+    paths:
+    - reliability-engineering/dockerfiles/govsvc/aws-terraform
+
 jobs:
 - name: selfupdate
   serial: true
@@ -95,6 +120,52 @@ jobs:
       tag_file: ruby-2.6.1/tag
       tag_as_latest: true
     get_params: {skip_download: true}
+
+- name: build-govsvc-aws-terraform
+  serial: true
+  plan:
+  - in_parallel:
+    - get: govsvc-aws-terraform-git
+      trigger: true
+    - get: terraform
+      trigger: true
+      params: {save: true}
+    - get: ubuntu
+      params: {save: true}
+  - task: generate-version-args
+    image: terraform
+    config:
+      platform: linux
+      inputs:
+      - name: ubuntu
+      - name: terraform
+      outputs:
+      - name: versions
+      run:
+        path: ash
+        args:
+        - -eu
+        - -c
+        - |
+          mkdir -p versions
+          terraform version | head -n1 | cut -d' ' -f2 | cut -d'v' -f2 > versions/terraform_version
+          cat <<EOF > versions/args
+          {
+            "ubuntu_digest": "$(cat ubuntu/digest)",
+            "terraform_digest": "$(cat terraform/digest)",
+            "terraform_version": "$(cat versions/terraform_version)"
+          }
+          EOF
+          cat versions/*
+  - put: govsvc-aws-terraform
+    params:
+      build: govsvc-aws-terraform-git/reliability-engineering/dockerfiles/govsvc/aws-terraform
+      load_bases: [ ubuntu, terraform ]
+      tag_file: versions/terraform_version
+      tag_as_latest: true
+      build_args_file: versions/args
+    get_params: {skip_download: true}
+
 - name: build-govsvc-octodns
   serial: true
   plan:
