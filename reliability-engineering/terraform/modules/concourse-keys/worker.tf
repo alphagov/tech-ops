@@ -40,6 +40,12 @@ resource "aws_iam_role" "concourse_workers" {
           "Service": "ec2.amazonaws.com"
         },
         "Effect": "Allow"
+      }, {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "AWS": "${aws_iam_role.concourse_sts_rotation_lambda_execution.arn}"
+        },
+        "Effect": "Allow"
       }
     ]
   }
@@ -48,4 +54,8 @@ ARP
 
 output "concourse_worker_iam_role_names" {
   value = zipmap(var.worker_team_names, aws_iam_role.concourse_workers.*.name)
+}
+
+output "concourse_worker_iam_role_arns" {
+  value = zipmap(var.worker_team_names, aws_iam_role.concourse_workers.*.arn)
 }

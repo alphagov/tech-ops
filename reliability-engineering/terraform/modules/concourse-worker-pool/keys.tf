@@ -14,7 +14,7 @@ resource "aws_ssm_parameter" "concourse_worker_web_ssh_public_key" {
   name = "/${var.deployment}/concourse/worker/${var.name}/web_ssh_public_key"
 
   type        = "SecureString"
-  description = "Concourse worker ssh private key"
+  description = "Concourse worker ssh public key"
   key_id      = var.kms_key_id
   value       = var.web_ssh_public_key_openssh
 
