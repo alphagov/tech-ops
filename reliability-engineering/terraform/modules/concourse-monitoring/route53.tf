@@ -19,6 +19,18 @@ resource "aws_route53_record" "concourse_public_prometheis" {
   }
 }
 
+resource "aws_route53_record" "concourse_public_prometheus" {
+  zone_id = data.aws_route53_zone.public_root.zone_id
+  name    = "prom.${local.monitoring_domain}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.concourse_monitoring.dns_name
+    zone_id                = aws_lb.concourse_monitoring.zone_id
+    evaluate_target_health = false
+  }
+}
+
 resource "aws_route53_record" "concourse_public_grafana" {
   zone_id = data.aws_route53_zone.public_root.zone_id
   name    = "grafana.${local.monitoring_domain}"
