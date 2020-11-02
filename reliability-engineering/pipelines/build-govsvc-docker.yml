@@ -6,6 +6,13 @@ resources:
     password: ((dockerhub-password))
     repository: govsvc/aws-ruby
 
+- name: github-aws-ruby
+  type: docker-image
+  source:
+    username: ((github-packages-username))
+    password: ((github-packages-token))
+    repository: ghcr.io/alphagov/aws-ruby
+
 - name: ruby-2.6.1
   type: docker-image
   source:
@@ -42,6 +49,13 @@ resources:
     password: ((dockerhub-password))
     repository: govsvc/octodns
 
+- name: github-octodns
+  type: docker-image
+  source:
+    username: ((github-packages-username))
+    password: ((github-packages-token))
+    repository: ghcr.io/alphagov/octodns
+
 - name: govsvc-octodns-git
   type: git
   source:
@@ -62,6 +76,13 @@ resources:
     username: ((dockerhub-username))
     password: ((dockerhub-password))
     repository: govsvc/awsc
+
+- name: github-awsc
+  type: docker-image
+  source:
+    username: ((github-packages-username))
+    password: ((github-packages-token))
+    repository: ghcr.io/alphagov/awsc
 
 - name: govsvc-awsc-git
   type: git
@@ -87,6 +108,13 @@ resources:
     username: ((dockerhub-username))
     password: ((dockerhub-password))
     repository: govsvc/aws-terraform
+
+- name: github-aws-terraform
+  type: docker-image
+  source:
+    username: ((github-packages-username))
+    password: ((github-packages-token))
+    repository: ghcr.io/alphagov/aws-terraform
 
 - name: govsvc-aws-terraform-git
   type: git
@@ -114,11 +142,14 @@ jobs:
       trigger: true
       params: {save: true}
   - put: govsvc-aws-ruby
-    params:
+    params: &aws-ruby-params
       build: govsvc-aws-ruby-git/reliability-engineering/dockerfiles/govsvc/aws-ruby
       load_bases: [ ruby-2.6.1 ]
       tag_file: ruby-2.6.1/tag
       tag_as_latest: true
+    get_params: {skip_download: true}
+  - put: github-aws-ruby
+    params: *aws-ruby-params
     get_params: {skip_download: true}
 
 - name: build-govsvc-aws-terraform
@@ -158,12 +189,15 @@ jobs:
           EOF
           cat versions/*
   - put: govsvc-aws-terraform
-    params:
+    params: &aws-terraform-params
       build: govsvc-aws-terraform-git/reliability-engineering/dockerfiles/govsvc/aws-terraform
       load_bases: [ ubuntu, terraform ]
       tag_file: versions/terraform_version
       tag_as_latest: true
       build_args_file: versions/args
+    get_params: {skip_download: true}
+  - put: github-aws-terraform
+    params: *aws-terraform-params
     get_params: {skip_download: true}
 
 - name: build-govsvc-octodns
@@ -176,10 +210,14 @@ jobs:
       trigger: true
       params: {save: true}
   - put: govsvc-octodns
-    params:
+    params: &octodns-params
       build: govsvc-octodns-git/reliability-engineering/dockerfiles/govsvc/octodns
       load_bases: [ awscli ]
     get_params: {skip_download: true}
+  - put: github-octodns
+    params: *octodns-params
+    get_params: {skip_download: true}
+
 - name: build-govsvc-awsc
   serial: true
   plan:
@@ -190,7 +228,10 @@ jobs:
       trigger: true
       params: {save: true}
   - put: govsvc-awsc-image
-    params:
+    params: &awsc-params
       build: govsvc-awsc-git/reliability-engineering/dockerfiles/govsvc/awsc
       load_bases: [ golang-1.12-image ]
+    get_params: {skip_download: true}
+  - put: github-awsc
+    params: *awsc-params
     get_params: {skip_download: true}
