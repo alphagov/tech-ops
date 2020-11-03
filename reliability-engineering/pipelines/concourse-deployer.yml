@@ -158,7 +158,7 @@ jobs:
       var_files:
       - concourse-provider-config/version.tfvars
 
-- name: scale-out
+- name: refresh-instances
   serial: true
   serial_groups: [deploy]
   plan:
@@ -177,83 +177,29 @@ jobs:
       params:
         globs:
         - concourse-*-linux-amd64.tgz.sha1
-  - task: configure-providers
-    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
-    params:
-      DEPLOYMENT_NAME: ((deployment_name))
-  - task: get-current-workers
-    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml
-    params:
-      DEPLOYMENT_NAME: ((deployment_name))
-  - do:
-    - in_parallel:
-      - task: scale-out-web-node-asg
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
-        params:
-          ASG_PREFIX: ((deployment_name))-concourse-web
-      - task: scale-out-main-team-workers-asg
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
-        params:
-          ASG_PREFIX: ((deployment_name))-main-concourse-worker
-    - task: land-old-workers
-      file: tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
-      params:
-        DEPLOYMENT_NAME: ((deployment_name))
-    on_failure:
-      put: infra # try to scale back in on failure to stay in sync
-      attempts: 10
-      params:
-        terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
-        override_files:
-        - concourse-provider-config/provider_concourse_override.tf.json
-        var_files:
-        - concourse-provider-config/version.tfvars
-
-- name: scale-in
-  serial: true
-  serial_groups: [deploy]
-  plan:
   - in_parallel:
-    - get: tech-ops-private
-      passed: [scale-out]
-      trigger: true
-    - get: tech-ops
-      passed: [scale-out]
-      trigger: true
-    - get: infra
-      passed: [scale-out]
-    - get: concourse-release
-      passed: [scale-out]
-      trigger: true
+    - task: refresh-web-node-asg
+      file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
       params:
-        globs:
-        - concourse-*-linux-amd64.tgz.sha1
-  - task: configure-providers
-    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
-    params:
-      DEPLOYMENT_NAME: ((deployment_name))
-  - put: infra
-    attempts: 10
-    params:
-      terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
-      override_files:
-      - concourse-provider-config/provider_concourse_override.tf.json
-      var_files:
-      - concourse-provider-config/version.tfvars
+        ASG_NAME: ((deployment_name))-concourse-web
+    - task: refresh-main-team-workers-asg
+      file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
+      params:
+        ASG_NAME: ((deployment_name))-main-concourse-worker
 
 - name: configure-teams
   serial: true
   plan:
   - in_parallel:
     - get: tech-ops-private
-      passed: [scale-in]
+      passed: [refresh-instances]
       trigger: true
     - get: tech-ops
       attempts: 10
-      passed: [scale-in]
+      passed: [refresh-instances]
       trigger: true
     - get: concourse-release
-      passed: [scale-in]
+      passed: [refresh-instances]
       trigger: true
   - task: generate-roll-instances-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
@@ -281,17 +227,17 @@ jobs:
   - in_parallel:
     - get: tech-ops-private
       attempts: 10
-      passed: [scale-in]
+      passed: [refresh-instances]
       trigger: true
     - get: tech-ops
       attempts: 10
-      passed: [scale-in]
+      passed: [refresh-instances]
       trigger: true
     - get: version
       attempts: 10
       params: {bump: minor}
     - get: concourse-release
-      passed: [scale-in]
+      passed: [refresh-instances]
       trigger: true
 
   # this is a simple check to ensure push to ecr works
