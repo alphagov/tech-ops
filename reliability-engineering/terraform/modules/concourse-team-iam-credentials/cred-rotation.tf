@@ -30,13 +30,15 @@ resource "aws_lambda_function" "sts_creds_to_ssm" {
 }
 
 resource "aws_cloudwatch_event_rule" "every_ten_minutes" {
-  name                = "every-ten-minutes"
+  name                = "every-ten-minutes-${each.key}"
   description         = "Fires every 10 minutes"
   schedule_expression = "rate(10 minutes)"
+
+  for_each = var.team_role_arns
 }
 
 resource "aws_cloudwatch_event_target" "update_sts" {
-  rule = aws_cloudwatch_event_rule.every_ten_minutes.name
+  rule = aws_cloudwatch_event_rule.every_ten_minutes[each.key].name
   arn  = aws_lambda_function.sts_creds_to_ssm.arn
 
   for_each = var.team_role_arns
@@ -49,11 +51,13 @@ resource "aws_cloudwatch_event_target" "update_sts" {
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_sts_creds_to_ssm" {
-  statement_id  = "AllowExecutionFromCloudWatch"
+  statement_id  = "AllowExecutionFromCloudWatch${each.key}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.sts_creds_to_ssm.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.every_ten_minutes.arn
+  source_arn    = aws_cloudwatch_event_rule.every_ten_minutes[each.key].arn
+
+  for_each = var.team_role_arns
 }
 
 resource "aws_cloudwatch_log_group" "sts_lambda" {
