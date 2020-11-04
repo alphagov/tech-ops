@@ -19,16 +19,11 @@ resource "aws_ssm_parameter" "concourse_grafana_db_password" {
   value  = random_string.concourse_grafana_db_password.result
 }
 
-resource "random_string" "concourse_grafana_admin_password" {
-  length  = 32
-  special = false
-}
-
 resource "aws_ssm_parameter" "concourse_grafana_admin_password" {
   name   = "/${var.deployment}/grafana/grafana-admin-password"
   type   = "SecureString"
   key_id = aws_kms_key.concourse_grafana.key_id
-  value  = random_string.concourse_grafana_admin_password.result
+  value  = var.grafana_admin_password
 }
 
 resource "aws_db_subnet_group" "concourse_grafana_db" {
@@ -129,11 +124,6 @@ resource "aws_service_discovery_service" "grafana_service_discovery" {
   health_check_custom_config {
     failure_threshold = 2
   }
-}
-
-provider "grafana" {
-  url  = "https://grafana.${local.monitoring_domain}"
-  auth = "admin:${random_string.concourse_grafana_admin_password.result}"
 }
 
 resource "grafana_data_source" "prom_data_source" {

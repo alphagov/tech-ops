@@ -6,6 +6,10 @@ variable "vpc_id" {
   type = string
 }
 
+variable "grafana_admin_password" {
+  type = string
+}
+
 variable "private_subnet_ids" {
   type = list(string)
 }
