@@ -132,6 +132,7 @@ resource "grafana_data_source" "prom_data_source" {
   type       = "prometheus"
   name       = "Prometheus ${count.index + 1}"
   url        = "http://prom-${count.index + 1}.${data.aws_route53_zone.private_root.name}:9090"
+  depends_on = [aws_ecs_service.concourse_grafana_v2]
 }
 
 resource "grafana_data_source" "cloudwatch" {
@@ -143,6 +144,7 @@ resource "grafana_data_source" "cloudwatch" {
     default_region = "eu-west-2"
   }
 
+  depends_on = [aws_ecs_service.concourse_grafana_v2]
 }
 
 locals {
