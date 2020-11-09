@@ -67,7 +67,7 @@ jobs:
           image_resource:
             type: docker-image
             source:
-              repository: govsvc/aws-ruby
+              repository: ghcr.io/alphagov/aws-ruby
               tag: 2.6.1
           inputs:
             - name: re-team-manual-git
@@ -110,7 +110,7 @@ jobs:
           image_resource:
             type: docker-image
             source:
-              repository: govsvc/aws-ruby
+              repository: ghcr.io/alphagov/aws-ruby
               tag: 2.6.1
           inputs:
             - name: reliability-engineering-git
@@ -137,7 +137,7 @@ jobs:
           image_resource:
             type: docker-image
             source:
-              repository: govsvc/aws-ruby
+              repository: ghcr.io/alphagov/aws-ruby
               tag: 2.6.1
           inputs:
             - name: gds-way-git
