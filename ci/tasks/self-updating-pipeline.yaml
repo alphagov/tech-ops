@@ -22,6 +22,9 @@ run:
   args:
   - -uec
   - |
+    echo "This reusable pipeline step is deprecated, you should use the builtin set_pipeline step instead now:"
+    echo https://concourse-ci.org/jobs.html#schema.step.set-pipeline-step.set_pipeline
+
     : ${CONCOURSE_TEAM:?}
     : ${CONCOURSE_PASSWORD:?}
     : ${PIPELINE_PATH:?}
