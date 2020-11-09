@@ -1,5 +1,11 @@
 ## Self updating pipeline
 
+**Deprecated**
+
+This step is deprecated, you should use the [set_pipeline step][] instead now.
+
+[set_pipeline step]: https://concourse-ci.org/jobs.html#schema.step.set-pipeline-step.set_pipeline
+
 The intention is for the pipelines to be able to self update.
 
 The task will validate the pipeline before applying.
