@@ -4,6 +4,7 @@ image_resource:
   source:
     repository: govsvc/task-toolbox
     tag: latest
+outputs: [ refresh ]
 params:
   AWS_DEFAULT_REGION: eu-west-2
   ASG_NAME:
@@ -14,36 +15,12 @@ run:
   - pipefail
   - -c
   - |
-    function refresh_fetch_info() {
-      refresh_id="$1"
-      aws autoscaling describe-instance-refreshes \
-        --auto-scaling-group-name "${ASG_NAME}" \
-        --instance-refresh-ids "${refresh_id}" \
-        | jq "InstanceRefreshes[]" \
-        > refresh.json
-    }
-    function refresh_status() {
-      jq -r '.Status' <refresh.json
-    }
-    function refresh_succeeded() {
-      return [[ "$(refresh_status)" = 'Successful' ]]
-    }
-    function refresh_failed() {
-      return [[ "$(refresh_status)" = 'Failed' -o "$(refresh_status)" = 'Cancelled' ]]
-    }
     function refresh_instances() {
+      mkdir refresh
       refresh_id=$(aws autoscaling start-instance-refresh \
         --auto-scaling-group-name "${ASG_NAME}" \
         | jq -r '.InstanceRefreshId')
-      refresh_fetch_info "${refresh_id}"
-      while !refresh_succeeded; do
-        echo "waiting for refresh ($(refresh_id)) to complete, current status ($(refresh_status))..."
-        if refresh_failed; then
-          echo "Refresh entered bad state ($(refresh_status)), aborting"
-          exit 1
-        fi
-        sleep 5
-        refresh_fetch_info "${refresh_id}"
+      echo "${refresh_id}" > refresh/id
       done
     }
     echo "trigger instance refresh of ${ASG_NAME}..."

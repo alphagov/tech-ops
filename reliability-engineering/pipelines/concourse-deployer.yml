@@ -36,9 +36,8 @@ resources:
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
       - reliability-engineering/terraform/modules
-      - reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
-      - reliability-engineering/pipelines/tasks/concourse-get-workers.yml
-      - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
+      - reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
+      - reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
       - reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
       - reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
@@ -169,8 +168,6 @@ jobs:
     - get: tech-ops
       passed: [deploy]
       trigger: true
-    - get: infra
-      passed: [deploy]
     - get: concourse-release
       passed: [deploy]
       trigger: true
@@ -180,10 +177,47 @@ jobs:
   - in_parallel:
     - task: refresh-web-node-asg
       file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
+      output_mapping:
+        refresh: web-refresh
       params:
         ASG_NAME: ((deployment_name))-concourse-web
     - task: refresh-main-team-workers-asg
       file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
+      output_mapping:
+        refresh: main-team-worker-refresh
+      params:
+        ASG_NAME: ((deployment_name))-main-concourse-worker
+
+- name: wait-for-refresh
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: tech-ops-private
+      passed: [refresh-instances]
+      trigger: true
+    - get: tech-ops
+      passed: [refresh-instances]
+      trigger: true
+    - get: concourse-release
+      passed: [refresh-instances]
+      trigger: true
+      params:
+        globs:
+        - concourse-*-linux-amd64.tgz.sha1
+  - in_parallel:
+    - task: wait-for-web-node-asg
+      attempts: 10
+      file: tech-ops/reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
+      input_mapping:
+        refresh: web-refresh
+      params:
+        ASG_NAME: ((deployment_name))-concourse-web
+    - task: wait-for-main-team-workers-asg
+      attempts: 10
+      file: tech-ops/reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
+      input_mapping:
+        refresh: main-team-worker-refresh
       params:
         ASG_NAME: ((deployment_name))-main-concourse-worker
 
@@ -192,14 +226,14 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops-private
-      passed: [refresh-instances]
+      passed: [wait-for-refresh]
       trigger: true
     - get: tech-ops
       attempts: 10
-      passed: [refresh-instances]
+      passed: [wait-for-refresh]
       trigger: true
     - get: concourse-release
-      passed: [refresh-instances]
+      passed: [wait-for-refresh]
       trigger: true
   - task: generate-roll-instances-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
@@ -227,17 +261,17 @@ jobs:
   - in_parallel:
     - get: tech-ops-private
       attempts: 10
-      passed: [refresh-instances]
+      passed: [wait-for-refresh]
       trigger: true
     - get: tech-ops
       attempts: 10
-      passed: [refresh-instances]
+      passed: [wait-for-refresh]
       trigger: true
     - get: version
       attempts: 10
       params: {bump: minor}
     - get: concourse-release
-      passed: [refresh-instances]
+      passed: [wait-for-refresh]
       trigger: true
 
   # this is a simple check to ensure push to ecr works
