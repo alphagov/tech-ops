@@ -7,6 +7,11 @@ resource_types:
   source:
     repository: ljfranklin/terraform-resource
     tag: 0.12.25
+- name: paas-semver
+  type: docker-image
+  source:
+    repository: governmentpaas/semver-resource
+    tag: latest
 - name: pool
   type: registry-image
   source:
@@ -58,12 +63,9 @@ resources:
       region: eu-west-2
       key: ((deployment_name)).tfstate
 - name: version
-  type: semver
+  type: paas-semver
   source:
     driver: s3
-    access_key_id: ((readonly_access_key_id))
-    secret_access_key: ((readonly_secret_access_key))
-    session_token: ((readonly_session_token))
     key: ((deployment_name))-version
     bucket: ((readonly_private_bucket_name))
     region_name: eu-west-2
