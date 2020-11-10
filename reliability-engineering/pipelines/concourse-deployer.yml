@@ -162,9 +162,6 @@ jobs:
   serial_groups: [deploy]
   plan:
   - in_parallel:
-    - get: tech-ops-private
-      passed: [deploy]
-      trigger: true
     - get: tech-ops
       passed: [deploy]
       trigger: true
@@ -208,9 +205,6 @@ jobs:
   serial: true
   plan:
   - in_parallel:
-    - get: tech-ops-private
-      passed: [refresh-instances]
-      trigger: true
     - get: tech-ops
       attempts: 10
       passed: [refresh-instances]
@@ -242,10 +236,6 @@ jobs:
   serial_groups: [deploy]
   plan:
   - in_parallel:
-    - get: tech-ops-private
-      attempts: 10
-      passed: [refresh-instances]
-      trigger: true
     - get: tech-ops
       attempts: 10
       passed: [refresh-instances]
