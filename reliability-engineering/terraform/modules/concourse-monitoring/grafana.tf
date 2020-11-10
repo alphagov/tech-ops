@@ -19,16 +19,11 @@ resource "aws_ssm_parameter" "concourse_grafana_db_password" {
   value  = random_string.concourse_grafana_db_password.result
 }
 
-resource "random_string" "concourse_grafana_admin_password" {
-  length  = 32
-  special = false
-}
-
 resource "aws_ssm_parameter" "concourse_grafana_admin_password" {
   name   = "/${var.deployment}/grafana/grafana-admin-password"
   type   = "SecureString"
   key_id = aws_kms_key.concourse_grafana.key_id
-  value  = random_string.concourse_grafana_admin_password.result
+  value  = var.grafana_admin_password
 }
 
 resource "aws_db_subnet_group" "concourse_grafana_db" {
@@ -131,17 +126,13 @@ resource "aws_service_discovery_service" "grafana_service_discovery" {
   }
 }
 
-provider "grafana" {
-  url  = "https://grafana.${local.monitoring_domain}"
-  auth = "admin:${random_string.concourse_grafana_admin_password.result}"
-}
-
 resource "grafana_data_source" "prom_data_source" {
   count      = 2
   is_default = element([true, false], count.index)
   type       = "prometheus"
   name       = "Prometheus ${count.index + 1}"
   url        = "http://prom-${count.index + 1}.${data.aws_route53_zone.private_root.name}:9090"
+  depends_on = [aws_ecs_service.concourse_grafana_v2]
 }
 
 resource "grafana_data_source" "cloudwatch" {
@@ -153,6 +144,7 @@ resource "grafana_data_source" "cloudwatch" {
     default_region = "eu-west-2"
   }
 
+  depends_on = [aws_ecs_service.concourse_grafana_v2]
 }
 
 locals {
