@@ -187,24 +187,6 @@ jobs:
         refresh: main-team-worker-refresh
       params:
         ASG_NAME: ((deployment_name))-main-concourse-worker
-
-- name: wait-for-refresh
-  serial: true
-  serial_groups: [deploy]
-  plan:
-  - in_parallel:
-    - get: tech-ops-private
-      passed: [refresh-instances]
-      trigger: true
-    - get: tech-ops
-      passed: [refresh-instances]
-      trigger: true
-    - get: concourse-release
-      passed: [refresh-instances]
-      trigger: true
-      params:
-        globs:
-        - concourse-*-linux-amd64.tgz.sha1
   - in_parallel:
     - task: wait-for-web-node-asg
       attempts: 10
@@ -226,14 +208,14 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops-private
-      passed: [wait-for-refresh]
+      passed: [refresh-instances]
       trigger: true
     - get: tech-ops
       attempts: 10
-      passed: [wait-for-refresh]
+      passed: [refresh-instances]
       trigger: true
     - get: concourse-release
-      passed: [wait-for-refresh]
+      passed: [refresh-instances]
       trigger: true
   - task: generate-roll-instances-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
@@ -261,17 +243,17 @@ jobs:
   - in_parallel:
     - get: tech-ops-private
       attempts: 10
-      passed: [wait-for-refresh]
+      passed: [refresh-instances]
       trigger: true
     - get: tech-ops
       attempts: 10
-      passed: [wait-for-refresh]
+      passed: [refresh-instances]
       trigger: true
     - get: version
       attempts: 10
       params: {bump: minor}
     - get: concourse-release
-      passed: [wait-for-refresh]
+      passed: [refresh-instances]
       trigger: true
 
   # this is a simple check to ensure push to ecr works
