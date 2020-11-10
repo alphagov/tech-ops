@@ -19,7 +19,7 @@ run:
       aws autoscaling describe-instance-refreshes \
         --auto-scaling-group-name "${ASG_NAME}" \
         --instance-refresh-ids "$(cat refresh/id)" \
-        | jq "InstanceRefreshes[]" \
+        | jq ".InstanceRefreshes[]" \
         > refresh.json
     }
     function refresh_status() {
