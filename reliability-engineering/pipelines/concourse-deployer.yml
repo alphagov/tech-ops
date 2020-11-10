@@ -6,7 +6,7 @@ resource_types:
   type: registry-image
   source:
     repository: ljfranklin/terraform-resource
-    tag: 0.12.25
+    tag: 0.13.5
 - name: paas-semver
   type: docker-image
   source:
