@@ -30,7 +30,7 @@ resource "aws_lambda_function" "sts_creds_to_ssm" {
 }
 
 resource "aws_cloudwatch_event_rule" "every_ten_minutes" {
-  name                = "every-ten-minutes-${each.key}"
+  name                = "${var.deployment}-every-ten-minutes-${each.key}"
   description         = "Fires every 10 minutes"
   schedule_expression = "rate(10 minutes)"
 
