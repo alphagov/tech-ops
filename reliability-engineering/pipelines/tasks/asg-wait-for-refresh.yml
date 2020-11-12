@@ -25,6 +25,15 @@ run:
     function refresh_status() {
       jq -r '.Status' <refresh.json
     }
+    function refresh_status_reason() {
+      jq -r '.StatusReason' <refresh.json
+    }
+    function refresh_percentage_complete() {
+      jq -r '.PercentageComplete' <refresh.json
+    }
+    function refresh_instances_to_update() {
+      jq -r '.InstancesToUpdate' <refresh.json
+    }
     function wait_for_refresh() {
       refresh_fetch_info
       while [[ "$(refresh_status)" != 'Successful' ]]; do
