@@ -18,7 +18,7 @@ run:
     function refresh_instances() {
       refresh_id=$(aws autoscaling start-instance-refresh \
         --auto-scaling-group-name "${ASG_NAME}" \
-        --preferences InstanceWarmup=120 \
+        --preferences InstanceWarmup=120,MinHealthyPercentage=100 \
         | jq -r '.InstanceRefreshId')
       echo "${refresh_id}" > refresh/id
     }
