@@ -1,0 +1,42 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: govsvc/task-toolbox
+    tag: latest
+inputs: [ refresh ]
+params:
+  AWS_DEFAULT_REGION: eu-west-2
+  ASG_NAME:
+run:
+  path: /bin/bash
+  args:
+  - -euo
+  - pipefail
+  - -c
+  - |
+    function refresh_fetch_info() {
+      aws autoscaling describe-instance-refreshes \
+        --auto-scaling-group-name "${ASG_NAME}" \
+        --instance-refresh-ids "$(cat refresh/id)" \
+        | jq ".InstanceRefreshes[]" \
+        > refresh.json
+    }
+    function refresh_status() {
+      jq -r '.Status' <refresh.json
+    }
+    function wait_for_refresh() {
+      refresh_fetch_info
+      while [[ "$(refresh_status)" != 'Successful' ]]; do
+        echo "waiting for refresh ($(cat refresh/id)) to complete, current status ($(refresh_status))..."
+        if [[ "$(refresh_status)" = 'Failed' || "$(refresh_status)" = 'Cancelled' ]]; then
+          echo "Refresh entered bad state ($(refresh_status)), aborting"
+          exit 1
+        fi
+        sleep 5
+        refresh_fetch_info
+      done
+    }
+    echo "Waiting for instance refresh of ${ASG_NAME} to complete..."
+    wait_for_refresh
+    echo "OK"

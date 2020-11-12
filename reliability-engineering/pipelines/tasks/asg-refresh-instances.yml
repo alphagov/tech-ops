@@ -1,0 +1,28 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: govsvc/task-toolbox
+    tag: latest
+outputs: [ refresh ]
+params:
+  AWS_DEFAULT_REGION: eu-west-2
+  ASG_NAME:
+run:
+  path: /bin/bash
+  args:
+  - -euo
+  - pipefail
+  - -c
+  - |
+    function refresh_instances() {
+      mkdir refresh
+      refresh_id=$(aws autoscaling start-instance-refresh \
+        --auto-scaling-group-name "${ASG_NAME}" \
+        | jq -r '.InstanceRefreshId')
+      echo "${refresh_id}" > refresh/id
+      done
+    }
+    echo "trigger instance refresh of ${ASG_NAME}..."
+    refresh_instances
+    echo "OK"
