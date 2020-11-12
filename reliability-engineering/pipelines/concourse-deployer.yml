@@ -167,34 +167,33 @@ jobs:
     passed: [deploy]
     trigger: true
   - in_parallel:
-    - do:
-      - task: refresh-web-node-asg
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
-        output_mapping:
-          refresh: web-refresh
-        params:
-          ASG_NAME: ((deployment_name))-concourse-web
-      - task: wait-for-web-node-asg
-        attempts: 10
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
-        input_mapping:
-          refresh: web-refresh
-        params:
-          ASG_NAME: ((deployment_name))-concourse-web
-    - do:
-      - task: refresh-main-team-workers-asg
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
-        output_mapping:
-          refresh: main-team-worker-refresh
-        params:
-          ASG_NAME: ((deployment_name))-main-concourse-worker
-      - task: wait-for-main-team-workers-asg
-        attempts: 10
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
-        input_mapping:
-          refresh: main-team-worker-refresh
-        params:
-          ASG_NAME: ((deployment_name))-main-concourse-worker
+    - task: refresh-web-node-asg
+      file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
+      output_mapping:
+        refresh: web-refresh
+      params:
+        ASG_NAME: ((deployment_name))-concourse-web
+    - task: refresh-main-team-workers-asg
+      file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
+      output_mapping:
+        refresh: main-team-worker-refresh
+      params:
+        ASG_NAME: ((deployment_name))-main-concourse-worker
+  - in_parallel:
+    - task: wait-for-web-node-asg
+      attempts: 10
+      file: tech-ops/reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
+      input_mapping:
+        refresh: web-refresh
+      params:
+        ASG_NAME: ((deployment_name))-concourse-web
+    - task: wait-for-main-team-workers-asg
+      attempts: 10
+      file: tech-ops/reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
+      input_mapping:
+        refresh: main-team-worker-refresh
+      params:
+        ASG_NAME: ((deployment_name))-main-concourse-worker
 
 - name: configure-teams
   serial: true
