@@ -108,12 +108,8 @@ jobs:
   serial: true
   serial_groups: [deploy]
   plan:
-  - in_parallel:
-    - get: tech-ops-private
-      trigger: true
-    - get: tech-ops
-      trigger: true
-    - get: infra
+  - get: tech-ops
+    trigger: true
   - task: verify-tech-ops-tag
     file: tech-ops/reliability-engineering/pipelines/tasks/verify-tag.yml
     input_mapping:
@@ -135,13 +131,10 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops-private
-      passed: [update]
       trigger: true
     - get: tech-ops
       passed: [update]
       trigger: true
-    - get: infra
-      passed: [update]
     - get: concourse-release
       trigger: true
       params:
