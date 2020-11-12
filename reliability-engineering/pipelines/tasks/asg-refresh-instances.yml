@@ -21,7 +21,6 @@ run:
         --auto-scaling-group-name "${ASG_NAME}" \
         | jq -r '.InstanceRefreshId')
       echo "${refresh_id}" > refresh/id
-      done
     }
     echo "trigger instance refresh of ${ASG_NAME}..."
     refresh_instances
