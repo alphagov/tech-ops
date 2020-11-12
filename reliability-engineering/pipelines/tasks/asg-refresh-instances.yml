@@ -16,7 +16,6 @@ run:
   - -c
   - |
     function refresh_instances() {
-      mkdir refresh
       refresh_id=$(aws autoscaling start-instance-refresh \
         --auto-scaling-group-name "${ASG_NAME}" \
         | jq -r '.InstanceRefreshId')
