@@ -4,7 +4,7 @@ image_resource:
   source:
     repository: govsvc/task-toolbox
     tag: latest
-inputs: [ refresh ]
+inputs: [ { name: refresh} ]
 params:
   AWS_DEFAULT_REGION: eu-west-2
   ASG_NAME:
