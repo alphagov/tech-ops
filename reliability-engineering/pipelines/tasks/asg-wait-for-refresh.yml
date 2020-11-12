@@ -37,7 +37,8 @@ run:
     function wait_for_refresh() {
       refresh_fetch_info
       while [[ "$(refresh_status)" != 'Successful' ]]; do
-        echo "waiting for refresh ($(cat refresh/id)) to complete, current status ($(refresh_status))..."
+        echo "refresh ($(cat refresh/id)) is currently $(refresh_status), because $(refresh_status_reason)..."
+        echo "$(refresh_percentage_complete)% complete, with $(refresh_instances_to_update) instances left to update"
         if [[ "$(refresh_status)" = 'Failed' || "$(refresh_status)" = 'Cancelled' ]]; then
           echo "Refresh entered bad state ($(refresh_status)), aborting"
           exit 1
