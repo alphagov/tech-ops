@@ -156,9 +156,34 @@ resource "aws_iam_policy" "concourse_worker_base" {
 POLICY
 }
 
+resource "aws_iam_policy" "concourse_worker_self_refresh" {
+  name   = "${var.deployment}-${var.name}-concourse-worker-self-refresh"
+  policy = <<-POLICY
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "autoscaling:StartInstanceRefresh",
+          "autoscaling:DescribeInstanceRefreshes",
+          "autoscaling:CancelInstanceRefresh"
+        ],
+        "Resource": "${aws_autoscaling_group.concourse_worker.arn}"
+      }
+    ]
+  }
+POLICY
+}
+
 resource "aws_iam_role_policy_attachment" "concourse_worker_concourse_worker_base" {
   role       = var.worker_iam_role_name
   policy_arn = aws_iam_policy.concourse_worker_base.arn
+}
+
+resource "aws_iam_role_policy_attachment" "concourse_worker_concourse_worker_self_refresh" {
+  role       = var.worker_iam_role_name
+  policy_arn = aws_iam_policy.concourse_worker_self_refresh.arn
 }
 
 resource "aws_iam_role_policy_attachment" "concourse_worker_additional" {
