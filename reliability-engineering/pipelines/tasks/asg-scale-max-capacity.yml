@@ -1,0 +1,61 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: govsvc/task-toolbox
+    tag: latest
+params:
+  AWS_DEFAULT_REGION: eu-west-2
+  ASG_PREFIX:
+run:
+  path: /bin/bash
+  args:
+  - -euo
+  - pipefail
+  - -c
+  - |
+    function asg_fetch_info() {
+      aws autoscaling describe-auto-scaling-groups \
+        | jq "\
+          .AutoScalingGroups[] \
+          | select(.AutoScalingGroupName \
+            | startswith(\"${ASG_PREFIX}\")\
+          )\
+        " > asg.json
+    }
+    function asg_instance_count() {
+      jq -r '.Instances | length' <asg.json
+    }
+    function asg_max_size() {
+      jq -r '.MaxSize' <asg.json
+    }
+    function asg_min_size() {
+      jq -r '.MinSize' <asg.json
+    }
+    function asg_name() {
+      jq -r '.AutoScalingGroupName' <asg.json
+    }
+    function asg_instance_count_inservice() {
+      jq -r '[.Instances[].LifecycleState | select(. == "InService")] | length' <asg.json
+    }
+    function asg_set_desired() {
+      desired="$1"
+      aws autoscaling set-desired-capacity \
+        --auto-scaling-group-name "$(asg_name)" \
+        --desired-capacity "${desired}"
+      while [[ "$(asg_instance_count)" != "${desired}" ]]; do
+        echo "waiting for instance count ($(asg_instance_count)) to match desired count ($desired)..."
+        sleep 5
+        asg_fetch_info
+      done
+      while [[ "$(asg_instance_count_inservice)" != "${desired}" ]]; do
+        echo "waiting for instance count in service ($(asg_instance_count_inservice)) to match desired count ($desired)..."
+        sleep 5
+        asg_fetch_info
+      done
+    }
+    echo "fetching asg state..."
+    asg_fetch_info
+    echo "trigger scale-out of $(asg_name) to $(asg_max_size) instances..."
+    asg_set_desired $(asg_max_size)
+    echo "OK"

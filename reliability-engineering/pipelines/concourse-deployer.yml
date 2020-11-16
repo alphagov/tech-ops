@@ -41,8 +41,9 @@ resources:
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
       - reliability-engineering/terraform/modules
-      - reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
-      - reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
+      - reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+      - reliability-engineering/pipelines/tasks/concourse-get-workers.yml
+      - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
       - reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
       - reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
@@ -159,50 +160,103 @@ jobs:
       var_files:
       - concourse-provider-config/version.tfvars
 
-- name: refresh-instances
+- name: scale-out
   serial: true
   serial_groups: [deploy]
   plan:
-  - get: tech-ops
-    passed: [deploy]
-    trigger: true
   - in_parallel:
-    - do:
-      - task: refresh-web-node-asg
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
-        output_mapping:
-          refresh: web-refresh
+    - get: tech-ops-private
+      passed: [deploy]
+      trigger: true
+    - get: tech-ops
+      passed: [deploy]
+      trigger: true
+    - get: infra
+      passed: [deploy]
+    - get: concourse-release
+      passed: [deploy]
+      trigger: true
+      params:
+        globs:
+        - concourse-*-linux-amd64.tgz.sha1
+  - task: configure-providers
+    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
+  - task: get-current-workers
+    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
+  - do:
+    - in_parallel:
+      - task: scale-out-web-node-asg
+        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
         params:
-          ASG_NAME: ((deployment_name))-concourse-web
-      - task: wait-for-web-node-asg
-        attempts: 10
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
-        input_mapping:
-          refresh: web-refresh
+          ASG_PREFIX: ((deployment_name))-concourse-web
+      - task: scale-out-main-team-workers-asg
+        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
         params:
-          ASG_NAME: ((deployment_name))-concourse-web
-    - do:
-      - task: refresh-main-team-workers-asg
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-refresh-instances.yml
-        output_mapping:
-          refresh: main-team-worker-refresh
-        params:
-          ASG_NAME: ((deployment_name))-main-concourse-worker
-      - task: wait-for-main-team-workers-asg
-        attempts: 10
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-wait-for-refresh.yml
-        input_mapping:
-          refresh: main-team-worker-refresh
-        params:
-          ASG_NAME: ((deployment_name))-main-concourse-worker
+          ASG_PREFIX: ((deployment_name))-main-concourse-worker
+    - task: land-old-workers
+      file: tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
+      params:
+        DEPLOYMENT_NAME: ((deployment_name))
+    on_failure:
+      put: infra # try to scale back in on failure to stay in sync
+      attempts: 10
+      params:
+        terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+        override_files:
+        - concourse-provider-config/provider_concourse_override.tf.json
+        var_files:
+        - concourse-provider-config/version.tfvars
+
+- name: scale-in
+  serial: true
+  serial_groups: [deploy]
+  plan:
+  - in_parallel:
+    - get: tech-ops-private
+      passed: [scale-out]
+      trigger: true
+    - get: tech-ops
+      passed: [scale-out]
+      trigger: true
+    - get: infra
+      passed: [scale-out]
+    - get: concourse-release
+      passed: [scale-out]
+      trigger: true
+      params:
+        globs:
+        - concourse-*-linux-amd64.tgz.sha1
+  - task: configure-providers
+    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
+    params:
+      DEPLOYMENT_NAME: ((deployment_name))
+  - put: infra
+    attempts: 10
+    params:
+      terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+      override_files:
+      - concourse-provider-config/provider_concourse_override.tf.json
+      var_files:
+      - concourse-provider-config/version.tfvars
 
 - name: configure-teams
   serial: true
   plan:
-  - get: tech-ops
-    attempts: 10
-    passed: [refresh-instances]
-    trigger: true
+  - in_parallel:
+    - get: tech-ops-private
+      passed: [scale-in]
+      trigger: true
+    - get: tech-ops
+      attempts: 10
+      passed: [scale-in]
+      trigger: true
+    - get: concourse-release
+      passed: [scale-in]
+      trigger: true
   - task: generate-roll-instances-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
     params:
@@ -227,13 +281,20 @@ jobs:
   serial_groups: [deploy]
   plan:
   - in_parallel:
+    - get: tech-ops-private
+      attempts: 10
+      passed: [scale-in]
+      trigger: true
     - get: tech-ops
       attempts: 10
-      passed: [refresh-instances]
+      passed: [scale-in]
       trigger: true
     - get: version
       attempts: 10
       params: {bump: minor}
+    - get: concourse-release
+      passed: [scale-in]
+      trigger: true
 
   # this is a simple check to ensure push to ecr works
   - put: ecr
@@ -294,6 +355,9 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops
+      passed: [test]
+      trigger: true
+    - get: concourse-release
       passed: [test]
       trigger: true
     - get: version
