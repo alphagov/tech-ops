@@ -56,7 +56,7 @@ run:
               "team": .name,
               "file": "tech-ops-private/reliability-engineering/terraform/deployments/gds-tech-ops/cd/pipelines/info.yml",
               "vars": {
-                "deployment": "${DEPLOYMENT_NAME}",
+                "deployment": "'"${DEPLOYMENT_NAME}"'",
                 "team": .name
                 }
             }]
