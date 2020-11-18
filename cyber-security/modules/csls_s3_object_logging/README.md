@@ -13,11 +13,11 @@ module "s3_object_logging_test" {
   source                     = "git::https://github.com/alphagov/tech-ops.git//cyber-security/modules/csls_s3_object_logging?ref=8743cc8372b896a694174d5354b6cbdd6c574005"
   cloudwatch_destination_arn = "[ ask in #cyber-security-help ]"
   logging_suffix             = ""
-  bucket_arn_list = [
-    "arn:aws:s3:::my-1st-bucket/",
-    "arn:aws:s3:::my-2nd-bucket/"
+  bucket_names_list          = [
+    "my-1st-bucket",
+    "my-2nd-bucket"
   ]
-  tags = {
+  tags =
     Add         = "your own"
     Tags        = "to tag all the"
     Created     = "resources"
@@ -26,15 +26,13 @@ module "s3_object_logging_test" {
 
 ```  
 
-NOTE: If individual bucket ARNS are added they must be appended with a trailing slash.
-
 ### Module Variables
 
 * `cloudwatch_destination_arn` (Required):  
     Ask in [#cyber-security-help](https://gds.slack.com/archives/CCMPJKFDK)
 * `cloudwatch_filter_pattern` (Optional): 
     Filter events before sending to Splunk.
-* `bucket_arn_list` (Optional):  
+* `bucket_names_list` (Optional):  
     The default behaviour is to monitor all buckets in the account. 
 * `logging_suffix` (Optional): 
     The default behaviour is to label things with the account ID.

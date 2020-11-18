@@ -33,7 +33,9 @@
       "PutObjectLockLegalHold",
       "GetObjectLockRetention",
       "GetObjectLockLegalHold"
-    ]
-  },
-  "resources": ${resources}
+    ],
+    "requestParameters": {
+      "bucketName": ${bucket_names_list}
+    }
+  }
 }
