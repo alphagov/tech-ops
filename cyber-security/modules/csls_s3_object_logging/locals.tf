@@ -1,7 +1,7 @@
 # This allows you to customise the naming of the components for 2 scenarios:
-# 1. logging_suffix = [default], bucket_arn_list = [default]
+# 1. logging_suffix = [default], bucket_names_list = [default]
 #     logs all buckets in account under a generic name
-# 2. logging_suffix = specified, bucket_arn_list = specified bucket ARNs.
+# 2. logging_suffix = specified, bucket_names_list = specified bucket ARNs.
 #     logs specified buckets under a specific name
 #     this is for logging a group of buckets that belong to the same service
 #     or for logging a single bucket

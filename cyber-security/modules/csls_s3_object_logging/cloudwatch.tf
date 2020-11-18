@@ -5,7 +5,7 @@ resource "aws_cloudwatch_event_rule" "s3_events" {
   tags = merge(local.tags, map("Name", local.cloudwatch_event_rule_name))
   
   event_pattern = templatefile("${path.module}/json/cloudwatch_event_pattern.json.tpl", {
-    bucket_arns = jsonencode(var.bucket_arns)
+    bucket_names_list = jsonencode(var.bucket_names_list)
   })
 }
 

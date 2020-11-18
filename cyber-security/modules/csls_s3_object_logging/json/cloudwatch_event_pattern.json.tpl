@@ -35,7 +35,7 @@
       "GetObjectLockLegalHold"
     ],
     "requestParameters": {
-      "bucketName": ${bucket_arns}
+      "bucketName": ${bucket_names_list}
     }
   }
 }
