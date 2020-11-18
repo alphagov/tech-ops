@@ -9,6 +9,11 @@ apt-get upgrade --yes
 export AWS_REGION=eu-west-2
 export AWS_DEFAULT_REGION=eu-west-2
 
+# Guard against Prometheus crashing because of a /etc/resolv.conf
+# parsing issue https://github.com/miekg/dns/pull/642
+rm /etc/resolv.conf
+sed -e 's/ trust-ad//' < /run/systemd/resolve/stub-resolv.conf > /etc/resolv.conf
+
 echo 'Configuring prometheus EBS'
 vol=""
 while [ -z "$vol" ]; do
