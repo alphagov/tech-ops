@@ -11,7 +11,7 @@ resource "aws_cloudtrail" "s3_object_logging_trail" {
 
     data_resource {
       type   = "AWS::S3::Object"
-      values = [join("", ["arn:aws:s3:::", var.bucket_arn, "/"])]
+      values = formatlist("arn:aws:s3:::%s/", var.bucket_arns)
     }
   }
 }
