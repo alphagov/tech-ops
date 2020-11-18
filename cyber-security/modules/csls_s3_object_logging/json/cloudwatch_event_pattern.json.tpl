@@ -35,5 +35,5 @@ ${jsonencode({
       "GetObjectLockLegalHold"
     ]
   },
-  "resources": "${target_arn}"
+  "resources": ${target_arn}
 })}
