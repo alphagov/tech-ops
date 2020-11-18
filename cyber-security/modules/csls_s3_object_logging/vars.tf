@@ -9,12 +9,11 @@ variable "cloudwatch_filter_pattern" {
   default     = ""
 }
 
-variable "bucket_arn_list" {
-  type        = list(string)
+variable "bucket_arn" {
+  # type        = list(string)
+  type          = string
   description = "Individual bucket ARNs should be appended with a trailing /. By default log all S3 buckets in the account."
-  default = [
-    "arn:aws:s3:::"
-  ]
+  default = "arn:aws:s3:::"
 }
 
 variable "logging_suffix" {
