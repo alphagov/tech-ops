@@ -34,5 +34,6 @@
       "GetObjectLockRetention",
       "GetObjectLockLegalHold"
     ]
-  }
+  },
+  "resources": ${resources}
 }

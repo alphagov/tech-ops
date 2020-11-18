@@ -1,14 +1,12 @@
-data "template_file" "event_pattern" {
-  template = file("${path.module}/json/cloudwatch_event_pattern.json")
-}
-
 resource "aws_cloudwatch_event_rule" "s3_events" {
   name        = local.cloudwatch_event_rule_name
   description = "S3 object level logging rule"
 
   tags = merge(local.tags, map("Name", local.cloudwatch_event_rule_name))
-
-  event_pattern = data.template_file.event_pattern.rendered
+  
+  event_pattern = templatefile("${path.module}/json/cloudwatch_event_pattern.json.tpl", {
+    resources = jsonencode(var.bucket_arn_list)
+  })
 }
 
 resource "aws_cloudwatch_event_target" "cloudwatch_target" {
