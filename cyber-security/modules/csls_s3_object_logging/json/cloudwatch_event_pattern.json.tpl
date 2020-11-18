@@ -1,4 +1,4 @@
-${jsonencode({
+{
   "source": [
     "aws.s3"
   ],
@@ -36,4 +36,4 @@ ${jsonencode({
     ]
   },
   "resources": ${target_arn}
-})}
+}
