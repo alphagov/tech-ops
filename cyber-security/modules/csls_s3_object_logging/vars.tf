@@ -12,7 +12,7 @@ variable "cloudwatch_filter_pattern" {
 variable "bucket_names_list" {
   type        = list(string)
   description = "A list of bucket names that you want to log."
-  default     = [""]
+  default     = []
 }
 
 variable "logging_suffix" {
