@@ -35,5 +35,5 @@
       "GetObjectLockLegalHold"
     ]
   },
-  "resources": ${target_arn}
+  "resources": ${resources}
 }
