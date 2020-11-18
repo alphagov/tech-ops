@@ -1,5 +1,5 @@
 data "template_file" "event_pattern" {
-  template = file("${path.module}/json/cloudwatch_event_pattern.json")
+  template = file("${path.module}/json/cloudwatch_event_pattern.tmpl")
 }
 
 resource "aws_cloudwatch_event_rule" "s3_events" {
