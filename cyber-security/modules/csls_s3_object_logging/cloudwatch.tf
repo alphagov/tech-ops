@@ -1,7 +1,7 @@
 data "template_file" "event_pattern" {
   template = file("${path.module}/json/cloudwatch_event_pattern.tmpl")
   vars = {
-    target_arn = flatten("${var.bucket_arn_list}")
+    target_arn = jsonencode("${var.bucket_arn_list}")
   }
 }
 
