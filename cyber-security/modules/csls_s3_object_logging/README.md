@@ -10,7 +10,7 @@ the logs to SplunkCloud.
 
 ```
 module "s3_object_logging_test" {
-  source                     = "git::https://github.com/alphagov/tech-ops.git//cyber-security/modules/csls_s3_object_logging?ref=8743cc8372b896a694174d5354b6cbdd6c574005"
+  source                     = "git::https://github.com/alphagov/tech-ops.git//cyber-security/modules/csls_s3_object_logging?ref=0e9b21f2c1ecc9885f439194483d81733469f111"
   cloudwatch_destination_arn = "[ ask in #cyber-security-help ]"
   logging_suffix             = ""
   bucket_names_list          = [
