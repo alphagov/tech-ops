@@ -7,29 +7,26 @@
 #     or for logging a single bucket
 
 locals {
-  # for account id = 1234..2
   # if logging_suffix is default
-  #   "s3-object-logging-1234..2"
+  #   "s3-object-logging-rule"
   # else if logging_suffix = "my_application"
-  #   "s3-object-logging-my-application"
+  #   "s3-object-logging-rule-my-application"
   # snake case is converted to kebab case
-  cloudtrail_name = "${
+  cloudwatch_event_rule_name = "${
     var.logging_suffix == ""
-    ? "s3-object-logging-${data.aws_caller_identity.current.account_id}"
-    : "s3-object-logging-${replace(var.logging_suffix, "_", "-")}"
+    ? "s3-object-logging-rule"
+    : "s3-object-logging-rule-${replace(var.logging_suffix, "_", "-")}"
   }"
 
-  # as above except account ID is always included in bucket name
-  # because S3 bucket names must be globally unique.
   # if logging_suffix is default
-  #   "s3-object-logging-1234..2"
+  #   "/aws/events/s3_data_events"
   # else if logging_suffix = "my_application"
-  #   "s3-object-logging-1234..2-my-application"
-  # snake case is converted to kebab case
-  cloudtrail_bucket_name = "${
+  #   "/aws/events/s3_data_events_my_application"
+  # kebab case is converted to snake case
+  cloudwatch_log_group_name = "${
     var.logging_suffix == ""
-    ? "s3-object-logging-${data.aws_caller_identity.current.account_id}"
-    : "s3-object-logging-${data.aws_caller_identity.current.account_id}-${replace(var.logging_suffix, "_", "-")}"
+    ? "/aws/events/s3_data_events"
+    : "/aws/events/s3_data_events_${replace(var.logging_suffix, "-", "_")}"
   }"
 
   # allow user to specify any tagging they like and then append our tags into the map.
