@@ -1,4 +1,4 @@
-module s3_to_spliunk {
+module s3_to_splunk {
   source                     = "../s3_to_splunk"
   cloudwatch_destination_arn = var.cloudwatch_destination_arn
   logging_suffix             = var.logging_suffix
