@@ -29,6 +29,9 @@ resource "aws_db_instance" "concourse" {
   vpc_security_group_ids       = [aws_security_group.concourse_db.id]
   ca_cert_identifier           = "rds-ca-2019"
   performance_insights_enabled = var.db_performance_insights_enabled
+  deletion_protection          = true
+  multi_az                     = var.db_multi_az
+  backup_retention_period      = var.db_backup_retention_period
 
   tags = {
     Name       = "${var.deployment}-concourse"
