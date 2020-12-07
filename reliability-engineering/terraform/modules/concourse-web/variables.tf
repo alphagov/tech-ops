@@ -99,6 +99,14 @@ variable "db_performance_insights_enabled" {
   default = false
 }
 
+variable "db_multi_az" {
+  default = false
+}
+
+variable "db_backup_retention_period" {
+  default = 0
+}
+
 variable "concourse_version" {
   type = string
 }
