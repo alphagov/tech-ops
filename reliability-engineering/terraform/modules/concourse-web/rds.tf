@@ -33,6 +33,7 @@ resource "aws_db_instance" "concourse" {
   deletion_protection          = true
   multi_az                     = var.db_multi_az
   backup_retention_period      = var.db_backup_retention_period
+  apply_immediately            = var.db_apply_immediately
 
   tags = {
     Name       = "${var.deployment}-concourse"
