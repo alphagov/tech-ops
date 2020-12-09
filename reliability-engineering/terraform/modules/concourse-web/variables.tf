@@ -107,6 +107,14 @@ variable "db_backup_retention_period" {
   default = 0
 }
 
+variable "db_storage_type" {
+  default = "gp2"
+}
+
+variable "db_storage_iops" {
+  default = null
+}
+
 variable "concourse_version" {
   type = string
 }

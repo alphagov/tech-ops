@@ -20,7 +20,8 @@ resource "aws_db_instance" "concourse" {
   password                     = random_string.concourse_db_password.result
   db_subnet_group_name         = aws_db_subnet_group.concourse.name
   allocated_storage            = var.db_storage_gb
-  storage_type                 = "gp2"
+  storage_type                 = var.db_storage_type
+  iops                         = var.db_storage_iops
   engine                       = "postgres"
   engine_version               = "10"
   instance_class               = var.db_instance_type
