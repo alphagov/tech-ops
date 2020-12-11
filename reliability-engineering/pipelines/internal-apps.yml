@@ -166,7 +166,7 @@ jobs:
             type: docker-image
             source:
               repository: ruby
-              tag: 2.7.1
+              tag: 2.7.2
           inputs:
             - name: re-request-an-aws-account-git
               path: repo
