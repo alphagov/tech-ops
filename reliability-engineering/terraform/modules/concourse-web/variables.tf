@@ -115,6 +115,10 @@ variable "db_storage_iops" {
   default = null
 }
 
+variable "db_apply_immediately" {
+  default = false
+}
+
 variable "concourse_version" {
   type = string
 }
