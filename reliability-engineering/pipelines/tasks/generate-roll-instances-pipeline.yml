@@ -37,7 +37,7 @@ run:
       ) | jq 'to_entries | map_values(.value) | {
       "resources": [
         {
-          "name": "every-weekday-morning",
+          "name": "every-weekday-evening",
           "type": "time",
           "source": {
             "location": "Europe/London",
@@ -67,7 +67,7 @@ run:
           {
             "in_parallel": [
               {
-                "get": "every-weekday-morning",
+                "get": "every-weekday-evening",
                 "trigger": true
               },
               {
