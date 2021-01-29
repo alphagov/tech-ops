@@ -41,8 +41,8 @@ run:
           "type": "time",
           "source": {
             "location": "Europe/London",
-            "start": "00:00 AM",
-            "stop": "01:00 AM",
+            "start": "20:00",
+            "stop": "21:00",
             "days": [
               "Monday",
               "Tuesday",
