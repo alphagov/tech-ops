@@ -1,5 +1,5 @@
 resource "tls_private_key" "concourse_worker_ssh_keys" {
-  count = length(var.worker_team_names)
+  for_each = toset(var.worker_team_names)
 
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -26,9 +26,9 @@ output "concourse_worker_ssh_private_keys_pem" {
 }
 
 resource "aws_iam_role" "concourse_workers" {
-  count = length(var.worker_team_names)
+  for_each = toset(var.worker_team_names)
 
-  name = "${var.deployment}-${var.worker_team_names[count.index]}-concourse-worker"
+  name = "${var.deployment}-${each.key}-concourse-worker"
 
   assume_role_policy = <<-ARP
   {
