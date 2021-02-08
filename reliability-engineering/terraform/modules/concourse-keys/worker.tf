@@ -7,12 +7,12 @@ resource "tls_private_key" "concourse_worker_ssh_keys" {
 
 locals {
   concourse_worker_ssh_public_keys_openssh = zipmap(
-    var.worker_team_names,
+    toset(var.worker_team_names),
     [for key in tls_private_key.concourse_worker_ssh_keys : key.public_key_openssh],
   )
 
   concourse_worker_ssh_private_keys_pem = zipmap(
-    var.worker_team_names,
+    toset(var.worker_team_names),
     [for key in tls_private_key.concourse_worker_ssh_keys : key.private_key_pem],
   )
 }
@@ -53,9 +53,9 @@ ARP
 }
 
 output "concourse_worker_iam_role_names" {
-  value = zipmap(var.worker_team_names, [for role in aws_iam_role.concourse_workers : role.name])
+  value = zipmap(toset(var.worker_team_names), [for role in aws_iam_role.concourse_workers : role.name])
 }
 
 output "concourse_worker_iam_role_arns" {
-  value = zipmap(var.worker_team_names, [for role in aws_iam_role.concourse_workers : role.arn])
+  value = zipmap(toset(var.worker_team_names), [for role in aws_iam_role.concourse_workers : role.arn])
 }
