@@ -56,7 +56,7 @@
       "reverseYBuckets": false,
       "targets": [
         {
-          "expr": "sum(increase(concourse_builds_duration_seconds_bucket { exported_job=~\"$exported_job\", pipeline=~\"$pipeline\"}[5m])) by (le)",
+          "expr": "sum(increase(concourse_builds_duration_seconds_bucket { exported_job=~\"$exported_job\", pipeline=~\"$pipeline\", team=~\"$team\" }[5m])) by (le)",
           "format": "heatmap",
           "instant": false,
           "interval": "5m",
@@ -488,9 +488,35 @@
         "includeAll": true,
         "label": "",
         "multi": false,
-        "name": "pipeline",
+        "name": "team",
         "options": [],
         "query": "concourse_builds_duration_seconds_bucket",
+        "refresh": 2,
+        "regex": ".*team=\\\"([^\"]+)\\\".*",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": "",
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "Prometheus 1",
+        "definition": "concourse_builds_duration_seconds_bucket { team=~\"$team\" }",
+        "hide": 0,
+        "includeAll": true,
+        "label": "",
+        "multi": false,
+        "name": "pipeline",
+        "options": [],
+        "query": "concourse_builds_duration_seconds_bucket { team=~\"$team\" }",
         "refresh": 2,
         "regex": ".*pipeline=\\\"([^\"]+)\\\".*",
         "skipUrlSync": false,
@@ -504,19 +530,19 @@
       {
         "allValue": "",
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "All",
           "value": "$__all"
         },
         "datasource": "Prometheus 1",
-        "definition": "concourse_builds_duration_seconds_bucket { pipeline=~\"$pipeline\" }",
+        "definition": "concourse_builds_duration_seconds_bucket { pipeline=~\"$pipeline\", team=~\"$team\" }",
         "hide": 0,
         "includeAll": true,
         "label": "",
         "multi": false,
         "name": "exported_job",
         "options": [],
-        "query": "concourse_builds_duration_seconds_bucket { pipeline=~\"$pipeline\" }",
+        "query": "concourse_builds_duration_seconds_bucket { pipeline=~\"$pipeline\", team=~\"$team\" }",
         "refresh": 2,
         "regex": ".*exported_job=\\\"([^\"]+)\\\".*",
         "skipUrlSync": false,
@@ -548,6 +574,6 @@
   },
   "timezone": "",
   "title": "Concourse internal",
-  "uid": "conc-int",
-  "version": 0
+  "uid": "JgCeuzcMk",
+  "version": 3
 }
