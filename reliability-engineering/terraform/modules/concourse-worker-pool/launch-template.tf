@@ -37,6 +37,7 @@ resource "aws_launch_template" "concourse_worker" {
 
     ebs {
       volume_size = var.volume_size
+      volume_type = "gp3"
     }
   }
 

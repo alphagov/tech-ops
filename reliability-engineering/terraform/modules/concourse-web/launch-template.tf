@@ -44,6 +44,7 @@ resource "aws_launch_template" "concourse_web" {
 
     ebs {
       volume_size = 50
+      volume_type = "gp3"
     }
   }
 
