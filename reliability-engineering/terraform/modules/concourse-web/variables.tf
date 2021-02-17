@@ -31,6 +31,11 @@ variable "main_team_github_team" {
   type        = string
 }
 
+variable "main_team_pipeline_operator_github_team" {
+  description = "GitHub team given pipeline-operator in the main team, $org:$teamName"
+  type        = string
+}
+
 variable "worker_team_names" {
   description = "The names of concourse worker team names, i.e. hosts, for keygen."
   type        = list(string)

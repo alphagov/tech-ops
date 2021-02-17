@@ -76,6 +76,18 @@ for team_name in $(jq -r 'keys | join("\n")' <<< "$team_keys"); do
   concourse_tsa_team_key_args="$concourse_tsa_team_key_args --tsa-team-authorized-keys=$team_name:$team_key_file_path"
 done
 
+cat <<EOF > /opt/concourse/main-team.yaml
+roles:
+- name: owner
+  github:
+    teams: ["${main_team_github_team}"]
+  local:
+    users: ["main"]
+- name: pipeline-operator
+  github:
+    teams: ["${main_team_pipeline_operator_github_team}"]
+EOF
+
 cat <<EOF > /etc/systemd/system/concourse-web.service
 [Unit]
 Description=concourse-web
@@ -105,14 +117,13 @@ ExecStart=/usr/local/concourse/bin/concourse web \
   \
   --github-client-id      $${github_client_id}     \
   --github-client-secret  $${github_client_secret} \
-  --main-team-github-team ${main_team_github_team} \
+  --main-team-config /opt/concourse/main-team.yaml \
   \
   --prometheus-bind-ip   0.0.0.0 \
   --prometheus-bind-port 9391    \
   \
   \
   $(jq -r 'to_entries | map("--add-local-user \(.key):\(.value)") | join(" ")' <<< $local_users) \
-  --main-team-local-user=main \
 
 Type=simple
 RestartSec=3s
