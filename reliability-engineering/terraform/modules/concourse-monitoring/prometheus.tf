@@ -52,6 +52,7 @@ resource "aws_ebs_volume" "concourse_prometheus" {
   count = 2
 
   size      = var.prometheus_volume_size
+  type      = "gp3"
   encrypted = true
 
   availability_zone = element(
