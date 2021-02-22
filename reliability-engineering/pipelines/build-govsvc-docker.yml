@@ -102,6 +102,12 @@ resources:
   source:
     repository: hashicorp/terraform
 
+- name: terraform-0.12
+  type: docker-image
+  source:
+    repository: hashicorp/terraform
+    tag: 0.12.29
+
 - name: govsvc-aws-terraform
   type: docker-image
   source:
@@ -123,6 +129,21 @@ resources:
     branch: master
     paths:
     - reliability-engineering/dockerfiles/govsvc/aws-terraform
+
+- name: github-automate-task-toolbox
+  type: docker-image
+  source:
+    username: ((github-packages-username))
+    password: ((github-packages-token))
+    repository: ghcr.io/alphagov/automate/task-toolbox
+
+- name: automate-task-toolbox-git
+  type: git
+  source:
+    uri: https://github.com/alphagov/tech-ops.git
+    branch: master
+    paths:
+    - reliability-engineering/dockerfiles/govsvc/concourse-task-toolbox
 
 jobs:
 - name: selfupdate
@@ -234,4 +255,19 @@ jobs:
     get_params: {skip_download: true}
   - put: github-awsc
     params: *awsc-params
+    get_params: {skip_download: true}
+
+- name: build-github-automate-task-toolbox
+  serial: true
+  plan:
+  - in_parallel:
+    - get: automate-task-toolbox-git
+      trigger: true
+    - get: terraform-0.12
+      trigger: true
+      params: {save: true}
+  - put: github-automate-task-toolbox
+    params:
+      build: automate-task-toolbox-git/reliability-engineering/dockerfiles/govsvc/concourse-task-toolbox
+      load_bases: [ terraform-0.12 ]
     get_params: {skip_download: true}
