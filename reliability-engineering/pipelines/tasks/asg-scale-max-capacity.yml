@@ -2,7 +2,7 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: govsvc/task-toolbox
+    repository: ghcr.io/alphagov/automate/task-toolbox
     tag: latest
 params:
   AWS_DEFAULT_REGION: eu-west-2
