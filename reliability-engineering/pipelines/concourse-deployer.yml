@@ -199,6 +199,10 @@ jobs:
       file: tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       params:
         DEPLOYMENT_NAME: ((deployment_name))
+    - task: prune-old-workers
+      file: tech-ops/reliability-engineering/pipelines/tasks/concourse-prune-workers.yml
+      params:
+        DEPLOYMENT_NAME: ((deployment_name))
     on_failure:
       put: infra # try to scale back in on failure to stay in sync
       attempts: 10

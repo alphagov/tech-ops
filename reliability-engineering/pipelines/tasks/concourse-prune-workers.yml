@@ -29,21 +29,21 @@ run:
       -p "${FLY_PASSWORD}" \
       -n "${FLY_TEAM}"
     fly -t concourse sync
+    echo "waiting for the new workers to appear..."
     function get_current_worker_count() {
       fly -t concourse workers | grep "${FLY_TEAM}" | grep running | wc -l
     }
     function get_old_worker_count() {
       wc -l <workers/names
     }
-    OLD_WORKER_COUNT=$(get_old_worker_count)
-    DOUBLE_WORKER_COUNT=$( expr "$OLD_WORKER_COUNT" '*' 2 )
-    while [ "$(get_current_worker_count)" != "$DOUBLE_WORKER_COUNT" ]; do
-      echo "...still only $(get_old_worker_count) workers expect $DOUBLE_WORKER_COUNT"
+    echo "wait for landing..."
+    while [ "$(get_current_worker_count)" > "$(get_old_worker_count)" ]; do
+      echo "...still too many workers currently $(get_current_worker_count) workers"
       sleep 10
     done
-    echo "OK!"
-    echo "landing old workers..."
+    echo "pruning the old workers..."
     for worker in $(cat workers/names); do
-      echo "--> ${worker} coming in for landing!"
-      fly -t concourse land-worker --worker "${worker}"
+      echo "--> ${worker} is being pruned"
+      fly -t concourse prune-worker --worker "${worker}"
     done
+    echo "OK!"
