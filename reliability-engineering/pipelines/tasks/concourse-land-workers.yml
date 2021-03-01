@@ -36,8 +36,10 @@ run:
     function get_old_worker_count() {
       wc -l <workers/names
     }
-    while [ "$(get_current_worker_count)" != "$(expr $(get_old_worker_count) \* 2)"]; do
-      echo "...still only $(get_old_worker_count) workers"
+    OLD_WORKER_COUNT=$(get_old_worker_count)
+    DOUBLE_WORKER_COUNT=$( expr "$OLD_WORKER_COUNT" '*' 2 )
+    while [ "$(get_current_worker_count)" != "$DOUBLE_WORKER_COUNT" ]; do
+      echo "...still only $(get_old_worker_count) workers expect $DOUBLE_WORKER_COUNT"
       sleep 3
     done
     echo "OK!"
