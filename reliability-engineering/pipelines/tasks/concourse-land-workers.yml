@@ -36,7 +36,7 @@ run:
     function get_old_worker_count() {
       wc -l <workers/names
     }
-    while [ "$(get_current_worker_count)" = "$(get_old_worker_count)" ]; do
+    while [ "$(get_current_worker_count)" != "$((get_old_worker_count \* 2))" ]; do
       echo "...still only $(get_old_worker_count) workers"
       sleep 3
     done
@@ -47,5 +47,13 @@ run:
       fly -t concourse land-worker --worker "${worker}"
     done
     echo "wait for landing..."
-    sleep 15 # TODO: we can do better!
+    while [ "$(get_current_worker_count)" > "$(get_old_worker_count)" ]; do
+      echo "...still too many workers currently $(get_old_worker_count) workers"
+      sleep 3
+    done
+    echo "pruning the old workers..."
+    for worker in $(cat workers/names); do
+      echo "--> ${worker} is being pruned"
+      fly -t concourse prune-worker --worker "${worker}"
+    done
     echo "OK!"
