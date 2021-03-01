@@ -233,36 +233,6 @@ jobs:
     params:
       DEPLOYMENT_NAME: ((deployment_name))
 
-
-- name: scale-in
-  serial: true
-  serial_groups: [deploy]
-  plan:
-  - in_parallel:
-    - get: tech-ops-private
-      passed: [prune-workers]
-      trigger: true
-    - get: tech-ops
-      passed: [prune-workers]
-      trigger: true
-    - get: infra
-      passed: [prune-workers]
-    - get: concourse-release
-      passed: [prune-workers]
-      trigger: true
-      params:
-        globs:
-        - concourse-*-linux-amd64.tgz.sha1
-  - task: configure-providers
-    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
-    params:
-      DEPLOYMENT_NAME: ((deployment_name))
-  - task: prune-old-workers
-    file: tech-ops/reliability-engineering/pipelines/tasks/concourse-prune-workers.yml
-    params:
-      DEPLOYMENT_NAME: ((deployment_name))
-
-
 - name: scale-in
   serial: true
   serial_groups: [deploy]
