@@ -2,7 +2,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: govsvc/task-toolbox
+    repository: ghcr.io/alphagov/automate/task-toolbox
     tag: latest
 params:
   AWS_REGION: eu-west-2
