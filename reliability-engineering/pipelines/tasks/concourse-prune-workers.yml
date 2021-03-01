@@ -12,7 +12,6 @@ params:
   FLY_TEAM: main
 inputs:
 - name: concourse-provider-config
-- name: workers
 run:
   path: sh
   args:
@@ -33,12 +32,12 @@ run:
     function get_current_worker_count() {
       fly -t concourse workers | grep "${FLY_TEAM}" | grep running | wc -l
     }
-    function get_old_worker_count() {
-      wc -l <workers/names
+    function get_landed_worker_count() {
+      fly -t concourse workers | grep "${FLY_TEAM}" | grep landed | wc -l
     }
     echo "wait for landing..."
-    while [ "$(get_current_worker_count)" > "$(get_old_worker_count)" ]; do
-      echo "...still too many workers currently $(get_current_worker_count) workers"
+    while [ "$(get_current_worker_count)" != "$(get_landed_worker_count)" ]; do
+      echo "...still too many workers currently $(get_current_worker_count) workers, landed workers $(get_landed_worker_count)"
       sleep 10
     done
     echo "pruning the old workers..."
