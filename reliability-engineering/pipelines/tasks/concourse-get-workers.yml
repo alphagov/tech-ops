@@ -9,9 +9,11 @@ image_resource:
 params:
   DEPLOYMENT_NAME:
   FLY_USERNAME: main
+  FLY_PASSWORD: 
   FLY_TEAM: main
 inputs:
 - name: concourse-provider-config
+  optional: true
 outputs:
 - name: workers
 run:
@@ -23,7 +25,7 @@ run:
   - |
     echo "configuring fly..."
     export PATH="$PATH:/opt/resource"
-    FLY_PASSWORD=$(cat concourse-provider-config/main_team_password)
+    [ -z "$FLY_PASSWORD" ] && FLY_PASSWORD=$(cat concourse-provider-config/main_team_password)
     fly -t concourse login \
       -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" \
       -u "${FLY_USERNAME}" \
@@ -32,5 +34,6 @@ run:
     fly -t concourse sync
     echo "fetching concourse worker names for ${FLY_TEAM}..."
     mkdir -p workers
-    fly -t concourse workers | grep "${FLY_TEAM}" | awk '{print $1}' > workers/names
+    touch workers/names
+    fly -t concourse workers | grep "${FLY_TEAM}" | awk '{print $1}' > workers/names || echo "Failed to get workers"
     echo "OK!"

@@ -9,9 +9,11 @@ image_resource:
 params:
   DEPLOYMENT_NAME:
   FLY_USERNAME: main
+  FLY_PASSWORD:
   FLY_TEAM: main
 inputs:
 - name: concourse-provider-config
+  optional: true
 - name: workers
 run:
   path: sh
@@ -22,7 +24,7 @@ run:
   - |
     echo "configuring fly..."
     export PATH="$PATH:/opt/resource"
-    FLY_PASSWORD=$(cat concourse-provider-config/main_team_password)
+    [ -z "$FLY_PASSWORD" ] && FLY_PASSWORD=$(cat concourse-provider-config/main_team_password)
     fly -t concourse login \
       -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" \
       -u "${FLY_USERNAME}" \
@@ -36,9 +38,11 @@ run:
     function get_old_worker_count() {
       wc -l <workers/names
     }
-    while [ "$(get_current_worker_count)" = "$(get_old_worker_count)" ]; do
-      echo "...still only $(get_old_worker_count) workers"
+    retrys=0
+    until [ "$(get_current_worker_count)" != "$(get_old_worker_count)" ] || [ $retrys -gt 50 ]; do
+      echo "...still only $(get_old_worker_count) workers, retry attempt $retrys"
       sleep 3
+      retrys=$((retrys+1))
     done
     echo "OK!"
     echo "landing old workers..."

@@ -21,7 +21,7 @@ resources:
   icon: github
   type: git
   source:
-    branch: ((deployment_branch))
+    branch: master
     uri: git@github.com:alphagov/tech-ops-private.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -36,7 +36,7 @@ resources:
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
       - reliability-engineering/terraform/modules
-      - reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+      - reliability-engineering/pipelines/tasks/asg-scale-capacity.yml
       - reliability-engineering/pipelines/tasks/concourse-get-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       - reliability-engineering/pipelines/tasks/concourse-provider-config.yml
@@ -188,13 +188,15 @@ jobs:
   - do:
     - in_parallel:
       - task: scale-out-web-node-asg
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml
         params:
           ASG_PREFIX: ((deployment_name))-concourse-web
+          SCALE_OUT: true
       - task: scale-out-main-team-workers-asg
-        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-max-capacity.yml
+        file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml
         params:
           ASG_PREFIX: ((deployment_name))-main-concourse-worker
+          SCALE_OUT: true
     - task: land-old-workers
       file: tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       params:
@@ -241,38 +243,50 @@ jobs:
       var_files:
       - concourse-provider-config/version.tfvars
 
-- name: configure-teams
+- name: generate-roll-team-workers
   serial: true
   plan:
-  - in_parallel:
-    - get: tech-ops-private
-      passed: [scale-in]
-      trigger: true
-    - get: tech-ops
-      attempts: 10
-      passed: [scale-in]
-      trigger: true
-    - get: concourse-release
-      passed: [scale-in]
-      trigger: true
+  - get: tech-ops
+    attempts: 10
+    # passed: [scale-in]
+    passed: [update]
+    trigger: true
   - task: generate-roll-instances-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
-      CONCOURSE_USERNAME: main
-      CONCOURSE_PASSWORD: ((readonly_local_user_password))
+      FLY_USERNAME: main
+      FLY_PASSWORD: ((readonly_local_user_password))
   - set_pipeline: roll-instances
     file: roll-instances-pipeline/roll-instances.json
+    vars:
+      deployment_branch: ((deployment_branch))
+      deployment_tag: ((deployment_tag))
+      deployment_name: ((deployment_name))
+
+- name: configure-info-pipeline
+  serial: true
+  plan:
+  - in_parallel:
+    - get: tech-ops-private
+      attempts: 10
+      passed: [update]
+      trigger: true
+    - get: tech-ops
+      attempts: 10
+      # passed: [scale-in]
+      passed: [update]
+      trigger: true
   - task: generate-deploy-info-pipelines-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
-      CONCOURSE_USERNAME: main
-      CONCOURSE_PASSWORD: ((readonly_local_user_password))
+      FLY_USERNAME: main
+      FLY_PASSWORD: ((readonly_local_user_password))
   - set_pipeline: deploy-info-pipelines
     file: deploy-info-pipelines-pipeline/deploy-info-pipelines.json
     vars:
-      deployment_branch: ((deployment_branch))
+      deployment_branch: master
 
 - name: test
   serial: true
