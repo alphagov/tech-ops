@@ -26,6 +26,7 @@ resources:
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
       - reliability-engineering/terraform/deployments/gds-tech-ops/((deployment_name))
+      - reliability-engineering/terraform/modules/gds-ips
 - name: tech-ops
   icon: github
   type: git
