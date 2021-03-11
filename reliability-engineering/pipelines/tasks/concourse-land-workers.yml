@@ -13,7 +13,7 @@ params:
   FLY_TEAM: main
 inputs:
 - name: concourse-provider-config
-  optional: true
+  optional: true # $FLY_PASSWORD can be set instead of using the provider.
 - name: workers
 run:
   path: sh
@@ -38,12 +38,15 @@ run:
     function get_old_worker_count() {
       wc -l <workers/names
     }
-    retrys=0
-    until [ "$(get_current_worker_count)" != "$(get_old_worker_count)" ] || [ $retrys -gt 50 ]; do
-      echo "...still only $(get_old_worker_count) workers, retry attempt $retrys"
+    retries=0
+    until [ "$(get_current_worker_count)" != "$(get_old_worker_count)" ] || [ $retries -gt 50 ]; do
+      echo "...still only $(get_old_worker_count) workers, retry attempt $retries"
       sleep 3
-      retrys=$((retrys+1))
+      retries=$((retries+1))
     done
+    if [ $retries -gt 50 ]; then
+      echo "Waiting for worker count to change has timed out. Maybe we had to many workers to start with."
+    fi
     echo "OK!"
     echo "landing old workers..."
     for worker in $(cat workers/names); do

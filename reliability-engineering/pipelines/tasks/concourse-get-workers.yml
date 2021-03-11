@@ -13,7 +13,7 @@ params:
   FLY_TEAM: main
 inputs:
 - name: concourse-provider-config
-  optional: true
+  optional: true # $FLY_PASSWORD can be set instead of using the provider.
 outputs:
 - name: workers
 run:

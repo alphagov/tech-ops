@@ -7,8 +7,7 @@ image_resource:
 params:
   AWS_DEFAULT_REGION: eu-west-2
   ASG_PREFIX:
-  SCALE_OUT: True
-  SCALE_IN: False
+  SCALE_DIRECTION: out
 run:
   path: /bin/bash
   args:
@@ -64,12 +63,14 @@ run:
     }
     echo "fetching asg state..."
     asg_fetch_info
-    if [ "$SCALE_OUT" = "true" ]; then
+    if [ "$SCALE_DIRECTION" = "out" ]; then
       echo "trigger scale-out of $(asg_name) to $(asg_max_size) instances..."
       asg_set_desired $(asg_max_size)
-    fi
-    if [ "$SCALE_IN" = "true" ]; then
+    elif [ "$SCALE_DIRECTION" = "in" ]; then
       echo "trigger scale-in of $(asg_name) to $(asg_min_size) instances..."
       asg_set_desired $(asg_min_size)
+    else
+      echo "Unknown SCALE_DIRECTION $SCALE_DIRECTION"
+      exit 13
     fi
     echo "OK"

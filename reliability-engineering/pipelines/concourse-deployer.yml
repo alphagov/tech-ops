@@ -21,7 +21,7 @@ resources:
   icon: github
   type: git
   source:
-    branch: master
+    branch: ((deployment_branch))
     uri: git@github.com:alphagov/tech-ops-private.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -191,12 +191,12 @@ jobs:
         file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml
         params:
           ASG_PREFIX: ((deployment_name))-concourse-web
-          SCALE_OUT: true
+          SCALE_DIRECTION: out
       - task: scale-out-main-team-workers-asg
         file: tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml
         params:
           ASG_PREFIX: ((deployment_name))-main-concourse-worker
-          SCALE_OUT: true
+          SCALE_DIRECTION: out
     - task: land-old-workers
       file: tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       params:
@@ -248,7 +248,6 @@ jobs:
   plan:
   - get: tech-ops
     attempts: 10
-    # passed: [scale-in]
     passed: [update]
     trigger: true
   - task: generate-roll-instances-pipeline
@@ -274,7 +273,6 @@ jobs:
       trigger: true
     - get: tech-ops
       attempts: 10
-      # passed: [scale-in]
       passed: [update]
       trigger: true
   - task: generate-deploy-info-pipelines-pipeline
@@ -286,7 +284,7 @@ jobs:
   - set_pipeline: deploy-info-pipelines
     file: deploy-info-pipelines-pipeline/deploy-info-pipelines.json
     vars:
-      deployment_branch: master
+      deployment_branch: ((deployment_branch))
 
 - name: test
   serial: true

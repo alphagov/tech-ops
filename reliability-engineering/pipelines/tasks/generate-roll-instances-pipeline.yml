@@ -68,7 +68,7 @@ run:
           }
         ],
         "jobs": [.[] | select (.team != "main") | {
-            "name": "roll-sandbox-concourse-workers",
+            "name": "roll-" + .team + "-concourse-workers",
             "serial": true,
             "plan": [
               {
@@ -96,7 +96,7 @@ run:
                 "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
                 "params": {
                   "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .team + "-concourse-worker"),
-                  "SCALE_OUT": true
+                  "SCALE_DIRECTION": "out"
                 }
               },
               {
@@ -113,8 +113,7 @@ run:
                 "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
                 "params": {
                   "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .team + "-concourse-worker"),
-                  "SCALE_OUT": false,
-                  "SCALE_IN": true
+                  "SCALE_DIRECTION": "in"
                 }
               }
             ]
