@@ -68,7 +68,7 @@ run:
           }
         ],
         "jobs": [.[] | select (.team != "main") | {
-            "name": "roll-" + .team + "-concourse-workers",
+            "name": ("roll-" + .team + "-concourse-workers"),
             "serial": true,
             "plan": [
               {
