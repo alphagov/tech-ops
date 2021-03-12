@@ -1,7 +1,7 @@
 resource "aws_autoscaling_group" "concourse_worker" {
   name                = "${var.deployment}-${var.name}-concourse-worker"
   max_size            = var.desired_capacity * 2
-  min_size            = 0
+  min_size            = var.desired_capacity
   desired_capacity    = var.desired_capacity
   vpc_zone_identifier = var.subnet_ids
 
