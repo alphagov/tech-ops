@@ -12,8 +12,8 @@ outputs:
 - name: deploy-info-pipelines-pipeline
 params:
   DEPLOYMENT_NAME:
-  CONCOURSE_USERNAME:
-  CONCOURSE_PASSWORD:
+  FLY_USERNAME:
+  FLY_PASSWORD:
 run:
   path: /bin/bash
   args:
@@ -24,7 +24,7 @@ run:
     apk update && apk add jq
     mkdir -p deploy-info-pipelines-pipeline
     export PATH="$PATH:/opt/resource"
-    fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD -n $CONCOURSE_USERNAME
+    fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $FLY_USERNAME -p $FLY_PASSWORD -n $FLY_USERNAME
     fly -t concourse sync
     fly -t concourse teams --json | jq '{
       "resources": [

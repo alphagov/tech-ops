@@ -7,6 +7,7 @@ image_resource:
 params:
   AWS_DEFAULT_REGION: eu-west-2
   ASG_PREFIX:
+  SCALE_DIRECTION: out
 run:
   path: /bin/bash
   args:
@@ -30,7 +31,13 @@ run:
       jq -r '.MaxSize' <asg.json
     }
     function asg_min_size() {
-      jq -r '.MinSize' <asg.json
+      result=$(jq -r '.MinSize' <asg.json)
+
+      if [ $result -eq 0 ]; then
+        result=1
+      fi
+
+      echo $result
     }
     function asg_name() {
       jq -r '.AutoScalingGroupName' <asg.json
@@ -56,6 +63,14 @@ run:
     }
     echo "fetching asg state..."
     asg_fetch_info
-    echo "trigger scale-out of $(asg_name) to $(asg_max_size) instances..."
-    asg_set_desired $(asg_max_size)
+    if [ "$SCALE_DIRECTION" = "out" ]; then
+      echo "trigger scale-out of $(asg_name) to $(asg_max_size) instances..."
+      asg_set_desired $(asg_max_size)
+    elif [ "$SCALE_DIRECTION" = "in" ]; then
+      echo "trigger scale-in of $(asg_name) to $(asg_min_size) instances..."
+      asg_set_desired $(asg_min_size)
+    else
+      echo "Unknown SCALE_DIRECTION $SCALE_DIRECTION"
+      exit 13
+    fi
     echo "OK"

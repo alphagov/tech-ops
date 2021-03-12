@@ -6,14 +6,12 @@ image_resource:
     tag: dev
   version:
     digest: sha256:cd899511e06c3027dc8429f4b38ba8ea32a4c0bea044f4711899d5987abf8fdf
-inputs:
-- name: tech-ops-private
 outputs:
 - name: roll-instances-pipeline
 params:
   DEPLOYMENT_NAME:
-  CONCOURSE_USERNAME:
-  CONCOURSE_PASSWORD:
+  FLY_USERNAME:
+  FLY_PASSWORD:
 run:
   path: /bin/bash
   args:
@@ -24,7 +22,7 @@ run:
     apk update && apk add jq
     mkdir -p roll-instances-pipeline
     export PATH="$PATH:/opt/resource"
-    fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD -n $CONCOURSE_USERNAME
+    fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $FLY_USERNAME -p $FLY_PASSWORD -n $FLY_USERNAME
     fly -t concourse sync
     jq -s '.[0] * .[1]' \
       <(fly -t concourse teams --json \
@@ -35,65 +33,90 @@ run:
         | jq '[group_by (.team)[] | {"team": (.[0].team), "workers": (. | length)}]' \
         | jq 'map( {(.team): .} ) | add' \
       ) | jq 'to_entries | map_values(.value) | {
-      "resources": [
-        {
-          "name": "every-weekday-evening",
-          "type": "time",
-          "source": {
-            "location": "Europe/London",
-            "start": "20:00",
-            "stop": "21:00",
-            "days": [
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday"
-            ]
-          }
-        },
-        {
-          "name": "awsc-image",
-          "type": "docker-image",
-          "source": {
-            "repository": "govsvc/awsc"
-          }
-        }
-      ],
-      "jobs": [.[] | select (.team != "main") | {
-        "name": ("roll-" + .team + "-concourse-workers"),
-        "serial": true,
-        "plan": [
+        "resources": [
           {
-            "in_parallel": [
-              {
-                "get": "every-weekday-evening",
-                "trigger": true
-              },
-              {
-                "get": "awsc-image"
-              }
-            ]
+            "name": "every-weekday-evening",
+            "type": "time",
+            "source": {
+              "location": "Europe/London",
+              "start": "20:00",
+              "stop": "21:00",
+              "days": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday"
+              ]
+            }
           },
           {
-            "task": "roll-instances",
-            "image": "awsc-image",
-            "config": {
-              "platform": "linux",
-              "params": {
-                "TEAM": .team,
-                "DEPLOYMENT_NAME": .deployment,
-                "MINIMUM_HEALTHY": (if (100 / .workers) == 100 then 0 else (100 / .workers) end)
-              },
-              "run": {
-                "path": "sh",
-                "args": [
-                  "-c",
-                  "set -ue; AWS_REGION=eu-west-2 awsc autoscaling migrate $DEPLOYMENT_NAME-$TEAM-concourse-worker -m $MINIMUM_HEALTHY"
-                ]
-              }
+            "name": "tech-ops",
+            "icon": "github",
+            "type": "git",
+            "source": {
+              "branch": ("((" + "deployment_branch" + "))"),
+              "tag_filter": ("((" + "deployment_tag" + "))"),
+              "uri": "git@github.com:alphagov/tech-ops.git",
+              "private_key": ("((" + "re-autom8-ci-github-ssh-private-key" + "))"),
+              "paths": [
+                "reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+                "reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
+                "reliability-engineering/pipelines/tasks/concourse-land-workers.yml"
+              ]
             }
           }
+        ],
+        "jobs": [.[] | select (.team != "main") | {
+            "name": "roll-" + .team + "-concourse-workers",
+            "serial": true,
+            "plan": [
+              {
+                "in_parallel": [
+                  {
+                    "get": "every-weekday-evening",
+                    "trigger": true
+                  },
+                  {
+                    "get": "tech-ops"
+                  }
+                ]
+              },
+              {
+                "task": "get-current-workers",
+                "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
+                "params": {
+                  "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
+                  "FLY_PASSWORD" : ("((" + "readonly_local_user_password" + "))"),
+                  "FLY_TEAM": (.team)
+                }
+              },
+              {
+                "task": ("scale-out-" + .team + "-team-workers-asg"),
+                "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+                "params": {
+                  "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .team + "-concourse-worker"),
+                  "SCALE_DIRECTION": "out"
+                }
+              },
+              {
+                "task": "land-old-workers",
+                "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml",
+                "params": {
+                  "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
+                  "FLY_PASSWORD" : ("((" + "readonly_local_user_password" + "))"),
+                  "FLY_TEAM": (.team)
+                }
+              },
+              {
+                "task": ("scale-in-" + .team + "-team-workers-asg"),
+                "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+                "params": {
+                  "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .team + "-concourse-worker"),
+                  "SCALE_DIRECTION": "in"
+                }
+              }
+            ]
+          }
         ]
-      }]
-    }' > roll-instances-pipeline/roll-instances.json
+      }' > roll-instances-pipeline/roll-instances.json
