@@ -249,7 +249,7 @@ jobs:
   plan:
   - get: tech-ops
     attempts: 10
-    passed: [update]
+    passed: [scale-in]
     trigger: true
   - task: generate-roll-instances-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
@@ -270,11 +270,11 @@ jobs:
   - in_parallel:
     - get: tech-ops-private
       attempts: 10
-      passed: [update]
+      passed: [scale-in]
       trigger: true
     - get: tech-ops
       attempts: 10
-      passed: [update]
+      passed: [scale-in]
       trigger: true
   - task: generate-deploy-info-pipelines-pipeline
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
@@ -366,10 +366,10 @@ jobs:
   plan:
   - in_parallel:
     - get: tech-ops
-      passed: [test]
+      passed: [generate-roll-team-workers, configure-info-pipeline, test]
       trigger: true
     - get: concourse-release
-      passed: [test]
+      passed: [generate-roll-team-workers, configure-info-pipeline, test]
       trigger: true
     - get: version
       params: {bump: minor}
