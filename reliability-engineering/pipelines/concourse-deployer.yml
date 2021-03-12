@@ -369,7 +369,7 @@ jobs:
       passed: [generate-roll-team-workers, configure-info-pipeline, test]
       trigger: true
     - get: concourse-release
-      passed: [generate-roll-team-workers, configure-info-pipeline, test]
+      passed: [test]
       trigger: true
     - get: version
       params: {bump: minor}
