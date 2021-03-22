@@ -14,6 +14,18 @@ variable "number_of_availability_zones" {
   default = 2
 }
 
+variable "openid_connect_provider_url" {
+  type = string
+}
+
+variable "openid_connect_provider_client_id" {
+    type = string
+}
+
+variable "openid_connect_provider_tls_cert_thumbprints" {
+  type = list(string)
+}
+
 data "aws_availability_zones" "available" {}
 
 locals {
