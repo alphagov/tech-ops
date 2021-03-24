@@ -8,10 +8,14 @@ data "archive_file" "sts_lambda_function_py" {
   }
 }
 
+locals {
+  function_name = "${var.deployment}_sts_creds_to_ssm"
+}
+
 resource "aws_lambda_function" "sts_creds_to_ssm" {
   filename         = data.archive_file.sts_lambda_function_py.output_path
   source_code_hash = data.archive_file.sts_lambda_function_py.output_base64sha256
-  function_name    = "${var.deployment}_sts_creds_to_ssm"
+  function_name    = local.function_name
 
   role        = var.lambda_execution_role_arn
   handler     = "lambda_function.lambda_handler"
@@ -27,6 +31,8 @@ resource "aws_lambda_function" "sts_creds_to_ssm" {
       KEY_ID     = var.kms_key_id
     }
   }
+
+  depends_on = [aws_cloudwatch_log_group.sts_lambda]
 }
 
 resource "aws_cloudwatch_event_rule" "every_ten_minutes" {
@@ -61,6 +67,6 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_sts_creds_to_ssm" {
 }
 
 resource "aws_cloudwatch_log_group" "sts_lambda" {
-  name              = "/aws/lambda/${aws_lambda_function.sts_creds_to_ssm.function_name}"
+  name              = "/aws/lambda/${local.function_name}"
   retention_in_days = 7
 }
