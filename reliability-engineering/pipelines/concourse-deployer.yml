@@ -55,7 +55,7 @@ resources:
     backend_type: s3
     private_key: ((re-autom8-ci-github-ssh-private-key))
     backend_config:
-      bucket: gds-tech-ops-tfstate
+      bucket: ((statefile_bucket))
       region: eu-west-2
       key: ((deployment_name)).tfstate
 - name: version
@@ -128,6 +128,7 @@ jobs:
       deployment_branch: ((deployment_branch))
       deployment_tag: ((deployment_tag))
       background_image: ((background-image))
+      statefile_bucket: ((statefile_bucket))
 
 - name: deploy
   serial: true
