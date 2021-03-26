@@ -127,7 +127,7 @@ jobs:
       deployment_name: ((deployment_name))
       deployment_branch: ((deployment_branch))
       deployment_tag: ((deployment_tag))
-      background_image: ((background-image))
+      background_image: ((background_image))
 
 - name: deploy
   serial: true
