@@ -125,6 +125,7 @@ jobs:
     file: tech-ops/reliability-engineering/pipelines/concourse-deployer.yml
     vars:
       deployment_name: ((deployment_name))
+      deployment_subdomain: ((deployment_subdomain))
       deployment_account_name: ((deployment_account_name))
       deployment_branch: ((deployment_branch))
       deployment_tag: ((deployment_tag))
@@ -153,6 +154,7 @@ jobs:
     file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
+      DEPLOYMENT_SUBDOMAIN: ((deployment_subdomain))
   - put: infra
     params:
       terraform_source: tech-ops-private/reliability-engineering/terraform/deployments/((deployment_account_name))/((deployment_name))
@@ -184,10 +186,12 @@ jobs:
     file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
+      DEPLOYMENT_SUBDOMAIN: ((deployment_subdomain))
   - task: get-current-workers
     file: tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
+      DEPLOYMENT_SUBDOMAIN: ((deployment_subdomain))
   - do:
     - in_parallel:
       - task: scale-out-web-node-asg
@@ -204,6 +208,7 @@ jobs:
       file: tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml
       params:
         DEPLOYMENT_NAME: ((deployment_name))
+        DEPLOYMENT_SUBDOMAIN: ((deployment_subdomain))
     on_failure:
       put: infra # try to scale back in on failure to stay in sync
       attempts: 10
@@ -237,6 +242,7 @@ jobs:
     file: tech-ops/reliability-engineering/pipelines/tasks/concourse-provider-config.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
+      DEPLOYMENT_SUBDOMAIN: ((deployment_subdomain))
   - put: infra
     attempts: 10
     params:
@@ -257,6 +263,7 @@ jobs:
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
+      DEPLOYMENT_SUBDOMAIN: ((deployment_subdomain))
       FLY_USERNAME: main
       FLY_PASSWORD: ((readonly_local_user_password))
   - set_pipeline: roll-instances
@@ -282,6 +289,7 @@ jobs:
     file: tech-ops/reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
     params:
       DEPLOYMENT_NAME: ((deployment_name))
+      DEPLOYMENT_SUBDOMAIN: ((deployment_subdomain))
       FLY_USERNAME: main
       FLY_PASSWORD: ((readonly_local_user_password))
   - set_pipeline: deploy-info-pipelines

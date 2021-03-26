@@ -8,6 +8,7 @@ image_resource:
     digest: sha256:cd899511e06c3027dc8429f4b38ba8ea32a4c0bea044f4711899d5987abf8fdf
 params:
   DEPLOYMENT_NAME:
+  DEPLOYMENT_SUBDOMAIN:
   FLY_USERNAME: main
   FLY_PASSWORD: 
   FLY_TEAM: main
@@ -27,7 +28,7 @@ run:
     export PATH="$PATH:/opt/resource"
     [ -z "$FLY_PASSWORD" ] && FLY_PASSWORD=$(cat concourse-provider-config/main_team_password)
     fly -t concourse login \
-      -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" \
+      -c "https://${DEPLOYMENT_NAME}${DEPLOYMENT_SUBDOMAIN}.gds-reliability.engineering" \
       -u "${FLY_USERNAME}" \
       -p "${FLY_PASSWORD}" \
       -n "${FLY_TEAM}"
