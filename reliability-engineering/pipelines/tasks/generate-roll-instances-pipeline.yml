@@ -10,6 +10,7 @@ outputs:
 - name: roll-instances-pipeline
 params:
   DEPLOYMENT_NAME:
+  DEPLOYMENT_SUBDOMAIN:
   FLY_USERNAME:
   FLY_PASSWORD:
 run:
@@ -22,7 +23,7 @@ run:
     apk update && apk add jq
     mkdir -p roll-instances-pipeline
     export PATH="$PATH:/opt/resource"
-    fly -t concourse login -c "https://${DEPLOYMENT_NAME}.gds-reliability.engineering" -u $FLY_USERNAME -p $FLY_PASSWORD -n $FLY_USERNAME
+    fly -t concourse login -c "https://${DEPLOYMENT_NAME}${DEPLOYMENT_SUBDOMAIN}.gds-reliability.engineering" -u $FLY_USERNAME -p $FLY_PASSWORD -n $FLY_USERNAME
     fly -t concourse sync
     jq -s '.[0] * .[1]' \
       <(fly -t concourse teams --json \
@@ -87,6 +88,7 @@ run:
                 "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
                 "params": {
                   "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
+                  "DEPLOYMENT_SUBDOMAIN": ("((" + "deployment_subdomain" + "))"),
                   "FLY_PASSWORD" : ("((" + "readonly_local_user_password" + "))"),
                   "FLY_TEAM": (.team)
                 }
@@ -104,6 +106,7 @@ run:
                 "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml",
                 "params": {
                   "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
+                  "DEPLOYMENT_SUBDOMAIN": ("((" + "deployment_subdomain" + "))"),
                   "FLY_PASSWORD" : ("((" + "readonly_local_user_password" + "))"),
                   "FLY_TEAM": (.team)
                 }
