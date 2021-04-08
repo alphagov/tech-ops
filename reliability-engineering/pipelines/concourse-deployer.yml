@@ -269,6 +269,7 @@ jobs:
   - set_pipeline: roll-instances
     file: roll-instances-pipeline/roll-instances.json
     vars:
+      deployment_subdomain: ((deployment_subdomain))
       deployment_branch: ((deployment_branch))
       deployment_tag: ((deployment_tag))
       deployment_name: ((deployment_name))
