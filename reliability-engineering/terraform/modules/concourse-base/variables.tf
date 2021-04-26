@@ -15,15 +15,16 @@ variable "number_of_availability_zones" {
 }
 
 variable "openid_connect_provider_url" {
-  type = string
+  default = ""
 }
 
 variable "openid_connect_provider_client_id" {
-    type = string
+  default = ""
 }
 
 variable "openid_connect_provider_tls_cert_thumbprints" {
   type = list(string)
+  default = []
 }
 
 data "aws_availability_zones" "available" {}
