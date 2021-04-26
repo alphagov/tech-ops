@@ -5,24 +5,16 @@ resource "tls_private_key" "concourse_worker_ssh_keys" {
   rsa_bits  = 4096
 }
 
-locals {
-  concourse_worker_ssh_public_keys_openssh = zipmap(
-    toset(var.worker_team_names),
-    [for key in tls_private_key.concourse_worker_ssh_keys : key.public_key_openssh],
-  )
-
-  concourse_worker_ssh_private_keys_pem = zipmap(
-    toset(var.worker_team_names),
-    [for key in tls_private_key.concourse_worker_ssh_keys : key.private_key_pem],
-  )
-}
-
 output "concourse_worker_ssh_public_keys_openssh" {
-  value = local.concourse_worker_ssh_public_keys_openssh
+  value = {
+    for name in var.worker_team_names : name => tls_private_key.concourse_worker_ssh_keys[name].public_key_openssh
+  }
 }
 
 output "concourse_worker_ssh_private_keys_pem" {
-  value = local.concourse_worker_ssh_private_keys_pem
+  value = {
+    for name in var.worker_team_names : name => tls_private_key.concourse_worker_ssh_keys[name].private_key_pem
+  }
 }
 
 resource "aws_iam_role" "concourse_workers" {
@@ -53,9 +45,13 @@ ARP
 }
 
 output "concourse_worker_iam_role_names" {
-  value = zipmap(toset(var.worker_team_names), [for role in aws_iam_role.concourse_workers : role.name])
+  value = {
+    for name in var.worker_team_names : name => aws_iam_role.concourse_workers[name].name
+  }
 }
 
 output "concourse_worker_iam_role_arns" {
-  value = zipmap(toset(var.worker_team_names), [for role in aws_iam_role.concourse_workers : role.arn])
+  value = {
+    for name in var.worker_team_names : name => aws_iam_role.concourse_workers[name].arn
+  }
 }
