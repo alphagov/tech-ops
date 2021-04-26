@@ -20,8 +20,7 @@ resource "aws_ssm_parameter" "concourse_local_usernames_and_passwords" {
 }
 
 output "local_user_passwords" {
-  value = zipmap(
-    toset(var.worker_team_names),
-    [for password in random_string.local_user_password : password.result],
-  )
+  value = {
+    for name in var.worker_team_names : name => random_string.local_user_password[name].result
+  }
 }
