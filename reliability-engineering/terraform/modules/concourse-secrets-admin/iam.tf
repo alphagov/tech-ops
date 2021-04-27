@@ -7,7 +7,7 @@ resource "aws_iam_role" "concourse_secrets_admin" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = module.concourse_base.aws_iam_openid_connect_provider_arn
+          Federated = var.iam_oidc_provider_arn
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -21,7 +21,7 @@ resource "aws_iam_role" "concourse_secrets_admin" {
         Effect = "Allow"
         Action = "sts:TagSession"
         Principal = {
-          Federated = module.concourse_base.aws_iam_openid_connect_provider_arn
+          Federated = var.iam_oidc_provider_arn
         }
       }
     ]

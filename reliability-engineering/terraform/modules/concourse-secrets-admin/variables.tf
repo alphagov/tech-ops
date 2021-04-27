@@ -16,6 +16,10 @@ variable "oidc_host_path" {
   type = string
 }
 
+variable "iam_oidc_provider_arn" {
+  type = string
+}
+
 variable "github_oauth_client_id" {
   type = string
 }
