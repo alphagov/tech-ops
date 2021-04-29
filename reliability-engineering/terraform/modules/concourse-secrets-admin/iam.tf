@@ -25,7 +25,7 @@ resource "aws_iam_role" "concourse_secrets_admin" {
         }
       }
     ]
-  }
+  })
 }
 
 resource "aws_iam_role_policy" "concourse_secrets_admin" {
