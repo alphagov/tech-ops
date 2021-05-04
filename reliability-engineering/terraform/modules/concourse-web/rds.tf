@@ -23,7 +23,7 @@ resource "aws_db_instance" "concourse" {
   storage_type                 = var.db_storage_type
   iops                         = var.db_storage_iops
   engine                       = "postgres"
-  engine_version               = "10"
+  engine_version               = "13"
   instance_class               = var.db_instance_type
   final_snapshot_identifier    = "${var.deployment}-concourse-final"
   storage_encrypted            = true
