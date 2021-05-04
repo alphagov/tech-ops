@@ -63,6 +63,7 @@ resource "aws_iam_role_policy" "concourse_secrets_admin" {
           "kms:ListAliases",
           "kms:Describe*",
           "kms:Decrypt",
+          "kms:Encrypt",
         ]
         Effect = "Allow"
         Resource = var.kms_key_arn
