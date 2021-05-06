@@ -93,7 +93,7 @@ variable "instance_type" {
 }
 
 variable "db_instance_type" {
-  default = "db.t3.micro"
+  default = "db.t3.small"
 }
 
 variable "db_storage_gb" {
