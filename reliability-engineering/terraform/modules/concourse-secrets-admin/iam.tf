@@ -24,7 +24,16 @@ resource "aws_iam_role" "concourse_secrets_admin" {
           Federated = var.iam_oidc_provider_arn
         }
       }
-    ]
+    ] + (length(var.allowed_cidrs) == 0 ? [] : [{
+        Effect = "Deny"
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          NotIpAddress = {
+            "aws:SourceIp" = var.allowed_cidrs
+          }
+        }
+      }
+    ])
   })
 }
 
@@ -68,6 +77,15 @@ resource "aws_iam_role_policy" "concourse_secrets_admin" {
         Effect = "Allow"
         Resource = var.kms_key_arn
       }
-    ]
+    ] + (length(var.allowed_cidrs) == 0 ? [] : [{
+        Effect = "Deny"
+        Action = "*"
+        Condition = {
+          NotIpAddress = {
+            "aws:SourceIp" = var.allowed_cidrs
+          }
+        }
+      }
+    ])
   })
 }
