@@ -25,7 +25,13 @@ variable "github_oauth_client_id" {
 }
 
 variable "trusted_github_team_id" {
+  default = ""
   type = string
+}
+
+variable "trusted_github_team_ids" {
+  default = []
+  type = list(string)
 }
 
 variable "allowed_cidrs" {
