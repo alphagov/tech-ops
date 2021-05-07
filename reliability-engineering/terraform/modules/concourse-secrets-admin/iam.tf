@@ -5,7 +5,10 @@ resource "aws_iam_role" "concourse_secrets_admin" {
     Version = "2012-10-17"
     Statement = concat(
       [
-        {
+        for team_id in concat(
+          var.trusted_github_team_id == "" ? [] : [var.trusted_github_team_id],
+          var.trusted_github_team_ids
+        ) : {
           Effect = "Allow"
           Principal = {
             Federated = var.iam_oidc_provider_arn
@@ -14,10 +17,13 @@ resource "aws_iam_role" "concourse_secrets_admin" {
           Condition = {
             StringEquals = {
               "${var.oidc_host_path}:aud" = var.github_oauth_client_id
-              "aws:RequestTag/t${var.trusted_github_team_id}" = "t"
+              "aws:RequestTag/t${team_id}" = "t"
             }
           }
-        }, {
+        }
+      ],
+      [
+        {
           Sid = "AllowPassSessionTagsAndTransitive"
           Effect = "Allow"
           Action = "sts:TagSession"
