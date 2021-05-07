@@ -27,7 +27,11 @@ resource "aws_iam_role" "concourse_secrets_admin" {
         }
       ],
       (length(var.allowed_cidrs) == 0 ? [] : [{
+          Sid = "DisallowAssumeFromUntrustedCIDR"
           Effect = "Deny"
+          Principal = {
+            Federated = var.iam_oidc_provider_arn
+          }
           Action = "sts:AssumeRoleWithWebIdentity"
           Condition = {
             NotIpAddress = {
