@@ -87,8 +87,10 @@ resource "aws_iam_role_policy" "concourse_secrets_admin" {
         }
       ],
       (length(var.allowed_cidrs) == 0 ? [] : [{
+          Sid = "DisallowAllFromUntrustedCIDR"
           Effect = "Deny"
           Action = "*"
+          Resource = "*"
           Condition = {
             NotIpAddress = {
               "aws:SourceIp" = var.allowed_cidrs
