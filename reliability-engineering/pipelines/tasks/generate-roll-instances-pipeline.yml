@@ -25,101 +25,103 @@ run:
     export PATH="$PATH:/opt/resource"
     fly -t concourse login -c "https://${DEPLOYMENT_NAME}${DEPLOYMENT_SUBDOMAIN}.gds-reliability.engineering" -u $FLY_USERNAME -p $FLY_PASSWORD -n $FLY_USERNAME
     fly -t concourse sync
-    jq -s '.[0] * .[1]' \
-      <(fly -t concourse teams --json \
-        | jq "[.[] | {team: .name, workers: 1, deployment: \"${DEPLOYMENT_NAME}\"}]" \
-        | jq 'map( {(.team): .} ) | add' \
-      ) \
-      <(fly -t concourse workers --json \
-        | jq '[group_by (.team)[] | {"team": (.[0].team), "workers": (. | length)}]' \
-        | jq 'map( {(.team): .} ) | add' \
-      ) | jq 'to_entries | map_values(.value) | {
-        "resources": [
-          {
-            "name": "every-weekday-evening",
-            "type": "time",
-            "source": {
-              "location": "Europe/London",
-              "start": "20:00",
-              "stop": "21:00",
-              "days": [
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday"
-              ]
-            }
-          },
-          {
-            "name": "tech-ops",
-            "icon": "github",
-            "type": "git",
-            "source": {
-              "branch": ("((" + "deployment_branch" + "))"),
-              "tag_filter": ("((" + "deployment_tag" + "))"),
-              "uri": "git@github.com:alphagov/tech-ops.git",
-              "private_key": ("((" + "re-autom8-ci-github-ssh-private-key" + "))"),
-              "paths": [
-                "reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
-                "reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
-                "reliability-engineering/pipelines/tasks/concourse-land-workers.yml"
-              ]
-            }
-          }
-        ],
-        "jobs": [.[] | select (.team != "main") | {
-            "name": ("roll-" + .team + "-concourse-workers"),
-            "serial": true,
-            "plan": [
-              {
-                "in_parallel": [
-                  {
-                    "get": "every-weekday-evening",
-                    "trigger": true
-                  },
-                  {
-                    "get": "tech-ops"
-                  }
-                ]
-              },
-              {
-                "task": "get-current-workers",
-                "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
-                "params": {
-                  "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
-                  "DEPLOYMENT_SUBDOMAIN": ("((" + "deployment_subdomain" + "))"),
-                  "FLY_PASSWORD" : ("((" + "readonly_local_user_password" + "))"),
-                  "FLY_TEAM": (.team)
-                }
-              },
-              {
-                "task": ("scale-out-" + .team + "-team-workers-asg"),
-                "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
-                "params": {
-                  "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .team + "-concourse-worker"),
-                  "SCALE_DIRECTION": "out"
-                }
-              },
-              {
-                "task": "land-old-workers",
-                "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml",
-                "params": {
-                  "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
-                  "DEPLOYMENT_SUBDOMAIN": ("((" + "deployment_subdomain" + "))"),
-                  "FLY_PASSWORD" : ("((" + "readonly_local_user_password" + "))"),
-                  "FLY_TEAM": (.team)
-                }
-              },
-              {
-                "task": ("scale-in-" + .team + "-team-workers-asg"),
-                "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
-                "params": {
-                  "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .team + "-concourse-worker"),
-                  "SCALE_DIRECTION": "in"
-                }
-              }
+    fly -t concourse teams --json | jq 'def rolltasks: [
+      {
+        "task": ("get-current-" + .name + "-team-workers"),
+        "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
+        "params": {
+          "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
+          "DEPLOYMENT_SUBDOMAIN": ("((" + "deployment_subdomain" + "))"),
+          "FLY_PASSWORD" : ("((" + "readonly_local_user_password" + "))"),
+          "FLY_TEAM": .name
+        }
+      },
+      {
+        "task": ("scale-out-" + .name + "-team-workers-asg"),
+        "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+        "params": {
+          "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .name + "-concourse-worker"),
+          "SCALE_DIRECTION": "out"
+        }
+      },
+      {
+        "task": ("land-old-" + .name + "-team-workers"),
+        "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml",
+        "params": {
+          "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
+          "DEPLOYMENT_SUBDOMAIN": ("((" + "deployment_subdomain" + "))"),
+          "FLY_PASSWORD" : ("((" + "readonly_local_user_password" + "))"),
+          "FLY_TEAM": .name
+        }
+      },
+      {
+        "task": ("scale-in-" + .name + "-team-workers-asg"),
+        "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+        "params": {
+          "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .name + "-concourse-worker"),
+          "SCALE_DIRECTION": "in"
+        }
+      }
+    ]; [.[] | select(.name != "main")] | {
+      "resources": [
+        {
+          "name": "every-weekday-evening",
+          "type": "time",
+          "source": {
+            "location": "Europe/London",
+            "start": "20:00",
+            "stop": "21:00",
+            "days": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday"
             ]
           }
-        ]
-      }' > roll-instances-pipeline/roll-instances.json
+        },
+        {
+          "name": "tech-ops",
+          "icon": "github",
+          "type": "git",
+          "source": {
+            "branch": ("((" + "deployment_branch" + "))"),
+            "tag_filter": ("((" + "deployment_tag" + "))"),
+            "uri": "git@github.com:alphagov/tech-ops.git",
+            "private_key": ("((" + "re-autom8-ci-github-ssh-private-key" + "))"),
+            "paths": [
+              "reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+              "reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
+              "reliability-engineering/pipelines/tasks/concourse-land-workers.yml"
+            ]
+          }
+        }
+      ],
+      "jobs": ([
+        {
+          "name": "roll-all-concourse-workers",
+          "serial": true,
+          "plan": ([
+            {
+              "in_parallel": [
+                {
+                  "get": "every-weekday-evening",
+                  "trigger": true
+                },
+                {
+                  "get": "tech-ops"
+                }
+              ]
+            }
+          ] + [.[] | rolltasks | {"do": .}])
+        }
+      ] + [.[] | {
+        "name": ("roll-" + .name + "-concourse-workers"),
+        "serial": true,
+        "plan": ([
+          {
+            "get": "tech-ops"
+          }
+        ] + (. | rolltasks))
+      }])
+    }' > roll-instances-pipeline/roll-instances.json
