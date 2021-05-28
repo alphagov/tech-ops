@@ -8,6 +8,8 @@ params:
   AWS_DEFAULT_REGION: eu-west-2
   ASG_PREFIX:
   SCALE_DIRECTION: out
+  SUSPEND_SCHEDULED_SCALING_BEFORE:
+  RESUME_SCHEDULED_SCALING_AFTER:
 run:
   path: /bin/bash
   args:
@@ -61,8 +63,17 @@ run:
         asg_fetch_info
       done
     }
+
     echo "fetching asg state..."
     asg_fetch_info
+
+    if [ -n "$SUSPEND_SCHEDULED_SCALING_BEFORE" ] && [ "$SUSPEND_SCHEDULED_SCALING_BEFORE" != 'false' ]; then
+      echo "suspending scheduled scaling events for $(asg_name)..."
+      aws autoscaling suspend-processes \
+        --auto-scaling-group-name "$(asg_name)" \
+        --scaling-processes ScheduledActions
+    fi
+
     if [ "$SCALE_DIRECTION" = "out" ]; then
       echo "trigger scale-out of $(asg_name) to $(asg_max_size) instances..."
       asg_set_desired $(asg_max_size)
@@ -73,4 +84,12 @@ run:
       echo "Unknown SCALE_DIRECTION $SCALE_DIRECTION"
       exit 13
     fi
+
+    if [ -n "$RESUME_SCHEDULED_SCALING_AFTER" ] && [ "$RESUME_SCHEDULED_SCALING_AFTER" != 'false' ]; then
+      echo "resuming scheduled scaling events for $(asg_name)..."
+      aws autoscaling resume-processes \
+        --auto-scaling-group-name "$(asg_name)" \
+        --scaling-processes ScheduledActions
+    fi
+
     echo "OK"

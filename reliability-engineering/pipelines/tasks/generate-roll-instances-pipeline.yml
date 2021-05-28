@@ -41,7 +41,8 @@ run:
         "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
         "params": {
           "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .name + "-concourse-worker"),
-          "SCALE_DIRECTION": "out"
+          "SCALE_DIRECTION": "out",
+          "SUSPEND_SCHEDULED_SCALING_BEFORE": true
         }
       },
       {
@@ -59,7 +60,8 @@ run:
         "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
         "params": {
           "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .name + "-concourse-worker"),
-          "SCALE_DIRECTION": "in"
+          "SCALE_DIRECTION": "in",
+          "RESUME_SCHEDULED_SCALING_AFTER": true
         }
       }
     ]; [.[] | select(.name != "main")] | {
