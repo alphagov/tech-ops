@@ -27,6 +27,15 @@ run:
     fly -t concourse sync
     fly -t concourse teams --json | jq 'def rolltasks: [
       {
+        "task": ("ensure-" + .name + "-team-workers-asg-scaled-in"),
+        "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+        "params": {
+          "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .name + "-concourse-worker"),
+          "SCALE_DIRECTION": "in",
+          "SUSPEND_SCHEDULED_SCALING_BEFORE": true
+        }
+      },
+      {
         "task": ("get-current-" + .name + "-team-workers"),
         "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
         "params": {
@@ -41,8 +50,7 @@ run:
         "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
         "params": {
           "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .name + "-concourse-worker"),
-          "SCALE_DIRECTION": "out",
-          "SUSPEND_SCHEDULED_SCALING_BEFORE": true
+          "SCALE_DIRECTION": "out"
         }
       },
       {
