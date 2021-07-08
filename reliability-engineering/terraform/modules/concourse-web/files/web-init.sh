@@ -161,6 +161,70 @@ EOF
 systemctl daemon-reload
 systemctl enable concourse-web
 
+
+cat <<'EOF' > /usr/local/bin/check-available-memory
+#!/bin/bash
+set -ue
+MIN_MEM_AVAILABLE_PERCENT='20'
+MEM_AVAILABLE_KB=$(grep -m 1 -P '^MemAvailable:\s+\d+\s*kB$' /proc/meminfo | grep -o -P '\d+')
+MEM_TOTAL_KB=$(grep -m 1 -P '^MemTotal:\s+\d+\s*kB$' /proc/meminfo | grep -o -P '\d+')
+
+if [ -z "$${MEM_AVAILABLE_KB}" ]; then
+  echo "WARNING: couldn't determine MemAvailable"
+  exit 18
+fi
+
+if [ -z "$${MEM_TOTAL_KB}" ]; then
+  echo "WARNING: couldn't determine MemTotal"
+  exit 19
+fi
+
+MEM_AVAILABLE_PERCENT=$(awk "BEGIN {print 100 * $${MEM_AVAILABLE_KB} / $${MEM_TOTAL_KB}}")
+echo "Calculated memory available: $${MEM_AVAILABLE_PERCENT}%"
+
+if awk "BEGIN {exit !($${MEM_AVAILABLE_PERCENT} < $${MIN_MEM_AVAILABLE_PERCENT})}"; then
+  echo "Determining instance id"
+  INSTANCE_ID="$(curl -sf http://169.254.169.254/latest/meta-data/instance-id)"
+  echo "Marking instance $${INSTANCE_ID} unhealthy in ASG"
+  aws autoscaling set-instance-health \
+    --instance-id "$${INSTANCE_ID}" \
+    --health-status Unhealthy
+fi
+EOF
+chmod +x /usr/local/bin/check-available-memory
+
+cat <<EOF > /etc/systemd/system/check-available-memory.service
+[Unit]
+Description=Check Available Memory and update ASG health accordingly
+
+[Service]
+Type=simple
+Restart=no
+ExecStart=/usr/local/bin/check-available-memory
+StandardError=journal
+StandardOutput=journal
+
+Environment=AWS_REGION=$${AWS_REGION}
+Environment=AWS_DEFAULT_REGION=$${AWS_DEFAULT_REGION}
+
+EOF
+
+cat <<EOF > /etc/systemd/system/check-available-memory.timer
+[Unit]
+Description=Timer for check-available-memory
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+
+systemctl daemon-reload
+systemctl enable check-available-memory.timer
+
 apt-get install --yes prometheus-node-exporter
 systemctl enable prometheus-node-exporter
 
