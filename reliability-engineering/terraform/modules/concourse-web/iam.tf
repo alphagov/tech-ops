@@ -83,6 +83,14 @@ resource "aws_iam_policy" "concourse_web" {
         "Resource": [
           "arn:aws:logs:*:*:*"
         ]
+      }, {
+        "Effect": "Allow",
+        "Action": [
+          "autoscaling:SetInstanceHealth"
+        ],
+        "Resource": [
+          "${aws_autoscaling_group.concourse_web.arn}"
+        ]
       }
     ]
   }
