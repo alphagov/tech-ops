@@ -89,6 +89,9 @@ scrape_configs:
         refresh_interval: 30s
         port: 9100
     relabel_configs:
+      - source_labels: [__meta_ec2_tag_Name]
+        regex: '^${deployment}-concourse.*'
+        action: keep
       - source_labels: [__meta_ec2_instance_id]
         target_label: instance
       - source_labels: [__meta_ec2_tag_Role]
