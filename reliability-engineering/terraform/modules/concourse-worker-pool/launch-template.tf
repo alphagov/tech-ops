@@ -72,4 +72,8 @@ resource "aws_launch_template" "concourse_worker" {
   tags = {
     Deployment = var.deployment
   }
+
+  depends_on = [
+    aws_iam_instance_profile.concourse_worker
+  ]
 }

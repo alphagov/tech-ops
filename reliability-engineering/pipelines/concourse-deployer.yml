@@ -6,7 +6,7 @@ resource_types:
   type: registry-image
   source:
     repository: ljfranklin/terraform-resource
-    tag: 0.13.5
+    tag: 0.14.4
 - name: pool
   type: registry-image
   source:
@@ -21,7 +21,7 @@ resources:
   icon: github
   type: git
   source:
-    branch: ((deployment_branch))
+    branch: ((deployment_branch_tech_ops_private))
     uri: git@github.com:alphagov/tech-ops-private.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
     paths:
@@ -32,7 +32,7 @@ resources:
   icon: github
   type: git
   source:
-    branch: ((deployment_branch))
+    branch: ((deployment_branch_tech_ops))
     tag_filter: ((deployment_tag))
     uri: git@github.com:alphagov/tech-ops.git
     private_key: ((re-autom8-ci-github-ssh-private-key))
@@ -57,7 +57,7 @@ resources:
     private_key: ((re-autom8-ci-github-ssh-private-key))
     backend_config:
       bucket: ((statefile_bucket))
-      region: eu-west-2
+      region: ((statefile_region))
       key: ((deployment_name)).tfstate
 - name: version
   type: semver
@@ -128,7 +128,9 @@ jobs:
       deployment_name: ((deployment_name))
       deployment_account_name: ((deployment_account_name))
       deployment_subdomain: ((deployment_subdomain))
-      deployment_branch: ((deployment_branch))
+      deployment_branch_tech_ops: ((deployment_branch_tech_ops))
+      deployment_branch_tech_ops_private: ((deployment_branch_tech_ops_private))
+      statefile_region: ((statefile_region))
       deployment_tag: ((deployment_tag))
       background_image: ((background_image))
       statefile_bucket: ((statefile_bucket))

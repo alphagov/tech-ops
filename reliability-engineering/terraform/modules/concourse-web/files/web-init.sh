@@ -16,7 +16,7 @@ echo "Downloading concourse binaries"
 concourse_archive="concourse-${concourse_version}-linux-amd64.tgz"
 concourse_url="https://github.com/concourse/concourse/releases/download/v${concourse_version}/$concourse_archive"
 cd /tmp
-echo '${concourse_sha1}' > concourse.sha1
+echo "${concourse_sha1}  $concourse_archive" > concourse.sha1
 curl -L --silent --fail "$concourse_url" > "$concourse_archive"
 sha1sum -c concourse.sha1
 echo "Concourse binaries ok and pass checksum"

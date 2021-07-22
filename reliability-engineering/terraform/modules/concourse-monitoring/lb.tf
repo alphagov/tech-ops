@@ -1,12 +1,12 @@
 resource "aws_lb" "concourse_monitoring" {
-  name               = "${var.deployment}-concourse-monitoring"
+  name               = "${var.deployment}-monitoring"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.concourse_monitoring_lb.id]
   subnets            = var.public_subnet_ids
 
   tags = {
-    Name       = "${var.deployment}-concourse-monitoring"
+    Name       = "${var.deployment}-monitoring"
     Deployment = var.deployment
   }
 }
@@ -77,7 +77,7 @@ resource "aws_lb_listener_rule" "concourse_prometheus_ecs" {
 resource "aws_lb_target_group" "concourse_prometheus" {
   count = 2
 
-  name     = "${var.deployment}-concourse-prometheus"
+  name     = "${var.deployment}-prometheus"
   port     = 9090
   protocol = "HTTP"
   vpc_id   = var.vpc_id

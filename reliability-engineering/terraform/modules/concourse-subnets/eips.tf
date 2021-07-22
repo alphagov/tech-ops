@@ -7,7 +7,7 @@ resource "aws_eip" "concourse_egress" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 

@@ -21,6 +21,8 @@ data "aws_iam_policy_document" "prometheus_data_volume_access" {
     }
 
     actions = [
+      "elasticfilesystem:DescribeFileSystemPolicy",
+      "elasticfilesystem:PutFileSystemPolicy",
       "elasticfilesystem:ClientMount",
       "elasticfilesystem:ClientWrite",
     ]
