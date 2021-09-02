@@ -22,6 +22,11 @@ variable "number_of_availability_zones" {
   default = 2
 }
 
+variable "deletion_protection" {
+  type = bool
+  default = true
+}
+
 data "aws_availability_zones" "available" {
 }
 
