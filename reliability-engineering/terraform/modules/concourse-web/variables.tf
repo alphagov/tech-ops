@@ -132,6 +132,11 @@ variable "concourse_sha1" {
   type = string
 }
 
+variable "deletion_protection" {
+  type = bool
+  default = true
+}
+
 data "aws_caller_identity" "account" {}
 
 locals {
