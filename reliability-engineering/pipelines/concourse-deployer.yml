@@ -45,7 +45,6 @@ resources:
       - reliability-engineering/pipelines/tasks/generate-deploy-info-pipelines-pipeline.yml
       - reliability-engineering/pipelines/tasks/generate-roll-instances-pipeline.yml
       - reliability-engineering/pipelines/tasks/sign-tag.yml
-      - reliability-engineering/pipelines/tasks/verify-tag.yml
       - reliability-engineering/pipelines/concourse-deployer.yml
       - reliability-engineering/dockerfiles/test.Dockerfile
 - name: infra
@@ -122,6 +121,54 @@ jobs:
     params:
       GPG_VERIFICATION_KEY: ((re-autom8-ci-github-gpg-private-key))
       GPG_VERIFICATION_TAG: ((deployment_tag))
+    config:
+      # this task definition MUST NOT be split out into a separate file
+      # unless it can be sourced from an already-verified copy of the repo
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: ghcr.io/alphagov/automate/task-toolbox
+          tag: latest
+      inputs:
+      - name: repository
+      params:
+        GPG_VERIFICATION_KEY:
+        GPG_VERIFICATION_TAG:
+      run:
+        path: sh
+        args:
+          - -euo
+          - pipefail
+          - -c
+          - |
+            echo "checking if we need to verify this tag..."
+            # also treat only-whitespace values of $GPG_VERIFICATION_TAG as empty
+            if [ -z "$(echo $GPG_VERIFICATION_TAG | tr -d '[:space:]')" ]; then
+              echo "+------------------------------------------------------------------+"
+              echo "| tag verification will be skipped as GPG_VERIFICATION_TAG not set |"
+              echo "+------------------------------------------------------------------+"
+              exit 0
+            fi
+            # also treat only-whitespace values of $GPG_VERIFICATION_KEY as empty
+            if [ -z "$(echo $GPG_VERIFICATION_KEY | tr -d '[:space:]')" ]; then
+              echo "+------------------------------------------------------------------+"
+              echo "| tag verification will be skipped as GPG_VERIFICATION_KEY not set |"
+              echo "+------------------------------------------------------------------+"
+              exit 0
+            fi
+            echo "configuring trusted keys..."
+            echo "${GPG_VERIFICATION_KEY}" > key
+            gpg --import key
+            export GPG_TTY=$(tty)
+            export TERM=xterm
+            echo "trusted keys..."
+            gpg --list-keys
+            echo "finding tag..."
+            cd repository
+            TAG=$(cat .git/ref)
+            echo "verifying $TAG signed by a trusted key..."
+            git tag -v "${TAG}"
   - set_pipeline: deploy
     file: tech-ops/reliability-engineering/pipelines/concourse-deployer.yml
     vars:
