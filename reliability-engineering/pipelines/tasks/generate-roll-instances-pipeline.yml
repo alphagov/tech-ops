@@ -6,6 +6,8 @@ image_resource:
     tag: dev
   version:
     digest: sha256:cd899511e06c3027dc8429f4b38ba8ea32a4c0bea044f4711899d5987abf8fdf
+inputs:
+- name: tech-ops
 outputs:
 - name: roll-instances-pipeline
 params:
@@ -20,15 +22,27 @@ run:
   - pipefail
   - -c
   - |
-    apk update && apk add jq
+    apk update && apk add jq && apk add yq
     mkdir -p roll-instances-pipeline
     export PATH="$PATH:/opt/resource"
+
+    # to avoid having to gpg-verify the tag of the tech-ops commit
+    # in the generated pipeline, we inline the task definitions into
+    # the pipeline so it doesn't need access to the repo at all.
+    #
+    # first we need to convert the yaml task definitions to json though...
+    mkdir -p tasks-json
+    for t in asg-scale-capacity concourse-get-workers concourse-land-workers; do
+      yq e '.' tech-ops/reliability-engineering/pipelines/tasks/${t}.yml -j \
+        > tasks-json/${t}.json
+    done
+
     fly -t concourse login -c "https://${DEPLOYMENT_NAME}${DEPLOYMENT_SUBDOMAIN}.gds-reliability.engineering" -u $FLY_USERNAME -p $FLY_PASSWORD -n $FLY_USERNAME
     fly -t concourse sync
     fly -t concourse teams --json | jq 'def rolltasks: [
       {
         "task": ("ensure-" + .name + "-team-workers-asg-scaled-in"),
-        "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+        "config": $asg_scale_capacity[0],
         "params": {
           "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .name + "-concourse-worker"),
           "SCALE_DIRECTION": "in",
@@ -37,7 +51,7 @@ run:
       },
       {
         "task": ("get-current-" + .name + "-team-workers"),
-        "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
+        "config": $concourse_get_workers[0],
         "params": {
           "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
           "DEPLOYMENT_SUBDOMAIN": ("((" + "deployment_subdomain" + "))"),
@@ -47,7 +61,7 @@ run:
       },
       {
         "task": ("scale-out-" + .name + "-team-workers-asg"),
-        "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+        "config": $asg_scale_capacity[0],
         "params": {
           "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .name + "-concourse-worker"),
           "SCALE_DIRECTION": "out"
@@ -55,7 +69,7 @@ run:
       },
       {
         "task": ("land-old-" + .name + "-team-workers"),
-        "file": "tech-ops/reliability-engineering/pipelines/tasks/concourse-land-workers.yml",
+        "config": $concourse_land_workers[0],
         "params": {
           "DEPLOYMENT_NAME": ("((" + "deployment_name" + "))"),
           "DEPLOYMENT_SUBDOMAIN": ("((" + "deployment_subdomain" + "))"),
@@ -65,7 +79,7 @@ run:
       },
       {
         "task": ("scale-in-" + .name + "-team-workers-asg"),
-        "file": "tech-ops/reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
+        "config": $asg_scale_capacity[0],
         "params": {
           "ASG_PREFIX": (("((" + "deployment_name" + "))") + "-" + .name + "-concourse-worker"),
           "SCALE_DIRECTION": "in",
@@ -89,22 +103,6 @@ run:
               "Friday"
             ]
           }
-        },
-        {
-          "name": "tech-ops",
-          "icon": "github",
-          "type": "git",
-          "source": {
-            "branch": ("((" + "deployment_branch" + "))"),
-            "tag_filter": ("((" + "deployment_tag" + "))"),
-            "uri": "git@github.com:alphagov/tech-ops.git",
-            "private_key": ("((" + "re-autom8-ci-github-ssh-private-key" + "))"),
-            "paths": [
-              "reliability-engineering/pipelines/tasks/asg-scale-capacity.yml",
-              "reliability-engineering/pipelines/tasks/concourse-get-workers.yml",
-              "reliability-engineering/pipelines/tasks/concourse-land-workers.yml"
-            ]
-          }
         }
       ],
       "jobs": ([
@@ -113,25 +111,18 @@ run:
           "serial": true,
           "plan": ([
             {
-              "in_parallel": [
-                {
-                  "get": "every-weekday-evening",
-                  "trigger": true
-                },
-                {
-                  "get": "tech-ops"
-                }
-              ]
+              "get": "every-weekday-evening",
+              "trigger": true
             }
           ] + [.[] | rolltasks | {"do": .}])
         }
       ] + [.[] | {
         "name": ("roll-" + .name + "-concourse-workers"),
         "serial": true,
-        "plan": ([
-          {
-            "get": "tech-ops"
-          }
-        ] + (. | rolltasks))
+        "plan": (. | rolltasks)
       }])
-    }' > roll-instances-pipeline/roll-instances.json
+    }' \
+      --slurpfile asg_scale_capacity tasks-json/asg-scale-capacity.json \
+      --slurpfile concourse_get_workers tasks-json/concourse-get-workers.json \
+      --slurpfile concourse_land_workers tasks-json/concourse-land-workers.json \
+      > roll-instances-pipeline/roll-instances.json
