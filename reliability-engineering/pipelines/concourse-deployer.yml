@@ -115,7 +115,6 @@ jobs:
       trigger: true
     - get: infra
   - task: verify-tech-ops-tag
-    file: tech-ops/reliability-engineering/pipelines/tasks/verify-tag.yml
     input_mapping:
       repository: tech-ops
     params:
