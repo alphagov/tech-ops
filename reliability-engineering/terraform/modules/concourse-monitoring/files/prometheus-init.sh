@@ -66,8 +66,11 @@ scrape_configs:
         refresh_interval: 30s
         port: 9090
     relabel_configs:
-      - source_labels: [__meta_ec2_tag_Name]
-        regex: '^${deployment}-concourse-prometheus$'
+      - source_labels: [__meta_ec2_tag_Deployment]
+        regex: '${deployment}'
+        action: keep
+      - source_labels: [__meta_ec2_tag_Role]
+        regex: 'prometheus'
         action: keep
       - source_labels: [__meta_ec2_instance_id]
         target_label: instance
@@ -89,8 +92,8 @@ scrape_configs:
         refresh_interval: 30s
         port: 9100
     relabel_configs:
-      - source_labels: [__meta_ec2_tag_Name]
-        regex: '^${deployment}-concourse.*'
+      - source_labels: [__meta_ec2_tag_Deployment]
+        regex: '${deployment}'
         action: keep
       - source_labels: [__meta_ec2_instance_id]
         target_label: instance
@@ -105,8 +108,11 @@ scrape_configs:
         refresh_interval: 30s
         port: 9391
     relabel_configs:
-      - source_labels: [__meta_ec2_tag_Name]
-        regex: '^${deployment}-concourse-web$'
+      - source_labels: [__meta_ec2_tag_Deployment]
+        regex: '${deployment}'
+        action: keep
+      - source_labels: [__meta_ec2_tag_Role]
+        regex: 'concourse-web'
         action: keep
       - source_labels: [__meta_ec2_instance_id]
         target_label: instance
