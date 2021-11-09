@@ -22,6 +22,10 @@ resource "aws_s3_bucket" "concourse_worker_private" {
   }
 }
 
+output "concourse_worker_private_s3_bucket_arn" {
+  value = aws_s3_bucket.concourse_worker_private.arn
+}
+
 resource "random_string" "concourse_worker_public_s3_bucket_offset" {
   length  = 6
   special = false
