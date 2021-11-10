@@ -35,6 +35,23 @@ resource "aws_iam_role" "gha_zendesk_scripts" {
   })
 }
 
+resource "aws_s3_bucket" "zendesk_deduplication_logs" {
+  bucket = "zendesk-dedup-logs"
+  acl    = "private"
+
+  versioning {
+    enabled = true
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
 
 resource "aws_iam_role_policy" "gha_zendesk_scripts" {
   name = "gha-zendesk-scripts-role-policy"
@@ -53,6 +70,8 @@ resource "aws_iam_role_policy" "gha_zendesk_scripts" {
           Resource = [
             "${var.zendesk_scripts_output_bucket}",
             "${var.zendesk_scripts_output_bucket}/*",
+            "${aws_s3_bucket.zendesk_deduplication_logs.arn}",
+            "${aws_s3_bucket.zendesk_deduplication_logs.arn}/*",
           ]
         }
       ]
