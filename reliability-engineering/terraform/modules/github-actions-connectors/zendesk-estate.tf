@@ -1,15 +1,3 @@
-resource "aws_iam_openid_connect_provider" "github_actions" {
-  url = "https://token.actions.githubusercontent.com"
-
-  client_id_list = [
-    "sts.amazonaws.com",
-  ]
-
-  thumbprint_list = [
-    "a031c46782e6e6c662c2c87c76da9aa62ccabd8e" # This is a magic string, if you want to know why its so magical read this -> https://stackoverflow.com/a/69247499
-  ]
-}
-
 resource "aws_iam_role" "gha_zendesk_scripts" {
   name = "${var.deployment}-gha-zendesk-scripts-role"
 
@@ -20,7 +8,7 @@ resource "aws_iam_role" "gha_zendesk_scripts" {
         {
           Effect = "Allow",
           Principal = {
-            Federated = aws_iam_openid_connect_provider.github_actions.arn
+            Federated = var.github_actions_openid_arn
           },
           Action = "sts:AssumeRoleWithWebIdentity",
           Condition = {
