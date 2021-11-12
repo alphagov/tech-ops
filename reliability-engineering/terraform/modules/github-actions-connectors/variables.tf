@@ -7,3 +7,7 @@ variable "github_oidc_claim" {
   description = "The OIDC Claim for the repo"
   default = "environment:development"  
 }
+
+variable "deployment" {
+  type = string
+}

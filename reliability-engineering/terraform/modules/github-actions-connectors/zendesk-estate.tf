@@ -11,7 +11,7 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
 }
 
 resource "aws_iam_role" "gha_zendesk_scripts" {
-  name = "gha-zendesk-scripts-role"
+  name = "${var.deployment}-gha-zendesk-scripts-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -36,7 +36,7 @@ resource "aws_iam_role" "gha_zendesk_scripts" {
 }
 
 resource "aws_s3_bucket" "zendesk_deduplication_logs" {
-  bucket = "zendesk-dedup-logs"
+  bucket = "${var.deployment}-zendesk-dedup-logs"
   acl    = "private"
 
   versioning {
@@ -54,7 +54,7 @@ resource "aws_s3_bucket" "zendesk_deduplication_logs" {
 
 
 resource "aws_iam_role_policy" "gha_zendesk_scripts" {
-  name = "gha-zendesk-scripts-role-policy"
+  name = "${var.deployment}-gha-zendesk-scripts-role-policy"
   role = aws_iam_role.gha_zendesk_scripts.id
 
   policy = jsonencode({
