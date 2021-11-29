@@ -39,4 +39,4 @@ jobs:
           push: true
           tags: |
             govsvc/octodns:latest
-            ghcr.io/govsvc/octodns:latest
+            ghcr.io/alphagov/octodns:latest
