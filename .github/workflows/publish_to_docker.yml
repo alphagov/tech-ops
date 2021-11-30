@@ -1,0 +1,98 @@
+name: Publish docker images
+
+on:
+  workflow_call:
+    inputs:
+      docker_context:
+        required: true
+        type: string
+      push_to_ghcr:
+        required: true
+        type: boolean
+      push_to_dockerhub:
+        required: true
+        type: boolean
+      docker_hub_repo:
+        required: false
+        default: false
+        type: string
+      ghcr_repo:
+        required: false
+        default: false
+        type: string
+      image_tag:
+        required: false
+        default: ""
+        type: string
+      
+    secrets:
+      dockerhub_username:
+        required: false
+      dockerhub_token:
+        required: false
+      ghcr_username:
+        required: false
+      ghcr_token:
+        required: false
+
+permissions:
+  contents: read
+  packages: write
+
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # 2.4.0
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@27d0a4f181a40b142cce983c5393082c365d1480 # v1.2.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@94ab11c41e45d028884a99163086648e898eed25 # v1.6.0
+      - name: Login to DockerHub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9 # v1.10.0
+        if: ${{ inputs.push_to_dockerhub }}
+        with:
+          username: ${{ secrets.dockerhub_username }}
+          password: ${{ secrets.dockerhub_token }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9 # v1.10.0
+        if: ${{ inputs.push_to_ghcr }}
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.ghcr_username }}
+          password: ${{ secrets.ghcr_token }}
+      - name: Construct tags string
+        id: tags
+        run: |
+          TAGS=""
+
+          if [ "${{ inputs.push_to_dockerhub }}" == "true" ]; then
+
+            TAGS="${{ inputs.docker_hub_repo }}:latest,"
+
+            if [ "${{ inputs.image_tag }}" != "" ]; then
+              TAGS="${TAGS}${{ inputs.docker_hub_repo }}:${{ inputs.image_tag }}"
+            fi
+          fi
+
+
+          if [ "${{ inputs.push_to_ghcr }}" == "true" ]; then
+
+            TAGS="${TAGS}${{ inputs.ghcr_repo }}:latest,"
+
+            if [ "${{ inputs.image_tag }}" != "" ]; then
+              TAGS="${TAGS}${{ inputs.ghcr_repo }}:${{ inputs.image_tag }},"
+            fi
+          fi
+
+          echo "::set-output name=tags::$TAGS"
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@a66e35b9cbcf4ad0ea91ffcaf7bbad63ad9e0229 # v2.7.0
+        with:
+          context: ${{ inputs.docker_context }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
