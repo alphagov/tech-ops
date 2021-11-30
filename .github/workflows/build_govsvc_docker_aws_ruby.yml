@@ -1,11 +1,11 @@
-name: govsvc concourse-task-toolbox
+name: govsvc aws-ruby
 
 on:
   push:
     branches:
       - 'master'
     paths:
-      - 'reliability-engineering/dockerfiles/govsvc/concourse-task-toolbox/**'
+      - 'reliability-engineering/dockerfiles/govsvc/aws-ruby/**'
 
   workflow_dispatch:
     inputs:
@@ -18,11 +18,15 @@ jobs:
   build-and-push:
     uses: alphagov/tech-ops/.github/workflows/publish_to_docker.yml@master
     with:
-      docker_context: ./reliability-engineering/dockerfiles/govsvc/concourse-task-toolbox
+      docker_context: ./reliability-engineering/dockerfiles/govsvc/aws-ruby
       push_to_ghcr: true
-      push_to_dockerhub: false
-      ghcr_repo: ghcr.io/alphagov/automate/task-toolbox
+      push_to_dockerhub: true
+      docker_hub_repo: govsvc/aws-ruby
+      ghcr_repo: ghcr.io/alphagov/aws-ruby
       image_tag: ${{ github.event.inputs.image_tag }}
     secrets:
+      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }} 
       ghcr_username: ${{ secrets.GHCR_USERNAME }}
       ghcr_token: ${{ secrets.CHCR_TOKEN }}
+                      
