@@ -1,14 +1,19 @@
-ARG ubuntu_digest
-ARG terraform_digest
-ARG terraform_version
+FROM hashicorp/terraform:1.2.0 as terraform
+FROM ubuntu:20.04
 
-FROM hashicorp/terraform@${terraform_digest} as terraform
-FROM ubuntu@${ubuntu_digest}
+LABEL terraform="1.2.0"
 
-LABEL terraform="${terraform_version}"
+ARG APT_GET_DEPENDENCIES="\
+ awscli \
+ curl \
+ dnsutils \
+ git \
+ jq \
+ unzip \
+"
 
-RUN apt-get update  --yes && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes awscli jq curl dnsutils unzip git
+RUN apt update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
+RUN apt upgrade -y && TZ=Etc/UTC apt install --no-install-recommends -y ${APT_GET_DEPENDENCIES} && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
 
