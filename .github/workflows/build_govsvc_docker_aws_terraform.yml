@@ -13,18 +13,6 @@ on:
         description: "Tag used within docker repository to mark as unique"
         required: false
         type: string
-      terraform_version:
-        description: "Terraform version to be used"
-        required: true
-        type: string
-      terraform_digest:
-        description: "Terraform SHA of the version to be used"
-        required: true
-        type: string
-      ubuntu_digest:
-        description: "Ubuntu SHA of the version to be used"
-        required: true
-        type: string
 
 jobs:
   build-and-push:
@@ -38,7 +26,3 @@ jobs:
     secrets:
       ghcr_username: ${{ secrets.GHCR_USERNAME }}
       ghcr_token: ${{ secrets.CHCR_TOKEN }}
-    build-args:
-      terraform_version: ${{ github.event.inputs.terraform_version }}
-      terraform_digest: ${{ github.event.inputs.terraform_digest }}
-      ubuntu_digest: ${{ github.event.inputs.ubuntu_digest }}
