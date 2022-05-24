@@ -1,14 +1,5 @@
 # default owners
-* @alphagov/re-common-cloud @alphagov/re-autom8 @alphagov/reliability-engineering
-
-# shared concourse owners
-# parts of the reliability-engineering terraform control deployment of the
-# shared concourse infrastructure and as such require approval from a smaller
-# subset of maintainers, in the future we may implement an alternative method
-# enforcing this policy that relaxes this requirement
-reliability-engineering/pipelines/concourse-deployer.yml @alphagov/re-common-cloud
-reliability-engineering/pipelines/tasks/* @alphagov/re-common-cloud
-reliability-engineering/terraform/modules/concourse-* @alphagov/re-common-cloud
+* @alphagov/re-autom8 @alphagov/reliability-engineering
 
 # cyber security owners
 /cyber-security/ @alphagov/reliability-engineering @alphagov/team-cybersecurity
