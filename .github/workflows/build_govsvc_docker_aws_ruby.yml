@@ -21,12 +21,12 @@ jobs:
       docker_context: ./reliability-engineering/dockerfiles/govsvc/aws-ruby
       push_to_ghcr: true
       push_to_dockerhub: true
-      docker_hub_repo: govsvc/aws-ruby
+      docker_hub_repo: governmentdigitalservice/aws-ruby
       ghcr_repo: ghcr.io/alphagov/aws-ruby
       image_tag: ${{ github.event.inputs.image_tag }}
     secrets:
-      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
-      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }} 
+      dockerhub_username: ${{ secrets.BOT_DOCKERHUB_USERNAME }}
+      dockerhub_token: ${{ secrets.BOT_DOCKERHUB_TOKEN }} 
       ghcr_username: ${{ secrets.GHCR_USERNAME }}
       ghcr_token: ${{ secrets.CHCR_TOKEN }}
                       
