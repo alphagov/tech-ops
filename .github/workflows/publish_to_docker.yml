@@ -58,8 +58,8 @@ jobs:
         uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # v2.0.0
         if: ${{ inputs.push_to_dockerhub }}
         with:
-          username: ${{ secrets.bot_dockerhub_username }}
-          password: ${{ secrets.bot_dockerhub_token }}
+          username: ${{ secrets.dockerhub_username }}
+          password: ${{ secrets.dockerhub_token }}
       - name: Login to GitHub Container Registry
         uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # v2.0.0
         if: ${{ inputs.push_to_ghcr }}
