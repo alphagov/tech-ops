@@ -22,5 +22,5 @@ jobs:
       dockerhub_username: ${{ secrets.BOT_DOCKERHUB_USERNAME }}
       dockerhub_token: ${{ secrets.BOT_DOCKERHUB_TOKEN }} 
       ghcr_username: ${{ secrets.GHCR_USERNAME }}
-      ghcr_token: ${{ secrets.CHCR_TOKEN }}
+      ghcr_token: ${{ secrets.GHCR_TOKEN }}
                       
