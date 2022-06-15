@@ -16,11 +16,11 @@ jobs:
       docker_context: ./reliability-engineering/dockerfiles/govsvc/octodns
       push_to_ghcr: true
       push_to_dockerhub: true
-      docker_hub_repo: govsvc/octodns
+      docker_hub_repo: governmentdigitalservice/octodns
       ghcr_repo: ghcr.io/alphagov/octodns
     secrets:
-      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
-      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }} 
+      dockerhub_username: ${{ secrets.BOT_DOCKERHUB_USERNAME }}
+      dockerhub_token: ${{ secrets.BOT_DOCKERHUB_TOKEN }} 
       ghcr_username: ${{ secrets.GHCR_USERNAME }}
       ghcr_token: ${{ secrets.CHCR_TOKEN }}
                       

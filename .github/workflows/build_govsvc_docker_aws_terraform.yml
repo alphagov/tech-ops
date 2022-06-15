@@ -23,9 +23,12 @@ jobs:
     with:
       docker_context: ./reliability-engineering/dockerfiles/govsvc/aws-terraform
       push_to_ghcr: true
-      push_to_dockerhub: false
+      push_to_dockerhub: true
+      docker_hub_repo: governmentdigitalservice/aws-terraform
       ghcr_repo: ghcr.io/alphagov/aws-terraform
       image_tag: ${{ github.event.inputs.image_tag }}
     secrets:
+      dockerhub_username: ${{ secrets.BOT_DOCKERHUB_USERNAME }}
+      dockerhub_token: ${{ secrets.BOT_DOCKERHUB_TOKEN }}
       ghcr_username: ${{ secrets.GHCR_CI_USERNAME }}
       ghcr_token: ${{ secrets.GHCR_TOKEN }}

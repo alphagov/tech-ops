@@ -22,10 +22,10 @@ jobs:
       push_to_ghcr: true
       push_to_dockerhub: true
       ghcr_repo: ghcr.io/alphagov/automate/task-toolbox
-      docker_hub_repo: govsvc/task-toolbox
+      docker_hub_repo: governmentdigitalservice/task-toolbox
       image_tag: ${{ github.event.inputs.image_tag }}
     secrets:
       ghcr_username: ${{ secrets.GHCR_USERNAME }}
       ghcr_token: ${{ secrets.CHCR_TOKEN }}
-      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
-      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }} 
+      dockerhub_username: ${{ secrets.BOT_DOCKERHUB_USERNAME }}
+      dockerhub_token: ${{ secrets.BOT_DOCKERHUB_TOKEN }} 

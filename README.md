@@ -12,24 +12,24 @@ Pipeline runs will have to be approved by a trusted person that is in the `re-au
 #### AWSC
 [:rocket: Github Action](https://github.com/alphagov/tech-ops/actions/workflows/build_govsvc_docker_awsc.yml)
 [:octocat: GHCR Repo](https://github.com/orgs/alphagov/packages/container/package/awsc)
-[:whale: Dockerhub Repo](https://hub.docker.com/r/govsvc/awsc)
+[:whale: Dockerhub Repo](https://hub.docker.com/r/governmentdigitalservice/awsc)
 
 #### AWS Terraform
 [:rocket: Github Action](https://github.com/alphagov/tech-ops/actions/workflows/build_govsvc_docker_aws_terraform.yml)
 [:octocat: GHCR Repo](https://github.com/orgs/alphagov/packages/container/package/aws-terraform)
-[:whale: Dockerhub Repo](https://hub.docker.com/r/govsvc/aws-terraform)
+[:whale: Dockerhub Repo](https://hub.docker.com/r/governmentdigitalservice/aws-terraform)
 
 #### AWS Ruby
 [:rocket: Github Action](https://github.com/alphagov/tech-ops/actions/workflows/build_govsvc_docker_aws_ruby.yml)
 [:octocat: GHCR Repo](https://github.com/orgs/alphagov/packages/container/package/aws-ruby)
-[:whale: Dockerhub Repo](https://hub.docker.com/r/govsvc/aws-ruby)
+[:whale: Dockerhub Repo](https://hub.docker.com/r/governmentdigitalservice/aws-ruby)
 
 #### OctoDNS
 [:rocket: Github Action](https://github.com/alphagov/tech-ops/actions/workflows/build_govsvc_docker_octodns.yml)
 [:octocat: GHCR Repo](https://github.com/orgs/alphagov/packages/container/package/octodns)
-[:whale: Dockerhub Repo](https://hub.docker.com/r/govsvc/octodns)
+[:whale: Dockerhub Repo](https://hub.docker.com/r/ggovernmentdigitalservice/octodns)
 
 #### Autom8 Task Toolbox
 [:rocket: Github Action](https://github.com/alphagov/tech-ops/actions/workflows/build_govsvc_docker_concourse_task_toolbox.yml)
 [:octocat: GHCR Repo](https://github.com/orgs/alphagov/packages/container/package/automate%2Ftask-toolbox)
-[:whale: Dockerhub Repo](https://hub.docker.com/r/govsvc/task-toolbox)
+[:whale: Dockerhub Repo](https://hub.docker.com/r/governmentdigitalservice/task-toolbox)
