@@ -1,10 +1,10 @@
-FROM ruby:2.6.1
+FROM ruby:3.1.2
 
-LABEL ruby="2.6.1"
-LABEL aws="3.0.1"
+LABEL ruby="3.1.2"
+LABEL aws="3.1.0"
 LABEL user="govsvc"
 LABEL repo="aws-ruby"
 
-RUN gem install aws-sdk:3.0.1
+RUN gem install aws-sdk:3.1.0
 
 ENTRYPOINT ["ruby"]
