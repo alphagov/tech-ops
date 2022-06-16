@@ -27,7 +27,7 @@ Pipeline runs will have to be approved by a trusted person that is in the `re-au
 #### OctoDNS
 [:rocket: Github Action](https://github.com/alphagov/tech-ops/actions/workflows/build_govsvc_docker_octodns.yml)
 [:octocat: GHCR Repo](https://github.com/orgs/alphagov/packages/container/package/octodns)
-[:whale: Dockerhub Repo](https://hub.docker.com/r/ggovernmentdigitalservice/octodns)
+[:whale: Dockerhub Repo](https://hub.docker.com/r/governmentdigitalservice/octodns)
 
 #### Autom8 Task Toolbox
 [:rocket: Github Action](https://github.com/alphagov/tech-ops/actions/workflows/build_govsvc_docker_concourse_task_toolbox.yml)
