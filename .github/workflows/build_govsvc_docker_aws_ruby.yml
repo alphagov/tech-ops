@@ -16,6 +16,9 @@ on:
 
 jobs:
   build-and-push:
+    permissions:
+      contents: read
+      packages: write
     uses: alphagov/tech-ops/.github/workflows/publish_to_docker.yml@master
     with:
       docker_context: ./reliability-engineering/dockerfiles/govsvc/aws-ruby
