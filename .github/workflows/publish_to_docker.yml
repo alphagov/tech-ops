@@ -77,7 +77,7 @@ jobs:
             TAGS="${{ inputs.docker_hub_repo }}:latest,"
 
             if [ "${{ inputs.image_tag }}" != "" ]; then
-              TAGS="${TAGS}${{ inputs.docker_hub_repo }}:${{ inputs.image_tag }}"
+              TAGS="${TAGS}${{ inputs.docker_hub_repo }}:${{ inputs.image_tag }},"
             fi
           fi
 
