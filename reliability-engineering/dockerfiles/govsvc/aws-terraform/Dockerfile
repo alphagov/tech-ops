@@ -1,7 +1,7 @@
-FROM hashicorp/terraform:1.2.3 as terraform
+FROM hashicorp/terraform:1.2.7 as terraform
 FROM ubuntu:20.04
 
-LABEL terraform="1.2.0"
+LABEL terraform="1.2.7"
 
 ARG APT_GET_DEPENDENCIES="\
  awscli \
