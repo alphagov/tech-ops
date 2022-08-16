@@ -10,10 +10,8 @@ data "aws_ami" "ubuntu_focal" {
   }
 }
 
-data "template_file" "concourse_prometheus_cloud_init" {
-  template = file("${path.module}/files/prometheus-init.sh")
-
-  vars = {
+variable concourse_prometheus_cloud_init {
+  default = {
     deployment       = var.deployment
     data_volume_size = var.prometheus_volume_size
   }
@@ -35,7 +33,7 @@ resource "aws_instance" "concourse_prometheus" {
 
   iam_instance_profile = aws_iam_instance_profile.concourse_prometheus.name
 
-  user_data = data.template_file.concourse_prometheus_cloud_init.rendered
+  user_data = templatefile("${path.module}/files/prometheus-init.sh", var.concourse_prometheus_cloud_init)
 
   root_block_device {
     volume_size = 20

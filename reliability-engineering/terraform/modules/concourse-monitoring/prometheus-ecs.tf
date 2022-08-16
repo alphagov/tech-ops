@@ -1,11 +1,3 @@
-data "template_file" "concourse_prometheus_config" {
-  template = file("${path.module}/files/prometheus.yml")
-
-  vars = {
-    deployment = var.deployment
-  }
-}
-
 resource "aws_cloudwatch_log_group" "prometheus" {
   name = "${var.deployment}-prometheus"
 }
@@ -16,20 +8,18 @@ locals {
 
 data "aws_region" "current" {}
 
-data "template_file" "prometheus_task_definition" {
-  template = file("${path.module}/files/prometheus-task-definition.json")
-  vars = {
-    data_volume_name             = local.data_volume_name
-    log_group_name               = aws_cloudwatch_log_group.prometheus.name
-    log_group_region             = data.aws_region.current.name
-    config_base64                = base64encode(data.template_file.concourse_prometheus_config.rendered)
+variable prometheus_vars {
+  default = {
+    data_volume_name = local.data_volume_name,
+    log_group_name = aws_cloudwatch_log_group.prometheus.name,
+    log_group_region = data.aws_region.current.name,
+    config_base64 = base64encode(templatefile("${path.module}/files/prometheus.yml", {deployment = var.deployment})),
     prometheus_entrypoint_base64 = base64encode(file("${path.module}/files/prometheus-entrypoint.sh"))
   }
 }
-
 resource "aws_ecs_task_definition" "prometheus" {
   family                   = "${var.deployment}-prometheus"
-  container_definitions    = data.template_file.prometheus_task_definition.rendered
+  container_definitions    = templatefile("${path.module}/files/prometheus-task-definition.json", var.prometheus_vars)
   requires_compatibilities = ["FARGATE"]
   cpu                      = 512
   memory                   = 1024

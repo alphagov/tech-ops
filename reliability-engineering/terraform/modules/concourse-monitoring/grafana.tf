@@ -49,10 +49,8 @@ resource "aws_db_instance" "concourse_grafana_db" {
   ca_cert_identifier        = "rds-ca-2019"
 }
 
-data "template_file" "concourse_grafana_container_def" {
-  template = file("${path.module}/files/grafana-container-def.json")
-
-  vars = {
+variable concourse_grafana_container_def {
+  default = {
     deployment                   = var.deployment
     grafana_url                  = local.grafana_url
     database_host                = aws_db_instance.concourse_grafana_db.endpoint
@@ -63,7 +61,7 @@ data "template_file" "concourse_grafana_container_def" {
 
 resource "aws_ecs_task_definition" "concourse_grafana_task_def" {
   family                   = "${var.deployment}-concourse-grafana"
-  container_definitions    = data.template_file.concourse_grafana_container_def.rendered
+  container_definitions    = templatefile("${path.module}/files/grafana-container-def.json" var.concourse_grafana_container_def)
   execution_role_arn       = aws_iam_role.concourse_grafana_execution.arn
   task_role_arn            = aws_iam_role.concourse_grafana_task.arn
   network_mode             = "awsvpc"
