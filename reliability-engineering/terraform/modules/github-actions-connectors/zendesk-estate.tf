@@ -56,9 +56,9 @@ resource "aws_iam_role_policy" "gha_zendesk_scripts" {
           ]
           Effect = "Allow"
           Resource = [
-            "${var.zendesk_scripts_output_bucket}",
+            var.zendesk_scripts_output_bucket,
             "${var.zendesk_scripts_output_bucket}/*",
-            "${aws_s3_bucket.zendesk_deduplication_logs.arn}",
+            aws_s3_bucket.zendesk_deduplication_logs.arn,
             "${aws_s3_bucket.zendesk_deduplication_logs.arn}/*",
           ]
         }
