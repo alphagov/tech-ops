@@ -6,7 +6,7 @@ resource_types:
   type: registry-image
   source:
     repository: ljfranklin/terraform-resource
-    tag: 0.13.5
+    tag: 1.2.7
 - name: pool
   type: registry-image
   source:
