@@ -22,6 +22,7 @@ run:
   - pipefail
   - -c
   - |
+    apk add -X https://dl-cdn.alpinelinux.org/alpine/v3.16/main -u alpine-keys
     apk update && apk add jq && apk add yq
     mkdir -p roll-instances-pipeline
     export PATH="$PATH:/opt/resource"
