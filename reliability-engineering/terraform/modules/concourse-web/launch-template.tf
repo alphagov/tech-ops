@@ -10,20 +10,18 @@ data "aws_ami" "ubuntu_focal" {
   }
 }
 
-data "template_file" "concourse_web_cloud_init" {
-  template = file("${path.module}/files/web-init.sh")
-
-  vars = {
-    deployment                              = var.deployment
-    main_team_github_team                   = var.main_team_github_team
-    main_team_pipeline_operator_github_team = var.main_team_pipeline_operator_github_team
-    concourse_external_url                  = aws_route53_record.concourse_public_deployment.fqdn
-    concourse_db_url                        = aws_route53_record.concourse_private_db.fqdn
-    concourse_version                       = var.concourse_version
-    concourse_sha1                          = var.concourse_sha1
-    concourse_web_bucket                    = aws_s3_bucket.concourse_web.bucket
-    worker_keys_s3_object_key               = aws_s3_bucket_object.concourse_web_team_authorized_worker_keys.id
-    concourse_web_syslog_log_group_name     = local.concourse_web_syslog_log_group_name
+variable concourse_web_vars {
+  default = {
+    deployment = var.deployment,
+    main_team_github_team = var.main_team_github_team,
+    main_team_pipeline_operator_github_team = var.main_team_pipeline_operator_github_team,
+    concourse_external_url = aws_route53_record.concourse_public_deployment.fqdn,
+    concourse_db_url = aws_route53_record.concourse_private_db.fqdn,
+    concourse_version  = var.concourse_version,
+    concourse_sha1 = var.concourse_sha1,
+    concourse_web_bucket = aws_s3_bucket.concourse_web.bucket,
+    worker_keys_s3_object_key = aws_s3_bucket_object.concourse_web_team_authorized_worker_keys.id,
+    concourse_web_syslog_log_group_name = local.concourse_web_syslog_log_group_name,
   }
 }
 
@@ -38,7 +36,7 @@ resource "aws_launch_template" "concourse_web" {
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.concourse_web.id]
 
-  user_data = base64encode(data.template_file.concourse_web_cloud_init.rendered)
+  user_data = base64encode(templatefilefile("${path.module}/files/web-init.sh", var.concourse_web_vars))
 
   block_device_mappings {
     device_name = "/dev/sda1"

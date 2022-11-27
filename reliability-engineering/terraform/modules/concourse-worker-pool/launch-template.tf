@@ -10,15 +10,13 @@ data "aws_ami" "ubuntu_focal" {
   }
 }
 
-data "template_file" "concourse_worker_cloud_init" {
-  template = file("${path.module}/files/worker-init.sh")
-
-  vars = {
-    deployment            = var.deployment
-    worker_team_name      = var.name
-    concourse_host        = local.concourse_url
-    concourse_version     = var.concourse_version
-    concourse_sha1        = var.concourse_sha1
+variable concourse_worker_vars {
+  default = {
+    deployment = var.deployment,
+    worker_team_name = var.name,
+    concourse_host = local.concourse_url,
+    concourse_version = var.concourse_version,
+    concourse_sha1 = var.concourse_sha1,
     syslog_log_group_name = "/${var.deployment}/concourse/worker"
   }
 }
@@ -30,7 +28,7 @@ resource "aws_launch_template" "concourse_worker" {
   instance_type          = var.instance_type
   vpc_security_group_ids = var.security_group_ids
 
-  user_data = base64encode(data.template_file.concourse_worker_cloud_init.rendered)
+  user_data = base64encode(templatefile("${path.module}/files/worker-init.sh", var.concourse_worker_vars ))
 
   block_device_mappings {
     device_name = "/dev/sda1"
