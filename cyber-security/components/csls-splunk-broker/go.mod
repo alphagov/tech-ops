@@ -13,8 +13,7 @@ require (
 	github.com/alphagov/paas-service-broker-base v0.7.0
 	github.com/apex/gateway v1.1.1
 	github.com/aws/aws-lambda-go v1.15.0 // indirect
-	github.com/aws/aws-sdk-go v1.29.20
-	github.com/google/uuid v1.1.1
+	github.com/aws/aws-sdk-go v1.34.0
 	github.com/influxdata/go-syslog/v3 v3.0.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
 	github.com/onsi/ginkgo v1.12.0
